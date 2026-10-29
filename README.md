@@ -155,11 +155,6 @@ and Bluetooth.
   0.2 s on a Mac. The first run on a new Inkscape profile can take much longer
   while fonts are indexed. Converting the text yourself (**Path → Object to
   Path**) skips this step.
-- **Inkscape crashes as soon as any extension runs on macOS.** This happens if
-  Inkscape was started from a terminal with a very high open-files limit
-  (`ulimit -n`). GLib, which Inkscape uses to start extensions, runs out of stack
-  while walking every possible file descriptor. Start Inkscape from the Dock or
-  Finder instead, or run `ulimit -n 10240` first.
 - **Nothing happens on the cutter.** Check that it's online, try the
   50 mm square test above, and set **Send through: File** to look at what
   CutScape produces.
