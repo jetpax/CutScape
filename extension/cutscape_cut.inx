@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Cut</name>
+  <id>io.github.jetpax.cutscape.cut</id>
+  <param name="action" type="optiongroup" appearance="radio" gui-text="Apply will:">
+    <option value="preview">Preview the toolpath on the canvas</option>
+    <option value="send">Send to the cutter</option>
+    <option value="clear">Remove the preview</option>
+  </param>
+  <param name="tab" type="notebook">
+    <page name="cut" gui-text="Cut">
+      <label>Cuts the selection, or the whole drawing if nothing is selected.</label>
+      <param name="speed" type="int" min="0" max="1000" gui-text="Speed (cm/s):" gui-description="0 leaves the cutter's own setting">0</param>
+      <param name="force" type="int" min="0" max="2000" gui-text="Force (g):" gui-description="0 leaves the cutter's own setting">0</param>
+      <param name="passes" type="int" min="1" max="20" gui-text="Passes:" gui-description="Cut each path this many times; closed paths are cut as one continuous loop">1</param>
+      <param name="overcut" type="float" min="0" max="20" precision="2" gui-text="Overcut (mm):" gui-description="Continue past the start of closed paths so the cut meets cleanly">1.00</param>
+      <param name="blade_offset" type="float" min="0" max="5" precision="2" gui-text="Blade offset (mm):" gui-description="Drag-knife tip offset; typically 0.25 for a 45° blade, 0.5 for 60°. Leave at 0 if the cutter compensates itself">0.00</param>
+      <param name="blade_cutoff" type="float" min="0" max="90" precision="1" gui-text="Swivel above (°):" gui-description="Corners sharper than this get a swivel arc when blade offset is on">5.0</param>
+      <param name="order" type="optiongroup" appearance="combo" gui-text="Order:">
+        <option value="inside">Inside shapes first, shortest travel</option>
+        <option value="nearest">Shortest travel</option>
+        <option value="document">As drawn</option>
+      </param>
+      <param name="tolerance" type="float" min="0.01" max="1" precision="2" gui-text="Curve tolerance (mm):" gui-description="Largest distance a cut may stray from a curve">0.05</param>
+    </page>
+    <page name="material" gui-text="Material">
+      <label>x runs across the material, y along the feed.</label>
+      <param name="width" type="float" min="0" max="10000" precision="1" gui-text="Width (mm):" gui-description="0 uses the device's width">0</param>
+      <param name="length" type="float" min="0" max="100000" precision="1" gui-text="Length (mm):" gui-description="0 for a roll">0</param>
+      <param name="auto_align" type="bool" gui-text="Move the job to the origin" gui-description="Otherwise it keeps its place relative to the page's bottom-left corner">true</param>
+      <param name="margin_x" type="float" min="0" max="1000" precision="1" gui-text="Margin x (mm):">0</param>
+      <param name="margin_y" type="float" min="0" max="1000" precision="1" gui-text="Margin y (mm):">0</param>
+      <param name="rotate" type="bool" gui-text="Rotate 90°">false</param>
+      <param name="mirror" type="bool" gui-text="Mirror (heat transfer vinyl)">false</param>
+      <separator/>
+      <param name="copies" type="int" min="1" max="1000" gui-text="Copies:">1</param>
+      <param name="spacing" type="float" min="0" max="1000" precision="1" gui-text="Spacing between copies (mm):">5</param>
+      <param name="weedline" type="bool" gui-text="Weed line around the job">false</param>
+      <param name="weedline_padding" type="float" min="0" max="100" precision="1" gui-text="Weed line padding (mm):">5</param>
+      <separator/>
+      <param name="prefeed" type="bool" gui-text="Pre-feed the job's length first" gui-description="Pull the material through and back before cutting so a roll tracks straight">false</param>
+      <param name="feed" type="float" min="0" max="10000" precision="1" gui-text="Feed past the job afterwards (mm):" gui-description="0 returns the head to the origin">0</param>
+    </page>
+    <page name="device" gui-text="Device">
+      <param name="preset" type="optiongroup" appearance="combo" gui-text="Cutter:">
+        <option value="custom">Custom (settings below)</option>
+        <option translatable="no" value="ANAgraph AE-70e">ANAgraph AE-70e</option>
+        <option translatable="no" value="Creation PCut CT-630">Creation PCut CT-630</option>
+        <option translatable="no" value="GCC Bobcat 60">GCC Bobcat 60</option>
+        <option translatable="no" value="Graphtec 8000-130">Graphtec 8000-130</option>
+        <option translatable="no" value="Graphtec CE5000-60">Graphtec CE5000-60</option>
+        <option translatable="no" value="Ioline Classic">Ioline Classic</option>
+        <option translatable="no" value="KNK ACS Eagle/Maxx">KNK ACS Eagle/Maxx</option>
+        <option translatable="no" value="Mimaki CG-60ST">Mimaki CG-60ST</option>
+        <option translatable="no" value="Redsail RS1360C">Redsail RS1360C</option>
+        <option translatable="no" value="Rheinstern LB-720A">Rheinstern LB-720A</option>
+        <option translatable="no" value="Roland CM-24">Roland CM-24</option>
+        <option translatable="no" value="Roland CX-24">Roland CX-24</option>
+        <option translatable="no" value="Roland PNC-900">Roland PNC-900</option>
+        <option translatable="no" value="Roland PNC-950">Roland PNC-950</option>
+        <option translatable="no" value="Roland PNC-1000">Roland PNC-1000</option>
+        <option translatable="no" value="Roland Stika SV-8">Roland Stika SV-8</option>
+        <option translatable="no" value="Roland Stika SV-12">Roland Stika SV-12</option>
+        <option translatable="no" value="Roland Stika SV-15">Roland Stika SV-15</option>
+        <option translatable="no" value="Secabo C60 II / C IV">Secabo C60 II / C IV</option>
+        <option translatable="no" value="SeikiTech SK-870T">SeikiTech SK-870T</option>
+        <option translatable="no" value="Sekonic SPL-450">Sekonic SPL-450</option>
+        <option translatable="no" value="Silhouette Cameo 4">Silhouette Cameo 4</option>
+        <option translatable="no" value="Silhouette Cameo 4 Plus">Silhouette Cameo 4 Plus</option>
+        <option translatable="no" value="Silhouette Portrait">Silhouette Portrait</option>
+        <option translatable="no" value="Summa D760">Summa D760</option>
+        <option translatable="no" value="Summa D120R">Summa D120R</option>
+        <option translatable="no" value="Summa T600">Summa T600</option>
+        <option translatable="no" value="US Cutter Laser Point">US Cutter Laser Point</option>
+        <option translatable="no" value="US Cutter Refine MH-721">US Cutter Refine MH-721</option>
+        <option translatable="no" value="US Cutter Refine MH-1351">US Cutter Refine MH-1351</option>
+        <option translatable="no" value="VEVOR KH-720">VEVOR KH-720</option>
+        <option translatable="no" value="VEVOR KH-870">VEVOR KH-870</option>
+        <option translatable="no" value="VEVOR Smart 1">VEVOR Smart 1</option>
+        <option translatable="no" value="Vision VE-810 engraver">Vision VE-810 engraver</option>
+      </param>
+      <label>With a cutter chosen, only Tool and the HPGL options below apply.</label>
+      <param name="protocol" type="optiongroup" appearance="combo" gui-text="Language:">
+        <option value="hpgl">HPGL</option>
+        <option value="dmpl">DMPL</option>
+        <option value="gpgl">GP-GL (Graphtec, Silhouette)</option>
+        <option value="camm-gl1">CAMM-GL I (Roland)</option>
+        <option value="gcode">G-code</option>
+      </param>
+      <param name="dmpl_mode" type="optiongroup" appearance="combo" gui-text="DMPL dialect:">
+        <option value="1">1: ;:HAEC1 (0.001 in)</option>
+        <option value="2">2: ;:ECN A L0 (0.025 mm)</option>
+        <option value="3">3: ;:H A L0</option>
+        <option value="4">4: ;:H A L0</option>
+        <option value="6">6: IN;PA;</option>
+        <option value="7">7: Creation PCut</option>
+      </param>
+      <param name="steps_x" type="float" min="0" max="1000" precision="3" gui-text="Steps per mm, x:" gui-description="0 uses the language's default: 40 for HPGL/DMPL, 20 for GP-GL">0</param>
+      <param name="steps_y" type="float" min="0" max="1000" precision="3" gui-text="Steps per mm, y:" gui-description="0 uses the same as x">0</param>
+      <param name="swap_xy" type="bool" gui-text="Swap axes">false</param>
+      <param name="invert_x" type="bool" gui-text="Invert x">false</param>
+      <param name="invert_y" type="bool" gui-text="Invert y">false</param>
+      <separator/>
+      <param name="pen" type="int" min="0" max="99" gui-text="Tool:" gui-description="Pen or tool number; 0 sends none">1</param>
+      <param name="hpgl_newline" type="bool" gui-text="HPGL: newline after each command">false</param>
+      <param name="hpgl_separate_z" type="bool" gui-text="HPGL: separate pen up/down from moves">false</param>
+    </page>
+    <page name="connection" gui-text="Connection">
+      <param name="transport" type="optiongroup" appearance="radio" gui-text="Send through:">
+        <option value="printer">Printer queue (CUPS or Windows)</option>
+        <option value="device">Device file</option>
+        <option value="serial">Serial port</option>
+        <option value="file">File</option>
+      </param>
+      <param name="printer" type="string" gui-text="Printer queue:" gui-description="A raw queue; leave empty to list the available ones"></param>
+      <param name="device" type="string" gui-text="Device file:" gui-description="eg /dev/usb/lp0 for a USB cutter on Linux">/dev/usb/lp0</param>
+      <param name="port" type="string" gui-text="Serial port:" gui-description="eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3"></param>
+      <param name="baud" type="optiongroup" appearance="combo" gui-text="Baud rate:">
+        <option translatable="no" value="9600">9600</option>
+        <option translatable="no" value="19200">19200</option>
+        <option translatable="no" value="38400">38400</option>
+        <option translatable="no" value="57600">57600</option>
+        <option translatable="no" value="115200">115200</option>
+        <option translatable="no" value="4800">4800</option>
+        <option translatable="no" value="2400">2400</option>
+      </param>
+      <param name="flow" type="optiongroup" appearance="combo" gui-text="Flow control:">
+        <option value="xonxoff">Software (XON/XOFF)</option>
+        <option value="rtscts">Hardware (RTS/CTS)</option>
+        <option value="dsrdtr">Hardware (DSR/DTR)</option>
+        <option value="none">None</option>
+      </param>
+      <param name="file" type="path" mode="file_new" filetypes="plt,hpgl,dmpl,gcode,nc,txt" gui-text="File:">~/cutscape.plt</param>
+    </page>
+  </param>
+  <effect needs-live-preview="false">
+    <object-type>all</object-type>
+    <icon>cutscape_cut.svg</icon>
+    <menu-tip>Preview or cut the selection on a vinyl cutter or plotter</menu-tip>
+    <effects-menu>
+      <submenu name="CutScape"/>
+    </effects-menu>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">cutscape_cut.py</command>
+  </script>
+</inkscape-extension>

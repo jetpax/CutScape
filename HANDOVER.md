@@ -113,6 +113,45 @@ inkex path ops is the main porting cost.
   → 50 mm square. Cutter must be online (panel) or CUPS sits at
   "Sending data to printer".
 
+## Progress, 2026-10-29 (second session)
+
+- Upstream PRs are open: inkcut/inkcut#443, #444 and #445. #443 and #445
+  include regression tests. The fork is renamed **jetpax/CutScape**
+  (`origin`); `upstream` is inkcut/inkcut.
+- The **CutScape prototype** is in `extension/`. It takes the inkex-only path
+  (B with A.2), and `README.md` documents it.
+  - The core is plain Python: geometry, filters, protocols, transports,
+    devices and job. Only `document.py` and `preview.py` use inkex.
+  - Tests are in `tests/test_cutscape_*.py`. `tools/package_extension.py`
+    builds the install zip.
+  - It targets Inkscape 1.4 and later; the cutter box will be upgraded from
+    1.2.2.
+- **Decisions:**
+  - Preview vs send is a radio in the dialog, not Inkscape's live preview,
+    because a script can't tell a preview run from Apply.
+  - The preview is a locked layer, laid over the drawing.
+  - Material space has x across the material and y along the feed.
+  - Preset invert flags reflect the job in place, and park stays at the
+    origin.
+  - HPGL defaults to 40 steps/mm; Inkcut used 1021 dpi.
+- **Folded in from unmerged upstream PRs:** #382, #388, #427, #428, #441 and
+  #442. The README credits them.
+- **Not done:**
+  - A real cut on the Secabo.
+  - Checking the orientation of the Stika, Silhouette and VEVOR presets.
+  - A live preview using 1.5's `pipe-diffs`.
+  - A GitHub release with the zip.
+  - Windows printing.
+  - Silhouette USB and Bluetooth.
+  - The CH554 USB transport from #428.
+- **USB id clash:** #428 lists the VEVOR KH-870 as USB `0483:5750`, the same
+  id as the Secabo C IV above. It says that firmware only cuts after CDC
+  line-coding and DTR/RTS requests, yet the Secabo cut through usblp/CUPS.
+  The two probably run different firmware behind the same id.
+- **macOS crash:** Inkscape 1.4 launched from a shell with `ulimit -n` around
+  1M crashes in GLib's spawn whenever it runs any extension. Launch it with a
+  normal limit.
+
 ## Suggested first steps
 1. Fork, push `fix/*`, open the three upstream PRs.
 2. Add regression tests on `dev`: `tests/test_svg.py` selecting a group by id;

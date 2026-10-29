@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+     width="160mm" height="90mm" viewBox="0 0 160 90" id="svg1">
+  <sodipodi:namedview id="namedview1" inkscape:document-units="mm"/>
+  <defs id="defs1"/>
+  <g id="layer1" inkscape:groupmode="layer" inkscape:label="Design">
+    <g id="tag" transform="translate(10,10)">
+      <rect id="plate" x="0" y="0" width="80" height="40" rx="6"
+            style="fill:#ffd166;stroke:#000;stroke-width:0.3"/>
+      <circle id="hole" cx="8" cy="20" r="3"
+              style="fill:#fff;stroke:#000;stroke-width:0.3"/>
+      <text id="label" x="18" y="30" style="font-size:24px;font-family:sans-serif;font-weight:bold;fill:#000">Jo</text>
+    </g>
+    <path id="star" d="M 120,12 L 127,32 L 148,32 L 131,44 L 137,64 L 120,52 L 103,64 L 109,44 L 92,32 L 113,32 Z"
+          style="fill:#06d6a0;stroke:#000;stroke-width:0.3"/>
+    <path id="hidden" d="M 0,0 L 10,10" style="display:none;stroke:#000"/>
+  </g>
+</svg>

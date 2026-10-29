@@ -47,7 +47,7 @@ jobs:
             pip install pywin32
           fi
           # testing specific libs not included in setup.py
-          pip install pytest pytest-coverage pytest-qt pytest-asyncio codecov
+          pip install pytest pytest-coverage pytest-qt pytest-asyncio codecov inkex
           # allow running CI tests for multiple Qt versions
           pip install "${{ matrix.qt }}"
       - name: Install inkcut
