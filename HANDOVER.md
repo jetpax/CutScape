@@ -136,11 +136,15 @@ inkex path ops is the main porting cost.
   - HPGL defaults to 40 steps/mm; Inkcut used 1021 dpi.
 - **Folded in from unmerged upstream PRs:** #382, #388, #427, #428, #441 and
   #442. The README credits them.
+- **Released** as [v0.1.0](https://github.com/jetpax/CutScape/releases/tag/v0.1.0)
+  (zip built by `tools/package_extension.py`); `dev` is the default branch.
+  The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
+  compiled catalogs in `extension/locale/`, and `tools/i18n.py` does
+  extract/compile. French is complete.
 - **Not done:**
   - A real cut on the Secabo.
   - Checking the orientation of the Stika, Silhouette and VEVOR presets.
   - A live preview using 1.5's `pipe-diffs`.
-  - A GitHub release with the zip.
   - Windows printing.
   - Silhouette USB and Bluetooth.
   - The CH554 USB transport from #428.
