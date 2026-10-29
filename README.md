@@ -150,9 +150,11 @@ and Bluetooth.
 
 ## Troubleshooting
 
-- **Converting text is slow.** CutScape starts a second, hidden Inkscape to turn
-  text into paths, which can take a while, especially the first time. Converting
-  the text yourself first (**Path → Object to Path**) avoids that.
+- **Text takes a little longer.** CutScape converts text with a second, hidden
+  Inkscape, so the cut matches exactly what Inkscape draws. That adds about
+  0.2 s on a Mac. The first run on a new Inkscape profile can take much longer
+  while fonts are indexed. Converting the text yourself (**Path → Object to
+  Path**) skips this step.
 - **Inkscape crashes as soon as any extension runs on macOS.** This happens if
   Inkscape was started from a terminal with a very high open-files limit
   (`ulimit -n`). GLib, which Inkscape uses to start extensions, runs out of stack
