@@ -174,6 +174,10 @@ with *Custom*.
 The orientation of the Roland Stika and Silhouette presets was converted from
 Inkcut and hasn't been checked against the machines. Do a small test cut first.
 
+For many more models, see the [cutters Inkcut users reported](docs/inkcut-reported-cutters.md),
+with how each was connected and whether it worked. CutScape sends the same
+commands, so it's a good starting point.
+
 ## Inkscape 1.5
 
 CutScape runs on Inkscape 1.4 and is ready for 1.5, which adds two
@@ -211,7 +215,7 @@ tests/test_cutscape_*.py
 - **Run the tests:**
 
   ```bash
-  pip install inkex pytest && python -m pytest tests/test_cutscape_core.py tests/test_cutscape_extension.py
+  pip install inkex pytest && python -m pytest
   ```
 
 - **Run the effect without the GUI:** use Inkscape's Python with Inkscape's
@@ -228,9 +232,8 @@ and contributors. It rebuilds Inkcut's cutting pipeline, which covers device
 presets, the HPGL/DMPL/GP-GL/CAMM-GL/G-code languages, blade offset, overcut and
 copies, as a Qt-free Inkscape extension.
 
-The `inkcut/` folder still holds the original Qt application, which this fork
-started from. It's kept for reference and for fixes sent upstream; you don't
-need it to use CutScape.
+Inkcut's Qt application isn't part of CutScape. It's still in this repository's
+history and in [inkcut/inkcut](https://github.com/inkcut/inkcut).
 
 Several upstream pull requests that were never merged are folded in:
 

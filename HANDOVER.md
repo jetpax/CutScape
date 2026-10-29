@@ -20,7 +20,7 @@ Base: upstream `master` @ `5e5f0b7` (merge of #440, the asyncio port).
 | `fix/lpr-printer-transport` | Printer transport on Linux/macOS never started `lpr` |
 | `fix/inkscape-selection-ids` | Extension passed XPath keys; Inkcut matched on `@id` → whole doc sent |
 | `fix/svg-selection-descendants` | Selection kept ancestors, not descendants → selected groups empty |
-| `dev` | octopus merge of all three; start new work here |
+| `dev` | CutScape (default branch). The three fixes were merged in, then the Qt app was removed; start new work here |
 
 Each fix branch is one commit with the root cause in the message, ready for
 `gh pr create --repo inkcut/inkcut --fill`. Origin still points at upstream:
@@ -141,6 +141,11 @@ inkex path ops is the main porting cost.
   The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
   compiled catalogs in `extension/locale/`, and `tools/i18n.py` does
   extract/compile. French is complete.
+- **The Qt app is gone from `dev`.** The `inkcut/` package, its tests, docs,
+  packaging, the old Inkscape plugin and the Qt CI were all removed. CI now runs
+  only the CutScape tests. The `fix/*` branches still sit on upstream `master`
+  for the upstream PRs. Inkcut's community device table is kept as
+  `docs/inkcut-reported-cutters.md`.
 - **Not done:**
   - A real cut on the Secabo.
   - Checking the orientation of the Stika, Silhouette and VEVOR presets.

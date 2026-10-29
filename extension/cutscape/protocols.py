@@ -1,6 +1,6 @@
 """
 Cutter command languages. Each protocol turns moves in device steps into
-the bytes the cutter expects. Ported from inkcut/device/protocols.
+the bytes the cutter expects. Ported from Inkcut (inkcut/device/protocols upstream).
 """
 
 

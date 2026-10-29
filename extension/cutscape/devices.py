@@ -1,5 +1,5 @@
 """
-Device presets, ported from inkcut/device/drivers/manifest.enaml plus
+Device presets, ported from Inkcut (inkcut/device/drivers/manifest.enaml upstream) plus
 unmerged upstream PRs (credited inline).
 
 A preset fixes the command language, resolution and axis orientation of a
