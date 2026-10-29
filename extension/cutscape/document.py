@@ -10,6 +10,8 @@ import tempfile
 import inkex
 from inkex import bezier, Transform
 
+from .i18n import _
+
 #: id of the layer the preview is drawn into; never cut
 PREVIEW_ID = 'cutscape-preview'
 
@@ -101,7 +103,7 @@ def selected_roots(svg, ids=None):
         els = [e for e in els if e is not None and not hidden(e)]
         if not els:
             #: Never fall back to the whole document (inkcut/inkcut#442)
-            raise ValueError("None of the selected objects can be cut")
+            raise ValueError(_("None of the selected objects can be cut"))
         return els
     return [e for e in svg if isinstance(e, inkex.BaseElement)
             and not hidden(e)]
@@ -140,8 +142,8 @@ def text_to_paths(document, ids):
     _point_inkex_at_inkscape()
     for i in ids:
         if not i or any(c in i for c in ',;\r\n'):
-            raise ValueError("Can't convert text with id %r to a path; "
-                             "convert it with Path > Object to Path" % i)
+            raise ValueError(_("Can't convert text {id} to a path; convert "
+                               "it with Path > Object to Path").format(id=i))
     tmp = tempfile.mkdtemp(prefix='cutscape-')
     path = os.path.join(tmp, 'input.svg')
     with open(path, 'wb') as f:
@@ -158,14 +160,13 @@ def polylines(svg, roots, tolerance=0.05):
     tolerance is the maximum deviation from curves in mm.
     """
     k = mm_to_uu(svg)
-    px, py, _, _ = page_box(svg)
+    px, py = page_box(svg)[:2]
     result = []
     for root in roots:
         for el, t in iter_shapes(root, _parent_transform(root)):
             if t is None:
-                raise ValueError(
-                    "Text %r must be converted to a path first" %
-                    el.get('id'))
+                raise ValueError(_("Text {id} must be converted to a path "
+                                   "first").format(id=el.get('id')))
             path = el.path
             if not path:
                 continue
@@ -182,5 +183,5 @@ def polylines(svg, roots, tolerance=0.05):
 def page_size(svg):
     """ (width, height) of the page in millimetres """
     k = mm_to_uu(svg)
-    _, _, w, h = page_box(svg)
+    w, h = page_box(svg)[2:]
     return w / k, h / k

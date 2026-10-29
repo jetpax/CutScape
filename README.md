@@ -8,6 +8,9 @@ preview the toolpath on your canvas and then send it to the cutter. It runs on
 the Python that ships with Inkscape, so there is no Qt, no virtualenv and nothing
 to `pip install`.
 
+*En français :* CutScape est une extension Inkscape, pas une application. Son
+interface est en français quand Inkscape l’est.
+
 ![The toolpath preview on the canvas: cuts in red, blade-up moves dashed in blue, the cutter's origin as a blue dot](docs/images/cutscape-preview.png)
 
 > **Status: prototype (0.1).** Written for Inkscape 1.4 and 1.5. So far it has
@@ -21,9 +24,7 @@ to `pip install`.
 You need Inkscape 1.4 or newer.
 
 1. Download `cutscape-0.1.0.zip` from the
-   [Releases page](https://github.com/jetpax/CutScape/releases). No release has
-   been published yet, so for now build the zip from a checkout with
-   `python3 tools/package_extension.py`; it lands in `dist/`.
+   [Releases page](https://github.com/jetpax/CutScape/releases/latest).
 2. In Inkscape, open **Edit → Preferences → System**. Next to
    **User extensions**, click **Open** to show the folder.
 3. Unzip the download into that folder. You should end up with
@@ -89,6 +90,24 @@ To send again with the same settings, use **Extensions → Previous Extension**.
 | | Feed past the job | Where the head parks when it's done. 0 returns it to the origin. |
 | Device | Cutter | A preset for your model, or *Custom* to set the command language (HPGL, DMPL, GP-GL, CAMM-GL, G-code), resolution and axes yourself. |
 | Connection | Send through | A printer queue, a device file, a serial port, or a file to check the output. |
+
+## Languages
+
+CutScape follows Inkscape's language (**Edit → Preferences → Interface →
+Language**). It's available in English and French:
+
+<img src="docs/images/cutscape-dialog-fr.png" width="360" alt="The dialog in French">
+
+To add a language:
+
+1. Copy `po/cutscape.pot` to `po/<code>.po`, for example `po/de.po`.
+2. Translate it in any PO editor.
+3. Run `python3 tools/i18n.py compile` and commit the `.po` and the
+   generated `extension/locale/<code>/LC_MESSAGES/cutscape.mo`.
+
+After changing any text in the dialog or the code, run
+`python3 tools/i18n.py extract` to update the template and the existing
+translations.
 
 ## Connecting your cutter
 
@@ -173,7 +192,10 @@ extension/              what gets installed (zip it with tools/package_extension
   cutscape_cut.py       the Inkscape effect
   cutscape/             the cutting core: plain Python, no Inkscape or Qt needed
     geometry.py filters.py protocols.py transports.py devices.py job.py
+    i18n.py
     document.py preview.py    (these two use inkex)
+  locale/               compiled translations (built from po/ by tools/i18n.py)
+po/                     translation sources
 tests/test_cutscape_*.py
 ```
 

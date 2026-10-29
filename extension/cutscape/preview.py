@@ -7,6 +7,7 @@ origin and material edge show where the drawing sits on the material.
 import inkex
 
 from .document import PREVIEW_ID, mm_to_uu, page_box
+from .i18n import _
 
 CUT = '#e01b24'
 TRAVEL = '#1c71d8'
@@ -35,15 +36,15 @@ def draw(svg, job):
     """ Replace any previous preview with one for job (a job.Plan) """
     remove(svg)
     k = mm_to_uu(svg)
-    px, py, _, _ = page_box(svg)
+    px, py = page_box(svg)[:2]
     #: Line the planned design's top-left up with the drawing's
-    ax0, ay0, _, _ = job.page_bbox
-    bx0, _, _, by1 = job.bbox
+    ax0, ay0 = job.page_bbox[:2]
+    bx0, by1 = job.bbox[0], job.bbox[3]
 
     def to_doc(x, y):
         return px + (ax0 + x - bx0) * k, py + (ay0 + by1 - y) * k
 
-    layer = inkex.Layer.new('CutScape preview', id=PREVIEW_ID)
+    layer = inkex.Layer.new(_('CutScape preview'), id=PREVIEW_ID)
     layer.set('sodipodi:insensitive', 'true')
     svg.append(layer)
 
@@ -55,12 +56,12 @@ def draw(svg, job):
         path.label = label
         layer.append(path)
 
-    _, _, x1, y1 = job.bbox
+    x1, y1 = job.bbox[2:]
     w = job.device['width'] or x1
     h = job.device['length'] or y1
     add(_d([[(0, 0), (w, 0), (w, h), (0, h), (0, 0)]], to_doc),
         {'fill': 'none', 'stroke': MATERIAL, 'stroke-width': 0.3 * k,
-         'stroke-dasharray': '%g,%g' % (2 * k, 2 * k)}, 'Material')
+         'stroke-dasharray': '%g,%g' % (2 * k, 2 * k)}, _('Material'))
 
     travel, pos = [], (0.0, 0.0)
     for p in job.prefeed:
@@ -72,15 +73,15 @@ def draw(svg, job):
     travel.append([pos, job.park])
     add(_d(travel, to_doc),
         {'fill': 'none', 'stroke': TRAVEL, 'stroke-width': 0.2 * k,
-         'stroke-dasharray': '%g,%g' % (1 * k, 1 * k)}, 'Travel')
+         'stroke-dasharray': '%g,%g' % (1 * k, 1 * k)}, _('Travel'))
 
     add(_d(job.paths, to_doc),
         {'fill': 'none', 'stroke': CUT, 'stroke-width': 0.4 * k,
-         'stroke-linejoin': 'round'}, 'Cuts')
+         'stroke-linejoin': 'round'}, _('Cuts'))
 
     ox, oy = to_doc(0, 0)
     origin = inkex.Circle.new(center=(ox, oy), radius=1.5 * k)
     origin.style = {'fill': TRAVEL, 'stroke': 'none'}
-    origin.label = 'Origin'
+    origin.label = _('Origin')
     layer.append(origin)
     return layer

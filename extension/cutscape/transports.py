@@ -7,6 +7,8 @@ import os
 import subprocess
 import sys
 
+from .i18n import _
+
 TRANSPORTS = ('file', 'printer', 'serial', 'device')
 
 
@@ -17,7 +19,7 @@ class TransportError(Exception):
 def to_file(data, path):
     path = os.path.expanduser(path)
     if not path:
-        raise TransportError("No output file set")
+        raise TransportError(_("No output file set"))
     with open(path, 'wb') as f:
         f.write(data)
     return path
@@ -42,17 +44,18 @@ def to_printer(data, queue):
     if not queue:
         queues = printer_queues()
         raise TransportError(
-            "No printer queue set. Available queues: %s" %
-            (', '.join(queues) or 'none found'))
+            _("No printer queue set. Available queues: {queues}").format(
+                queues=', '.join(queues) or _("none found")))
     try:
         p = subprocess.run(['lpr', '-P', queue, '-o', 'raw'], input=data,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                            timeout=60)
     except OSError as e:
-        raise TransportError("Could not run lpr: %s" % e)
+        raise TransportError(_("Could not run lpr: {error}").format(error=e))
     if p.returncode:
-        raise TransportError("lpr failed (%i): %s" % (
-            p.returncode, p.stderr.decode(errors='replace').strip()))
+        raise TransportError(_("lpr failed ({code}): {error}").format(
+            code=p.returncode,
+            error=p.stderr.decode(errors='replace').strip()))
     return queue
 
 
@@ -60,7 +63,7 @@ def _to_win32_printer(data, queue):
     try:
         import win32print
     except ImportError:
-        raise TransportError("Printing on Windows needs pywin32")
+        raise TransportError(_("Printing on Windows needs pywin32"))
     h = win32print.OpenPrinter(queue or win32print.GetDefaultPrinter())
     try:
         win32print.StartDocPrinter(h, 1, ("CutScape job", None, "RAW"))
@@ -88,9 +91,9 @@ def to_serial(data, port, baud=9600, flow='xonxoff', ack=False,
         import serial
     except ImportError:
         raise TransportError(
-            "Serial output needs pyserial (python3-serial on Linux)")
+            _("Serial output needs pyserial (python3-serial on Linux)"))
     if not port:
-        raise TransportError("No serial port set")
+        raise TransportError(_("No serial port set"))
     try:
         with serial.Serial(port, int(baud), timeout=timeout,
                            write_timeout=None,
@@ -104,7 +107,8 @@ def to_serial(data, port, baud=9600, flow='xonxoff', ack=False,
             #: Wait for the OS buffer to drain before closing
             s.flush()
     except serial.SerialException as e:
-        raise TransportError("Serial port %s: %s" % (port, e))
+        raise TransportError(_("Serial port {port}: {error}").format(
+            port=port, error=e))
     return port
 
 
@@ -118,7 +122,8 @@ def _send_acked(s, data, timeout):
             reply = s.readline()
             if not reply:
                 raise TransportError(
-                    "No reply to %r within %is" % (line, timeout))
+                    _("No reply to {command} within {seconds} s").format(
+                        command=line, seconds=timeout))
             reply = reply.decode('ascii', errors='replace').strip().lower()
             if reply.startswith('ok'):
                 break
@@ -131,11 +136,12 @@ def to_device(data, path):
     class cutters on Linux) or a parallel port.
     """
     if not path:
-        raise TransportError("No device path set")
+        raise TransportError(_("No device file set"))
     try:
         fd = os.open(path, os.O_WRONLY)
     except OSError as e:
-        raise TransportError("Could not open %s: %s" % (path, e))
+        raise TransportError(_("Could not open {path}: {error}").format(
+            path=path, error=e))
     try:
         view = memoryview(data)
         while view:

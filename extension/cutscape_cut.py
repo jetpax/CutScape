@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import inkex  # noqa: E402
 
 from cutscape import document, job, preview, transports  # noqa: E402
+from cutscape.i18n import _  # noqa: E402
 
 CONNECTION = dict(transport='printer', printer='', device='/dev/usb/lp0',
                   port='', baud='9600', flow='xonxoff',
@@ -56,8 +57,10 @@ class CutScape(inkex.EffectExtension):
         except (ValueError, transports.TransportError) as e:
             raise inkex.AbortExtension(str(e))
         x0, y0, x1, y1 = plan.bbox
-        self.msg("Sent %.0f x %.0f mm, %.2f m of cuts (%i bytes) to %s." % (
-            x1 - x0, y1 - y0, plan.cut_length / 1000, len(data), where))
+        self.msg(_("Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of "
+                   "cuts ({size} bytes) to {where}.").format(
+            width=x1 - x0, height=y1 - y0, metres=plan.cut_length / 1000,
+            size=len(data), where=where))
 
     def plan(self, settings):
         #: inkex drops ids it can't find; an unmatched selection must fail
@@ -73,7 +76,7 @@ class CutScape(inkex.EffectExtension):
             svg = converted.getroot()
             roots = document.selected_roots(svg, ids)
         polys = document.polylines(svg, roots, settings.tolerance)
-        _, page_height = document.page_size(svg)
+        page_height = document.page_size(svg)[1]
         return job.plan(polys, page_height, settings)
 
 

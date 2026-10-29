@@ -1,0 +1,444 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: CutScape\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: extension/cutscape_cut.inx
+#: extension/cutscape_cut.inx
+msgid "Cut"
+msgstr "Découpe"
+
+#: extension/cutscape_cut.inx
+msgid "Apply will:"
+msgstr "Le bouton Appliquer :"
+
+#: extension/cutscape_cut.inx
+msgid "Preview the toolpath on the canvas"
+msgstr "prévisualise le tracé de coupe sur le canevas"
+
+#: extension/cutscape_cut.inx
+msgid "Send to the cutter"
+msgstr "envoie à la découpeuse"
+
+#: extension/cutscape_cut.inx
+msgid "Remove the preview"
+msgstr "supprime l’aperçu"
+
+#: extension/cutscape_cut.inx
+msgid "Cuts the selection, or the whole drawing if nothing is selected."
+msgstr "Découpe la sélection, ou tout le dessin si rien n’est sélectionné."
+
+#: extension/cutscape_cut.inx
+msgid "Speed (cm/s):"
+msgstr "Vitesse (cm/s) :"
+
+#: extension/cutscape_cut.inx
+#: extension/cutscape_cut.inx
+msgid "0 leaves the cutter's own setting"
+msgstr "0 conserve le réglage de la découpeuse"
+
+#: extension/cutscape_cut.inx
+msgid "Force (g):"
+msgstr "Pression (g) :"
+
+#: extension/cutscape_cut.inx
+msgid "Passes:"
+msgstr "Passages :"
+
+#: extension/cutscape_cut.inx
+msgid "Cut each path this many times; closed paths are cut as one continuous loop"
+msgstr "Découpe chaque chemin ce nombre de fois ; les chemins fermés sont découpés en une seule boucle continue"
+
+#: extension/cutscape_cut.inx
+msgid "Overcut (mm):"
+msgstr "Surcoupe (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Continue past the start of closed paths so the cut meets cleanly"
+msgstr "Prolonge la coupe au-delà du début des chemins fermés pour qu’elle se referme proprement"
+
+#: extension/cutscape_cut.inx
+msgid "Blade offset (mm):"
+msgstr "Décalage de lame (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Drag-knife tip offset; typically 0.25 for a 45° blade, 0.5 for 60°. Leave at 0 if the cutter compensates itself"
+msgstr "Décalage de la pointe de la lame traînante ; en général 0,25 pour une lame à 45°, 0,5 pour 60°. Laisser à 0 si la découpeuse le compense elle-même"
+
+#: extension/cutscape_cut.inx
+msgid "Swivel above (°):"
+msgstr "Pivoter au-delà de (°) :"
+
+#: extension/cutscape_cut.inx
+msgid "Corners sharper than this get a swivel arc when blade offset is on"
+msgstr "Les angles plus aigus reçoivent un arc de pivotement quand le décalage de lame est actif"
+
+#: extension/cutscape_cut.inx
+msgid "Order:"
+msgstr "Ordre :"
+
+#: extension/cutscape_cut.inx
+msgid "Inside shapes first, shortest travel"
+msgstr "Formes intérieures d’abord, trajet le plus court"
+
+#: extension/cutscape_cut.inx
+msgid "Shortest travel"
+msgstr "Trajet le plus court"
+
+#: extension/cutscape_cut.inx
+msgid "As drawn"
+msgstr "Ordre du dessin"
+
+#: extension/cutscape_cut.inx
+msgid "Curve tolerance (mm):"
+msgstr "Tolérance des courbes (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Largest distance a cut may stray from a curve"
+msgstr "Écart maximal entre la coupe et la courbe"
+
+#: extension/cutscape_cut.inx
+#: extension/cutscape/preview.py:64
+msgid "Material"
+msgstr "Matériau"
+
+#: extension/cutscape_cut.inx
+msgid "x runs across the material, y along the feed."
+msgstr "x traverse le matériau, y suit le sens d’avance."
+
+#: extension/cutscape_cut.inx
+msgid "Width (mm):"
+msgstr "Largeur (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "0 uses the device's width"
+msgstr "0 utilise la largeur de la machine"
+
+#: extension/cutscape_cut.inx
+msgid "Length (mm):"
+msgstr "Longueur (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "0 for a roll"
+msgstr "0 pour un rouleau"
+
+#: extension/cutscape_cut.inx
+msgid "Move the job to the origin"
+msgstr "Placer le travail à l’origine"
+
+#: extension/cutscape_cut.inx
+msgid "Otherwise it keeps its place relative to the page's bottom-left corner"
+msgstr "Sinon, il garde sa position par rapport au coin inférieur gauche de la page"
+
+#: extension/cutscape_cut.inx
+msgid "Margin x (mm):"
+msgstr "Marge x (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Margin y (mm):"
+msgstr "Marge y (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Rotate 90°"
+msgstr "Pivoter de 90°"
+
+#: extension/cutscape_cut.inx
+msgid "Mirror (heat transfer vinyl)"
+msgstr "Miroir (flex thermocollant)"
+
+#: extension/cutscape_cut.inx
+msgid "Copies:"
+msgstr "Copies :"
+
+#: extension/cutscape_cut.inx
+msgid "Spacing between copies (mm):"
+msgstr "Espacement entre les copies (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Weed line around the job"
+msgstr "Ligne d’échenillage autour du travail"
+
+#: extension/cutscape_cut.inx
+msgid "Weed line padding (mm):"
+msgstr "Marge de la ligne d’échenillage (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "Pre-feed the job's length first"
+msgstr "Dérouler d’abord la longueur du travail"
+
+#: extension/cutscape_cut.inx
+msgid "Pull the material through and back before cutting so a roll tracks straight"
+msgstr "Fait avancer puis reculer le matériau avant la découpe pour qu’un rouleau reste bien droit"
+
+#: extension/cutscape_cut.inx
+msgid "Feed past the job afterwards (mm):"
+msgstr "Avancer après le travail (mm) :"
+
+#: extension/cutscape_cut.inx
+msgid "0 returns the head to the origin"
+msgstr "0 ramène la tête à l’origine"
+
+#: extension/cutscape_cut.inx
+msgid "Device"
+msgstr "Machine"
+
+#: extension/cutscape_cut.inx
+msgid "Cutter:"
+msgstr "Découpeuse :"
+
+#: extension/cutscape_cut.inx
+msgid "Custom (settings below)"
+msgstr "Personnalisée (réglages ci-dessous)"
+
+#: extension/cutscape_cut.inx
+msgid "With a cutter chosen, only Tool and the HPGL options below apply."
+msgstr "Avec une découpeuse choisie, seuls l’outil et les options HPGL ci-dessous s’appliquent."
+
+#: extension/cutscape_cut.inx
+msgid "Language:"
+msgstr "Langage :"
+
+#: extension/cutscape_cut.inx
+msgid "DMPL dialect:"
+msgstr "Dialecte DMPL :"
+
+#: extension/cutscape_cut.inx
+msgid "Steps per mm, x:"
+msgstr "Pas par mm, x :"
+
+#: extension/cutscape_cut.inx
+msgid "0 uses the language's default: 40 for HPGL/DMPL, 20 for GP-GL"
+msgstr "0 utilise la valeur par défaut du langage : 40 pour HPGL/DMPL, 20 pour GP-GL"
+
+#: extension/cutscape_cut.inx
+msgid "Steps per mm, y:"
+msgstr "Pas par mm, y :"
+
+#: extension/cutscape_cut.inx
+msgid "0 uses the same as x"
+msgstr "0 reprend la valeur de x"
+
+#: extension/cutscape_cut.inx
+msgid "Swap axes"
+msgstr "Permuter les axes"
+
+#: extension/cutscape_cut.inx
+msgid "Invert x"
+msgstr "Inverser x"
+
+#: extension/cutscape_cut.inx
+msgid "Invert y"
+msgstr "Inverser y"
+
+#: extension/cutscape_cut.inx
+msgid "Tool:"
+msgstr "Outil :"
+
+#: extension/cutscape_cut.inx
+msgid "Pen or tool number; 0 sends none"
+msgstr "Numéro de stylo ou d’outil ; 0 n’en envoie aucun"
+
+#: extension/cutscape_cut.inx
+msgid "HPGL: newline after each command"
+msgstr "HPGL : saut de ligne après chaque commande"
+
+#: extension/cutscape_cut.inx
+msgid "HPGL: separate pen up/down from moves"
+msgstr "HPGL : séparer la levée/descente de l’outil des déplacements"
+
+#: extension/cutscape_cut.inx
+msgid "Connection"
+msgstr "Connexion"
+
+#: extension/cutscape_cut.inx
+msgid "Send through:"
+msgstr "Envoyer via :"
+
+#: extension/cutscape_cut.inx
+msgid "Printer queue (CUPS or Windows)"
+msgstr "File d’impression (CUPS ou Windows)"
+
+#: extension/cutscape_cut.inx
+msgid "Device file"
+msgstr "Fichier de périphérique"
+
+#: extension/cutscape_cut.inx
+msgid "Serial port"
+msgstr "Port série"
+
+#: extension/cutscape_cut.inx
+msgid "File"
+msgstr "Fichier"
+
+#: extension/cutscape_cut.inx
+msgid "Printer queue:"
+msgstr "File d’impression :"
+
+#: extension/cutscape_cut.inx
+msgid "A raw queue; leave empty to list the available ones"
+msgstr "Une file brute (raw) ; laisser vide pour lister celles disponibles"
+
+#: extension/cutscape_cut.inx
+msgid "Device file:"
+msgstr "Fichier de périphérique :"
+
+#: extension/cutscape_cut.inx
+msgid "eg /dev/usb/lp0 for a USB cutter on Linux"
+msgstr "p. ex. /dev/usb/lp0 pour une découpeuse USB sous Linux"
+
+#: extension/cutscape_cut.inx
+msgid "Serial port:"
+msgstr "Port série :"
+
+#: extension/cutscape_cut.inx
+msgid "eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3"
+msgstr "p. ex. /dev/ttyUSB0, /dev/cu.usbserial-…, COM3"
+
+#: extension/cutscape_cut.inx
+msgid "Baud rate:"
+msgstr "Débit (bauds) :"
+
+#: extension/cutscape_cut.inx
+msgid "Flow control:"
+msgstr "Contrôle de flux :"
+
+#: extension/cutscape_cut.inx
+msgid "Software (XON/XOFF)"
+msgstr "Logiciel (XON/XOFF)"
+
+#: extension/cutscape_cut.inx
+msgid "Hardware (RTS/CTS)"
+msgstr "Matériel (RTS/CTS)"
+
+#: extension/cutscape_cut.inx
+msgid "Hardware (DSR/DTR)"
+msgstr "Matériel (DSR/DTR)"
+
+#: extension/cutscape_cut.inx
+msgid "None"
+msgstr "Aucun"
+
+#: extension/cutscape_cut.inx
+msgid "File:"
+msgstr "Fichier :"
+
+#: extension/cutscape_cut.inx
+msgid "Preview or cut the selection on a vinyl cutter or plotter"
+msgstr "Prévisualiser ou découper la sélection sur une découpeuse vinyle ou un traceur"
+
+#: extension/cutscape_cut.inx
+msgid "CutScape"
+msgstr "CutScape"
+
+#: extension/cutscape_cut.py:60
+#, python-brace-format
+msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
+msgstr "{width:.0f} × {height:.0f} mm envoyés, soit {metres:.2f} m de découpe ({size} octets), vers {where}."
+
+#: extension/cutscape/document.py:106
+msgid "None of the selected objects can be cut"
+msgstr "Aucun des objets sélectionnés ne peut être découpé"
+
+#: extension/cutscape/document.py:145
+#, python-brace-format
+msgid "Can't convert text {id} to a path; convert it with Path > Object to Path"
+msgstr "Impossible de convertir le texte {id} en chemin ; utilisez Chemin > Objet en chemin"
+
+#: extension/cutscape/document.py:168
+#, python-brace-format
+msgid "Text {id} must be converted to a path first"
+msgstr "Le texte {id} doit d’abord être converti en chemin"
+
+#: extension/cutscape/job.py:156
+msgid "Nothing to cut"
+msgstr "Rien à découper"
+
+#: extension/cutscape/job.py:118
+#, python-brace-format
+msgid "The job extends {distance:.1f} mm past the origin; move it onto the page or turn on \"Move the job to the origin\"."
+msgstr "Le travail dépasse l’origine de {distance:.1f} mm ; placez-le sur la page ou activez « Placer le travail à l’origine »."
+
+#: extension/cutscape/job.py:124
+#, python-brace-format
+msgid "The job is {size:.1f} mm wide but the material is only {limit:.1f} mm."
+msgstr "Le travail fait {size:.1f} mm de large mais le matériau ne fait que {limit:.1f} mm."
+
+#: extension/cutscape/job.py:127
+#, python-brace-format
+msgid "The job is {size:.1f} mm long but the material is only {limit:.1f} mm."
+msgstr "Le travail fait {size:.1f} mm de long mais le matériau ne fait que {limit:.1f} mm."
+
+#: extension/cutscape/preview.py:85
+msgid "Origin"
+msgstr "Origine"
+
+#: extension/cutscape/preview.py:47
+msgid "CutScape preview"
+msgstr "Aperçu CutScape"
+
+#: extension/cutscape/preview.py:76
+msgid "Travel"
+msgstr "Déplacements"
+
+#: extension/cutscape/preview.py:80
+msgid "Cuts"
+msgstr "Découpes"
+
+#: extension/cutscape/transports.py:22
+msgid "No output file set"
+msgstr "Aucun fichier de sortie défini"
+
+#: extension/cutscape/transports.py:96
+msgid "No serial port set"
+msgstr "Aucun port série défini"
+
+#: extension/cutscape/transports.py:139
+msgid "No device file set"
+msgstr "Aucun fichier de périphérique défini"
+
+#: extension/cutscape/transports.py:66
+msgid "Printing on Windows needs pywin32"
+msgstr "L’impression sous Windows nécessite pywin32"
+
+#: extension/cutscape/transports.py:94
+msgid "Serial output needs pyserial (python3-serial on Linux)"
+msgstr "La sortie série nécessite pyserial (python3-serial sous Linux)"
+
+#: extension/cutscape/transports.py:47
+#, python-brace-format
+msgid "No printer queue set. Available queues: {queues}"
+msgstr "Aucune file d’impression définie. Files disponibles : {queues}"
+
+#: extension/cutscape/transports.py:56
+#, python-brace-format
+msgid "lpr failed ({code}): {error}"
+msgstr "lpr a échoué ({code}) : {error}"
+
+#: extension/cutscape/transports.py:48
+msgid "none found"
+msgstr "aucune"
+
+#: extension/cutscape/transports.py:54
+#, python-brace-format
+msgid "Could not run lpr: {error}"
+msgstr "Impossible de lancer lpr : {error}"
+
+#: extension/cutscape/transports.py:110
+#, python-brace-format
+msgid "Serial port {port}: {error}"
+msgstr "Port série {port} : {error}"
+
+#: extension/cutscape/transports.py:143
+#, python-brace-format
+msgid "Could not open {path}: {error}"
+msgstr "Impossible d’ouvrir {path} : {error}"
+
+#: extension/cutscape/transports.py:125
+#, python-brace-format
+msgid "No reply to {command} within {seconds} s"
+msgstr "Pas de réponse à {command} en {seconds} s"
+

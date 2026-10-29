@@ -9,6 +9,7 @@ Coordinates go through three spaces:
             to device steps.
 """
 from . import devices, filters, geometry, protocols
+from .i18n import _
 
 DEFAULTS = dict(
     #: Device
@@ -114,16 +115,17 @@ class Plan(object):
         out = []
         x0, y0, x1, y1 = geometry.bbox(self.paths)
         if x0 < -geometry.EPSILON or y0 < -geometry.EPSILON:
-            out.append("The job extends %.1f mm past the origin; move it "
-                       "onto the page or enable auto align." %
-                       -min(x0, y0))
+            out.append(_("The job extends {distance:.1f} mm past the "
+                         "origin; move it onto the page or turn on \"Move "
+                         "the job to the origin\".").format(
+                distance=-min(x0, y0)))
         w, l = self.device['width'], self.device['length']
         if w and x1 > w + geometry.EPSILON:
-            out.append("The job is %.1f mm wide but the material is only "
-                       "%.1f mm." % (x1, w))
+            out.append(_("The job is {size:.1f} mm wide but the material "
+                         "is only {limit:.1f} mm.").format(size=x1, limit=w))
         if l and y1 > l + geometry.EPSILON:
-            out.append("The job is %.1f mm long but the material is only "
-                       "%.1f mm." % (y1, l))
+            out.append(_("The job is {size:.1f} mm long but the material "
+                         "is only {limit:.1f} mm.").format(size=y1, limit=l))
         return out
 
 
@@ -134,7 +136,7 @@ def _copies(polys, s, width):
     w, h = x1 - x0, y1 - y0
     out = []
     col, row = 0, 0
-    for _ in range(int(s.copies)):
+    for _copy in range(int(s.copies)):
         dx = col * (w + s.spacing)
         if col and width and x1 + dx > width:
             col, row = 0, row + 1
@@ -151,7 +153,7 @@ def plan(page_polys, page_height, s):
              for p in page_polys]
     polys = [p for p in polys if len(p) > 1]
     if not polys:
-        raise NoPathsError("Nothing to cut")
+        raise NoPathsError(_("Nothing to cut"))
 
     x0, y0, x1, y1 = geometry.bbox(polys)
     if s.mirror:
@@ -159,7 +161,7 @@ def plan(page_polys, page_height, s):
     if s.rotate:
         polys = geometry.rotate90(polys)
 
-    bx0, by0, _, _ = geometry.bbox(polys)
+    bx0, by0 = geometry.bbox(polys)[:2]
     if s.auto_align:
         polys = geometry.translate(polys, s.margin_x - bx0, s.margin_y - by0)
     else:
@@ -179,7 +181,7 @@ def plan(page_polys, page_height, s):
 
     if s.auto_align:
         #: Blade offset and overcut can reach past the margin; shift back
-        tx0, ty0, _, _ = geometry.bbox(paths)
+        tx0, ty0 = geometry.bbox(paths)[:2]
         dx, dy = max(0.0, s.margin_x - tx0), max(0.0, s.margin_y - ty0)
         if dx or dy:
             paths = geometry.translate(paths, dx, dy)

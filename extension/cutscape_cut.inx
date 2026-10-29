@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+<inkscape-extension translationdomain="cutscape" xmlns="http://www.inkscape.org/namespace/inkscape/extension">
   <name>Cut</name>
   <id>io.github.jetpax.cutscape.cut</id>
   <param name="action" type="optiongroup" appearance="radio" gui-text="Apply will:">
@@ -81,19 +81,19 @@
       </param>
       <label>With a cutter chosen, only Tool and the HPGL options below apply.</label>
       <param name="protocol" type="optiongroup" appearance="combo" gui-text="Language:">
-        <option value="hpgl">HPGL</option>
-        <option value="dmpl">DMPL</option>
-        <option value="gpgl">GP-GL (Graphtec, Silhouette)</option>
-        <option value="camm-gl1">CAMM-GL I (Roland)</option>
-        <option value="gcode">G-code</option>
+        <option translatable="no" value="hpgl">HPGL</option>
+        <option translatable="no" value="dmpl">DMPL</option>
+        <option translatable="no" value="gpgl">GP-GL (Graphtec, Silhouette)</option>
+        <option translatable="no" value="camm-gl1">CAMM-GL I (Roland)</option>
+        <option translatable="no" value="gcode">G-code</option>
       </param>
       <param name="dmpl_mode" type="optiongroup" appearance="combo" gui-text="DMPL dialect:">
-        <option value="1">1: ;:HAEC1 (0.001 in)</option>
-        <option value="2">2: ;:ECN A L0 (0.025 mm)</option>
-        <option value="3">3: ;:H A L0</option>
-        <option value="4">4: ;:H A L0</option>
-        <option value="6">6: IN;PA;</option>
-        <option value="7">7: Creation PCut</option>
+        <option translatable="no" value="1">1: ;:HAEC1 (0.001 in)</option>
+        <option translatable="no" value="2">2: ;:ECN A L0 (0.025 mm)</option>
+        <option translatable="no" value="3">3: ;:H A L0</option>
+        <option translatable="no" value="4">4: ;:H A L0</option>
+        <option translatable="no" value="6">6: IN;PA;</option>
+        <option translatable="no" value="7">7: Creation PCut</option>
       </param>
       <param name="steps_x" type="float" min="0" max="1000" precision="3" gui-text="Steps per mm, x:" gui-description="0 uses the language's default: 40 for HPGL/DMPL, 20 for GP-GL">0</param>
       <param name="steps_y" type="float" min="0" max="1000" precision="3" gui-text="Steps per mm, y:" gui-description="0 uses the same as x">0</param>
