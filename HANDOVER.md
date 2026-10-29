@@ -136,7 +136,8 @@ inkex path ops is the main porting cost.
   - HPGL defaults to 40 steps/mm; Inkcut used 1021 dpi.
 - **Folded in from unmerged upstream PRs:** #382, #388, #427, #428, #441 and
   #442. The README credits them.
-- **Released** as [v0.1.0](https://github.com/jetpax/CutScape/releases/tag/v0.1.0)
+- **Released** as [v0.1.0](https://github.com/jetpax/CutScape/releases/tag/v0.1.0),
+  then [v0.1.1](https://github.com/jetpax/CutScape/releases/tag/v0.1.1) (docs and repo cleanup)
   (zip built by `tools/package_extension.py`); `dev` is the default branch.
   The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
   compiled catalogs in `extension/locale/`, and `tools/i18n.py` does

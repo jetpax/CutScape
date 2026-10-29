@@ -23,7 +23,7 @@ interface est en français quand Inkscape l’est.
 
 You need Inkscape 1.4 or newer.
 
-1. Download `cutscape-0.1.0.zip` from the
+1. Download the `cutscape-….zip` file from the
    [Releases page](https://github.com/jetpax/CutScape/releases/latest).
 2. In Inkscape, open **Edit → Preferences → System**. Next to
    **User extensions**, click **Open** to show the folder.
