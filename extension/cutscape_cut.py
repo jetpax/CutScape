@@ -19,13 +19,17 @@ CONNECTION = dict(transport='printer', printer='', device='/dev/usb/lp0',
                   port='', baud='9600', flow='xonxoff',
                   file='~/cutscape.plt')
 
+#: mm; also checks the scale
+TEST_SQUARE = 50.0
+
 
 class CutScape(inkex.EffectExtension):
 
     def add_arguments(self, pars):
         pars.add_argument('--tab')
         pars.add_argument('--action', default='preview',
-                          choices=('preview', 'send', 'clear'))
+                          choices=('preview', 'send', 'test', 'find',
+                                   'clear'))
         for name, default in job.DEFAULTS.items():
             kind = inkex.Boolean if isinstance(default, bool) \
                 else type(default)
@@ -38,9 +42,15 @@ class CutScape(inkex.EffectExtension):
         if o.action == 'clear':
             preview.remove(self.svg)
             return
+        if o.action == 'find':
+            self.msg(transports.find_cutters())
+            return
         settings = job.Settings(**{k: getattr(o, k) for k in job.DEFAULTS})
         try:
-            plan = self.plan(settings)
+            if o.action == 'test':
+                plan = self.test_plan(settings)
+            else:
+                plan = self.plan(settings)
             problems = plan.problems()
             if o.action == 'preview':
                 preview.draw(self.svg, plan)
@@ -56,11 +66,32 @@ class CutScape(inkex.EffectExtension):
                 ack=plan.device['protocol'] == 'gcode')
         except (ValueError, transports.TransportError) as e:
             raise inkex.AbortExtension(str(e))
+        if o.action == 'test':
+            self.msg(_("Sent a {size:.0f} mm test square to {where}. Measure "
+                       "it: if it isn't {size:.0f} mm, the cutter's steps "
+                       "per mm are wrong.").format(size=TEST_SQUARE,
+                                                   where=where))
+            return
         x0, y0, x1, y1 = plan.bbox
         self.msg(_("Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of "
                    "cuts ({size} bytes) to {where}.").format(
             width=x1 - x0, height=y1 - y0, metres=plan.cut_length / 1000,
             size=len(data), where=where))
+
+    @staticmethod
+    def test_plan(settings):
+        """ A square at the origin, with the dialog's device, connection
+        and cut settings, ignoring the drawing and the material layout
+        """
+        for name in ('mirror', 'rotate', 'weedline', 'prefeed'):
+            setattr(settings, name, False)
+        settings.copies, settings.passes = 1, 1
+        settings.auto_align = True
+        settings.margin_x = settings.margin_y = 0.0
+        settings.feed = 0.0
+        size = TEST_SQUARE
+        square = [(0, 0), (size, 0), (size, size), (0, size), (0, 0)]
+        return job.plan([square], size, settings)
 
     def plan(self, settings):
         #: inkex drops ids it can't find; an unmatched selection must fail

@@ -5,6 +5,8 @@
   <param name="action" type="optiongroup" appearance="radio" gui-text="Apply will:">
     <option value="preview">Preview the toolpath on the canvas</option>
     <option value="send">Send to the cutter</option>
+    <option value="test">Send a 50 mm test square</option>
+    <option value="find">Find connected cutters</option>
     <option value="clear">Remove the preview</option>
   </param>
   <param name="tab" type="notebook">
@@ -113,8 +115,8 @@
         <option value="file">File</option>
       </param>
       <param name="printer" type="string" gui-text="Printer queue:" gui-description="A raw queue; leave empty to list the available ones"></param>
-      <param name="device" type="string" gui-text="Device file:" gui-description="eg /dev/usb/lp0 for a USB cutter on Linux">/dev/usb/lp0</param>
-      <param name="port" type="string" gui-text="Serial port:" gui-description="eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3"></param>
+      <param name="device" type="string" gui-text="Device file:" gui-description="eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes. Find connected cutters lists them">/dev/usb/lp0</param>
+      <param name="port" type="string" gui-text="Serial port:" gui-description="eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3, or a USB id such as usb:1a86:7523"></param>
       <param name="baud" type="optiongroup" appearance="combo" gui-text="Baud rate:">
         <option translatable="no" value="9600">9600</option>
         <option translatable="no" value="19200">19200</option>

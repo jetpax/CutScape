@@ -111,37 +111,54 @@ translations.
 
 ## Connecting your cutter
 
-**USB cutters on Linux.** Most HPGL cutters present themselves as USB printers.
-The simplest setup is a *raw* CUPS queue, which passes the commands through
-untouched. Find the cutter's URI, then create the queue:
+**Start with *Find connected cutters*.** Choose it under *Apply will:* and click
+Apply. CutScape lists every USB cutter, printer queue and serial port it can see,
+with what to enter on the **Connection** tab. If something needs setting up, it
+says how. Then choose **Send a 50 mm test square**: it uses your Device and
+Connection settings, ignores the drawing, and checks the scale.
 
-```bash
-lpinfo -v | grep usb
-```
+**USB cutters on Linux: Device file (recommended).** Most HPGL cutters are USB
+printers, and Linux makes them `/dev/usb/lp0`, `lp1` and so on. The number can
+change when you plug things in, so use one of these instead:
+
+- **A USB id** such as `usb:0483:5750`, as listed by *Find connected cutters*.
+  CutScape looks it up each time.
+- **`/dev/cutter`**, using a udev rule. *Find connected cutters* prints the rule
+  for your cutter when you can't write to it yet. Save it as
+  `/etc/udev/rules.d/70-cutter.rules`, then run:
+
+  ```bash
+  sudo udevadm control --reload && sudo udevadm trigger
+  ```
+
+  The rule also lets whoever is logged in use the cutter, so you don't need the
+  `lp` group, and it works for every account. Keep the file's number below 73.
+
+If the cutter stops taking data for 30 seconds (it's offline, paused or out of
+material), CutScape stops with an error rather than leaving Inkscape waiting.
+
+**Printer queue (macOS, or Linux with CUPS).** macOS has no `/dev/usb/lp…`, so
+use a *raw* CUPS queue, which passes the commands through untouched. *Find
+connected cutters* lists USB printers that have no queue yet, with the
+command to create one:
 
 ```bash
 sudo lpadmin -p cutter -E -v 'usb://YOUR/CUTTER?serial=…' -m raw
 ```
 
-In CutScape, choose **Printer queue** and enter `cutter`. If you leave the queue
-empty and click Apply, CutScape lists the queues it can see. To check the queue
-without Inkscape, this should cut a 50 mm square:
-
-```bash
-printf 'IN;PU0,0;PD2000,0,2000,2000,0,2000,0,0;PU0,0;' | lp -d cutter -o raw
-```
-
-The cutter must be online (check its panel), or CUPS waits at
+CUPS warns that raw queues are deprecated. They still work, but this is why
+Device file is the better choice on Linux. In CutScape, choose **Printer queue**
+and enter `cutter`. CutScape stops if the queue is stopped. It can't tell
+whether the cutter is online, though: CUPS accepts the job either way. If
+nothing moves, check the cutter's panel. `lpstat -o` shows the job waiting at
 "Sending data to printer".
 
-Alternatively, choose **Device file** and enter `/dev/usb/lp0`. Your account
-needs to be in the `lp` group for that: run `sudo usermod -aG lp $USER`, then
-log out and back in.
-
-**Serial and USB-serial cutters.** Choose **Serial port** and enter the port:
-`/dev/ttyUSB0` on Linux, `/dev/cu.usbserial-…` on macOS, `COM3` on Windows. Set
-the baud rate and flow control from the cutter's manual. G-code controllers such
-as GRBL are fed one line at a time, waiting for each `ok`.
+**Serial and USB-serial cutters.** Choose **Serial port** and enter the port
+(`/dev/ttyUSB0` on Linux, `/dev/cu.usbserial-…` on macOS, `COM3` on Windows), or
+the USB id listed by *Find connected cutters*. Set the baud rate and flow
+control from the cutter's manual. G-code controllers such as GRBL are fed one
+line at a time, waiting for each `ok`. A port that stops taking data for 30
+seconds ends the job with an error.
 
 **Windows printer queues** need pywin32. They are untested.
 
@@ -155,9 +172,12 @@ and Bluetooth.
   0.2 s on a Mac. The first run on a new Inkscape profile can take much longer
   while fonts are indexed. Converting the text yourself (**Path → Object to
   Path**) skips this step.
-- **Nothing happens on the cutter.** Check that it's online, try the
-  50 mm square test above, and set **Send through: File** to look at what
-  CutScape produces.
+- **Nothing happens on the cutter.** Check that it's online on its panel,
+  run *Find connected cutters*, and send the test square. To see what
+  CutScape produces, set **Send through: File** and open the file.
+- **"stopped accepting data".** The cutter took part of the job and then
+  nothing for 30 s. It's usually offline (press its online or enter key),
+  paused, or out of material. Cut what was sent off and send again.
 
 ## Supported cutters
 

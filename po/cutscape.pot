@@ -23,6 +23,14 @@ msgid "Send to the cutter"
 msgstr ""
 
 #: extension/cutscape_cut.inx
+msgid "Send a 50 mm test square"
+msgstr ""
+
+#: extension/cutscape_cut.inx
+msgid "Find connected cutters"
+msgstr ""
+
+#: extension/cutscape_cut.inx
 msgid "Remove the preview"
 msgstr ""
 
@@ -285,7 +293,7 @@ msgid "Device file:"
 msgstr ""
 
 #: extension/cutscape_cut.inx
-msgid "eg /dev/usb/lp0 for a USB cutter on Linux"
+msgid "eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes. Find connected cutters lists them"
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -293,7 +301,7 @@ msgid "Serial port:"
 msgstr ""
 
 #: extension/cutscape_cut.inx
-msgid "eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3"
+msgid "eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3, or a USB id such as usb:1a86:7523"
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -332,9 +340,14 @@ msgstr ""
 msgid "CutScape"
 msgstr ""
 
-#: extension/cutscape_cut.py:60
+#: extension/cutscape_cut.py:76
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
+msgstr ""
+
+#: extension/cutscape_cut.py:70
+#, python-brace-format
+msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
 msgstr ""
 
 #: extension/cutscape/document.py:106
@@ -386,57 +399,134 @@ msgstr ""
 msgid "Cuts"
 msgstr ""
 
-#: extension/cutscape/transports.py:22
+#: extension/cutscape/transports.py:452
+msgid "No cutters found. Check that it is plugged in and switched on. On Linux, serial ports need pyserial: sudo apt install python3-serial."
+msgstr ""
+
+#: extension/cutscape/transports.py:35
 msgid "No output file set"
 msgstr ""
 
-#: extension/cutscape/transports.py:96
+#: extension/cutscape/transports.py:152
 msgid "No serial port set"
 msgstr ""
 
-#: extension/cutscape/transports.py:139
+#: extension/cutscape/transports.py:199
+#, python-brace-format
+msgid "{where} stopped accepting data for {seconds:.0f} s. Is the cutter online, with material loaded? Check its panel."
+msgstr ""
+
+#: extension/cutscape/transports.py:233
 msgid "No device file set"
 msgstr ""
 
-#: extension/cutscape/transports.py:66
+#: extension/cutscape/transports.py:283
+#, python-brace-format
+msgid "Could not write to {path}: {error}"
+msgstr ""
+
+#: extension/cutscape/transports.py:415
+msgid "USB cutters (choose Device file):"
+msgstr ""
+
+#: extension/cutscape/transports.py:431
+msgid "Printer queues (choose Printer queue):"
+msgstr ""
+
+#: extension/cutscape/transports.py:440
+msgid "USB printers with no queue yet; to make one:"
+msgstr ""
+
+#: extension/cutscape/transports.py:446
+msgid "Serial ports (choose Serial port):"
+msgstr ""
+
+#: extension/cutscape/transports.py:122
 msgid "Printing on Windows needs pywin32"
 msgstr ""
 
-#: extension/cutscape/transports.py:94
+#: extension/cutscape/transports.py:150
 msgid "Serial output needs pyserial (python3-serial on Linux)"
 msgstr ""
 
-#: extension/cutscape/transports.py:47
+#: extension/cutscape/transports.py:276
+#, python-brace-format
+msgid "No permission to write to {path}. Add a udev rule for the cutter (choose \"Find connected cutters\" for one), or join the lp group: sudo usermod -aG lp $USER, then log out and back in."
+msgstr ""
+
+#: extension/cutscape/transports.py:281
+#, python-brace-format
+msgid "{path} isn't there. Is the cutter plugged in and switched on?"
+msgstr ""
+
+#: extension/cutscape/transports.py:98
 #, python-brace-format
 msgid "No printer queue set. Available queues: {queues}"
 msgstr ""
 
-#: extension/cutscape/transports.py:56
+#: extension/cutscape/transports.py:102
 #, python-brace-format
-msgid "lpr failed ({code}): {error}"
+msgid "The printer queue {queue} is stopped, so the job would wait in it. Run: cupsenable {queue}"
 msgstr ""
 
-#: extension/cutscape/transports.py:48
+#: extension/cutscape/transports.py:111
+#, python-brace-format
+msgid "lp failed ({code}): {error}"
+msgstr ""
+
+#: extension/cutscape/transports.py:339
+#, python-brace-format
+msgid "A USB id looks like usb:0483:5750, optionally followed by :SERIAL; got {path}"
+msgstr ""
+
+#: extension/cutscape/transports.py:348
+#, python-brace-format
+msgid "No USB printer {path} is connected. Is the cutter plugged in and switched on?"
+msgstr ""
+
+#: extension/cutscape/transports.py:352
+#, python-brace-format
+msgid "More than one USB printer matches {path}: {paths}. Add the serial number to tell them apart."
+msgstr ""
+
+#: extension/cutscape/transports.py:388
+#, python-brace-format
+msgid "No single serial port matches {port}; found {count}."
+msgstr ""
+
+#: extension/cutscape/transports.py:434
+msgid "(stopped)"
+msgstr ""
+
+#: extension/cutscape/transports.py:99
 msgid "none found"
 msgstr ""
 
-#: extension/cutscape/transports.py:54
+#: extension/cutscape/transports.py:109
 #, python-brace-format
-msgid "Could not run lpr: {error}"
+msgid "Could not run lp: {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:110
+#: extension/cutscape/transports.py:168
 #, python-brace-format
 msgid "Serial port {port}: {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:143
-#, python-brace-format
-msgid "Could not open {path}: {error}"
+#: extension/cutscape/transports.py:420
+msgid "You can't write to it yet. To fix that for everyone who logs in, and to always find it at /dev/cutter, save this line as /etc/udev/rules.d/70-cutter.rules:"
 msgstr ""
 
-#: extension/cutscape/transports.py:125
+#: extension/cutscape/transports.py:425
+msgid "then run: sudo udevadm control --reload && sudo udevadm trigger"
+msgstr ""
+
+#: extension/cutscape/transports.py:214
 #, python-brace-format
 msgid "No reply to {command} within {seconds} s"
+msgstr ""
+
+#: extension/cutscape/transports.py:263
+#, python-brace-format
+msgid "{sent} of {total} bytes were sent."
 msgstr ""
 

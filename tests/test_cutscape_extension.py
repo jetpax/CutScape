@@ -48,6 +48,26 @@ def test_send_to_file(tmp_path):
     assert data.endswith(b'PU0,0;IN;')
 
 
+def test_test_square(tmp_path):
+    """ The test square ignores the drawing and material layout, but uses
+    the device settings: 50 mm at HPGL's 40 steps per mm
+    """
+    plt = tmp_path / 'test.plt'
+    run(tmp_path, '--action=test', '--id=star', '--transport=file',
+        '--file=%s' % plt, '--overcut=0', '--copies=3', '--mirror=true')
+    data = plt.read_bytes()
+    assert data.startswith(b'IN;SP1;PU')
+    assert b'2000,0' in data and b'2000,2000' in data and b'0,2000' in data
+    assert data.count(b'PD') == 4
+
+
+def test_find_cutters_action(tmp_path, monkeypatch):
+    from cutscape import transports
+    monkeypatch.setattr(transports, 'find_cutters', lambda: 'REPORT')
+    ext, out = run(tmp_path, '--action=find')
+    assert not (tmp_path / 'job.plt').exists()
+
+
 def test_whole_drawing_skips_hidden(tmp_path):
     svg = inkex.load_svg(SAMPLE).getroot()
     roots = document.selected_roots(svg)
