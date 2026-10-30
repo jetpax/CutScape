@@ -18,8 +18,10 @@ from cutscape.i18n import _  # noqa: E402
 
 CONNECTION = dict(transport='printer', printer='', device='/dev/usb/lp0',
                   port='', baud='9600', flow='xonxoff',
-                  file='~/cutscape.plt', printer_task='create',
-                  printer_uri='')
+                  file='~/cutscape.plt')
+
+#: Extensions > CutScape > Printer Queue
+QUEUE = dict(printer_task='create', printer_uri='')
 
 #: mm; also checks the scale
 TEST_SQUARE = 50.0
@@ -36,7 +38,9 @@ class CutScape(inkex.EffectExtension):
             kind = inkex.Boolean if isinstance(default, bool) \
                 else type(default)
             pars.add_argument('--' + name, type=kind, default=default)
-        for name, default in CONNECTION.items():
+        #: The Find, Printer Queue and Remove Preview menu entries run this
+        #: script too, with a fixed --action and only their own parameters
+        for name, default in list(CONNECTION.items()) + list(QUEUE.items()):
             pars.add_argument('--' + name, default=default)
 
     def effect(self):

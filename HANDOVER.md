@@ -146,7 +146,12 @@ inkex path ops is the main porting cost.
   then [v0.1.1](https://github.com/jetpax/CutScape/releases/tag/v0.1.1) (docs and repo cleanup)
   and [v0.2.0](https://github.com/jetpax/CutScape/releases/tag/v0.2.0) (connections: find cutters, USB ids,
   stall timeouts, test square, and managing the CUPS queue: create, restart,
-  remove, in `extension/cutscape/printers.py`)
+  remove, in `extension/cutscape/printers.py`). The Extensions > CutScape
+  submenu has four entries, each an .inx running `cutscape_cut.py` with a
+  hidden `--action`: Cut… (preview, send, test square), Find Connected
+  Cutters and Remove Preview (no dialog), and Printer Queue… (its own
+  small dialog). Inkscape stores settings per entry, so anything that
+  needs the device or connection settings stays in Cut….
   (zip built by `tools/package_extension.py`); `dev` is the default branch.
   The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
   compiled catalogs in `extension/locale/`, and `tools/i18n.py` does

@@ -1,6 +1,7 @@
 """
 Translations: the catalogs match the sources and load at run time.
 """
+import glob
 import importlib.util
 import re
 import xml.etree.ElementTree as ET
@@ -47,8 +48,9 @@ def test_compiled_catalog_is_current(lang):
         assert f.read() == tool.mo_bytes(header, entries)
 
 
-def test_inx_uses_catalog():
-    root = ET.parse('extension/cutscape_cut.inx').getroot()
+@pytest.mark.parametrize('inx', sorted(glob.glob('extension/*.inx')))
+def test_inx_uses_catalog(inx):
+    root = ET.parse(inx).getroot()
     assert root.get('translationdomain') == i18n.DOMAIN
 
 

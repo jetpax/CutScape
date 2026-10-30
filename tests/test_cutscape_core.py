@@ -1,6 +1,8 @@
 """
 CutScape core: plain Python, no inkex or Qt needed.
 """
+import glob
+import importlib.util
 import math
 import re
 import xml.etree.ElementTree as ET
@@ -279,3 +281,44 @@ def test_inx_defaults_match_dataclass():
             assert text == ('true' if default else 'false'), name
         elif isinstance(default, (int, float)):
             assert math.isclose(float(text), default), name
+
+
+# -----------------------------------------------------------------------------
+# The other menu entries: Find Connected Cutters, Printer Queue, Remove Preview
+# -----------------------------------------------------------------------------
+MENU = {
+    'extension/cutscape_find.inx': ('find', set()),
+    'extension/cutscape_queue.inx': ('printers',
+                                     {'printer', 'printer_task',
+                                      'printer_uri'}),
+    'extension/cutscape_clear.inx': ('clear', set()),
+}
+
+
+@pytest.mark.parametrize('inx', sorted(MENU))
+def test_menu_entries(inx):
+    """ Each runs the effect script with a fixed, hidden --action and only
+    parameters the script knows
+    """
+    action, visible = MENU[inx]
+    root = ET.parse(inx).getroot()
+    q = '{%s}' % NS['i']
+    params = {p.get('name'): p for p in root.iter(q + 'param')}
+    assert params['action'].get('gui-hidden') == 'true'
+    assert params['action'].text == action
+    assert set(params) - {'action'} == visible
+    assert root.find(q + 'script/' + q + 'command').text == 'cutscape_cut.py'
+    assert root.find('.//' + q + 'submenu').get('name') == 'CutScape'
+    if importlib.util.find_spec('inkex') is None:
+        pytest.skip("inkex not installed")
+    spec = importlib.util.spec_from_file_location(
+        'cutscape_cut', 'extension/cutscape_cut.py')
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert visible <= set(mod.CONNECTION) | set(mod.QUEUE)
+
+
+def test_menu_ids_unique():
+    ids = [ET.parse(p).getroot().find('{%s}id' % NS['i']).text
+           for p in sorted(glob.glob('extension/*.inx'))]
+    assert len(ids) == len(set(ids)) == 4

@@ -3,10 +3,16 @@
 Send drawings from Inkscape straight to a vinyl cutter or plotter.
 
 CutScape is an **Inkscape extension, not an app**. You don't launch anything
-separately. It adds **Extensions → CutScape → Cut…** to Inkscape, where you
-preview the toolpath on your canvas and then send it to the cutter. It runs on
-the Python that ships with Inkscape, so there is no Qt, no virtualenv and nothing
-to `pip install`.
+separately. It adds a **CutScape** submenu to Inkscape's **Extensions** menu. It
+runs on the Python that ships with Inkscape, so there is no Qt, no virtualenv
+and nothing to `pip install`.
+
+| Extensions → CutScape → | |
+|---|---|
+| **Cut…** | Preview the toolpath on your canvas, send it to the cutter, or send a 50 mm test square |
+| **Find Connected Cutters** | List the cutters, printer queues and serial ports CutScape can send to |
+| **Printer Queue…** | Create, restart or remove the printer queue for a USB cutter |
+| **Remove Preview** | Take the toolpath preview off the drawing |
 
 *En français :* CutScape est une extension Inkscape, pas une application. Son
 interface est en français quand Inkscape l’est.
@@ -63,7 +69,8 @@ equivalent. Nothing else is needed.
    - Grey dashes mark the edge of the material.
 
    The preview goes on a locked layer called *CutScape preview*, which is
-   never cut. **Remove the preview** (or Ctrl+Z) takes it away.
+   never cut. **Extensions → CutScape → Remove Preview** (or Ctrl+Z) takes it
+   away.
 5. Choose **Send to the cutter** and click **Apply**.
 
 To send again with the same settings, use **Extensions → Previous Extension**.
@@ -90,7 +97,6 @@ To send again with the same settings, use **Extensions → Previous Extension**.
 | | Feed past the job | Where the head parks when it's done. 0 returns it to the origin. |
 | Device | Cutter | A preset for your model, or *Custom* to set the command language (HPGL, DMPL, GP-GL, CAMM-GL, G-code), resolution and axes yourself. |
 | Connection | Send through | A printer queue, a device file, a serial port, or a file to check the output. |
-| | Manage the queue | Create, restart or remove the cutter's printer queue, when *Apply will* is *Manage the printer queue*. |
 
 ## Languages
 
@@ -112,19 +118,19 @@ translations.
 
 ## Connecting your cutter
 
-**Start with *Find connected cutters*.** Choose it under *Apply will:* and click
-Apply. CutScape lists every USB cutter, printer queue and serial port it can see,
+**Start with Extensions → CutScape → Find Connected Cutters.** It runs straight
+away. CutScape lists every USB cutter, printer queue and serial port it can see,
 with what to enter on the **Connection** tab. If something needs setting up, it
-says how. Then choose **Send a 50 mm test square**: it uses your Device and
+says how. Then, in **Cut…**, choose **Send a 50 mm test square**: it uses your Device and
 Connection settings, ignores the drawing, and checks the scale.
 
 **USB cutters on Linux: Device file (recommended).** Most HPGL cutters are USB
 printers, and Linux makes them `/dev/usb/lp0`, `lp1` and so on. The number can
 change when you plug things in, so use one of these instead:
 
-- **A USB id** such as `usb:0483:5750`, as listed by *Find connected cutters*.
+- **A USB id** such as `usb:0483:5750`, as listed by *Find Connected Cutters*.
   CutScape looks it up each time.
-- **`/dev/cutter`**, using a udev rule. *Find connected cutters* prints the rule
+- **`/dev/cutter`**, using a udev rule. *Find Connected Cutters* prints the rule
   for your cutter when you can't write to it yet. Save it as
   `/etc/udev/rules.d/70-cutter.rules`, then run:
 
@@ -143,17 +149,19 @@ use a *raw* CUPS queue, which passes the commands through untouched. CutScape
 can set it up for you:
 
 1. Plug in the cutter and switch it on.
-2. On the **Connection** tab, enter a queue name under **Printer queue**, or
-   leave it empty to use `cutter`. Choose **Manage the queue: Create it for the
-   USB cutter**.
-3. Under *Apply will:*, choose **Manage the printer queue** and click Apply.
-4. Set **Send through** to **Printer queue**.
+2. Open **Extensions → CutScape → Printer Queue…**, choose **Create the queue
+   for the USB cutter**, and click Apply. The queue is called `cutter` unless you
+   change **Queue name**.
+3. In **Cut…**, on the **Connection** tab, set **Send through** to **Printer
+   queue** and enter the same name.
+
+<img src="docs/images/cutscape-printer-queue.png" width="380" alt="The Printer Queue dialog">
 
 If more than one USB printer has no queue, CutScape lists their addresses. Paste
 the cutter's address (`usb://…`) into **Cutter's USB address** and apply again.
 
-The same action can also **Restart** a stopped queue (clearing any jobs stuck in
-it) or **Remove** the queue. Changing printers needs CUPS admin rights. On
+The same dialog can also **restart** a stopped queue (clearing any jobs stuck in
+it) or **remove** the queue. Changing printers needs CUPS admin rights. On
 Ubuntu, the first user account has them. If CUPS refuses, CutScape shows the
 `sudo` command to run in a terminal instead, for example:
 
@@ -169,7 +177,7 @@ job waiting at "Sending data to printer".
 
 **Serial and USB-serial cutters.** Choose **Serial port** and enter the port
 (`/dev/ttyUSB0` on Linux, `/dev/cu.usbserial-…` on macOS, `COM3` on Windows), or
-the USB id listed by *Find connected cutters*. Set the baud rate and flow
+the USB id listed by *Find Connected Cutters*. Set the baud rate and flow
 control from the cutter's manual. G-code controllers such as GRBL are fed one
 line at a time, waiting for each `ok`. A port that stops taking data for 30
 seconds ends the job with an error.
@@ -187,7 +195,7 @@ and Bluetooth.
   while fonts are indexed. Converting the text yourself (**Path → Object to
   Path**) skips this step.
 - **Nothing happens on the cutter.** Check that it's online on its panel,
-  run *Find connected cutters*, and send the test square. To see what
+  run *Find Connected Cutters*, and send the test square. To see what
   CutScape produces, set **Send through: File** and open the file.
 - **"stopped accepting data".** The cutter took part of the job and then
   nothing for 30 s. It's usually offline (press its online or enter key),

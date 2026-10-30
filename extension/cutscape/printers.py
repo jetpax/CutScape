@@ -115,8 +115,8 @@ def create(queue='', uri=''):
         msg = _("The printer queue {queue} is already set up for "
                 "{uri}.").format(queue=queue, uri=uri)
         if transports.queue_state(queue) == 'disabled':
-            msg += ' ' + _("It is stopped; choose Restart it and clear "
-                           "stuck jobs to start it.")
+            msg += ' ' + _("It is stopped; choose Restart the queue and "
+                           "clear stuck jobs to start it.")
         return msg
     #: -m raw passes the cutter's commands through untouched. CUPS warns
     #: that raw queues are deprecated, but they still work.
@@ -125,8 +125,8 @@ def create(queue='', uri=''):
     if existing:
         return _("Moved the printer queue {queue} to {uri}.").format(
             queue=queue, uri=uri)
-    return _("Created the printer queue {queue} for {uri}. On the "
-             "Connection tab, choose Printer queue and enter "
+    return _("Created the printer queue {queue} for {uri}. In Cut, on "
+             "the Connection tab, choose Printer queue and enter "
              "{queue}.").format(queue=queue, uri=uri)
 
 
