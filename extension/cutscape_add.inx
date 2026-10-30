@@ -2,7 +2,7 @@
 <inkscape-extension translationdomain="cutscape" xmlns="http://www.inkscape.org/namespace/inkscape/extension">
   <name>Add Cutter</name>
   <id>io.github.jetpax.cutscape.add</id>
-  <param name="action" type="string" gui-hidden="true">add</param>
+  <param name="entry" type="string" gui-hidden="true">add</param>
   <label>Plug the cutter in and switch it on, choose its model, and click Apply. CutScape finds the cutter and sets up the connection. From then on, Cut sends to it.</label>
   <param name="model" type="optiongroup" appearance="combo" gui-text="Model:">
     <option value="custom">Not listed (set it up on Cut's Device tab)</option>

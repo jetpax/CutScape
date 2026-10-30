@@ -303,16 +303,16 @@ MENU = {
 
 @pytest.mark.parametrize('inx', sorted(MENU))
 def test_menu_entries(inx):
-    """ Each runs the effect script with a fixed, hidden --action and only
+    """ Each runs the effect script with a fixed, hidden --entry and only
     parameters the script knows
     """
-    action, visible = MENU[inx]
+    entry, visible = MENU[inx]
     root = ET.parse(inx).getroot()
     q = '{%s}' % NS['i']
     params = {p.get('name'): p for p in root.iter(q + 'param')}
-    assert params['action'].get('gui-hidden') == 'true'
-    assert params['action'].text == action
-    assert set(params) - {'action'} == visible
+    assert params['entry'].get('gui-hidden') == 'true'
+    assert params['entry'].text == entry
+    assert set(params) - {'entry'} == visible
     assert root.find(q + 'script/' + q + 'command').text == 'cutscape_cut.py'
     assert root.find('.//' + q + 'submenu').get('name') == 'CutScape'
     if importlib.util.find_spec('inkex') is None:
@@ -322,6 +322,22 @@ def test_menu_entries(inx):
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert visible <= set(mod.CONNECTION) | set(mod.ADD)
+
+
+def test_cut_actions_match():
+    """ Anything else Inkscape passes as --action (an old saved choice)
+    previews, as the dialog shows """
+    action = [p for p in _inx().iter('{%s}param' % NS['i'])
+              if p.get('name') == 'action'][0]
+    values = [o.get('value') for o in action.iter('{%s}option' % NS['i'])]
+    if importlib.util.find_spec('inkex') is None:
+        pytest.skip("inkex not installed")
+    spec = importlib.util.spec_from_file_location(
+        'cutscape_cut', 'extension/cutscape_cut.py')
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert values == list(mod.CUT_ACTIONS)
+    assert values[0] == 'preview'
 
 
 def test_menu_ids_unique():

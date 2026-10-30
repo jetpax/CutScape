@@ -2,7 +2,7 @@
 <inkscape-extension translationdomain="cutscape" xmlns="http://www.inkscape.org/namespace/inkscape/extension">
   <name>Remove Cutter</name>
   <id>io.github.jetpax.cutscape.remove</id>
-  <param name="action" type="string" gui-hidden="true">remove</param>
+  <param name="entry" type="string" gui-hidden="true">remove</param>
   <!-- The label gives it a dialog, so removing takes a second click -->
   <label>Forgets the cutter you added, and removes the printer queue Add Cutter made for it. You can add it again at any time.</label>
   <effect needs-live-preview="false">

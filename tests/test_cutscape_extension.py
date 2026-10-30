@@ -37,6 +37,17 @@ def test_preview_layer(tmp_path):
     assert all(r.get('id') != document.PREVIEW_ID for r in roots)
 
 
+@pytest.mark.parametrize('action', ['find', 'printers', 'clear'])
+def test_old_saved_action_previews(tmp_path, action):
+    """ Inkscape still passes the action saved by 0.2.0's Cut dialog, while
+    the dialog shows Preview as chosen. "clear" is valid for Remove
+    Preview, but not from Cut's dialog. """
+    ext, out = run(tmp_path, '--action=' + action, '--id=star',
+                   '--preset=custom', '--transport=printer')
+    svg = inkex.load_svg(str(out)).getroot()
+    assert svg.getElementById(document.PREVIEW_ID) is not None
+
+
 def test_send_to_file(tmp_path):
     plt = tmp_path / 'job.plt'
     run(tmp_path, '--action=send', '--id=star', '--transport=file',
@@ -66,7 +77,7 @@ def test_add_cutter_action(tmp_path, monkeypatch, capsys):
     calls = []
     monkeypatch.setattr(cutter, 'add', lambda *a: calls.append(a) or (
         'ADDED', True))
-    run(tmp_path, '--action=add', '--model=Summa D760', '--address= vinyl ')
+    run(tmp_path, '--entry=add', '--model=Summa D760', '--address= vinyl ')
     assert calls == [('Summa D760', ' vinyl ')]
     #: CUTSCAPE_STDERR (conftest) keeps it out of a window
     assert 'ADDED' in capsys.readouterr().err
@@ -78,7 +89,7 @@ def test_messages_use_a_window_when_possible(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(notify, 'show',
                         lambda text, **kw: shown.append((text, kw)) or True)
     monkeypatch.setattr(cutter, 'add', lambda *a: ('NOT YET', False))
-    run(tmp_path, '--action=add')
+    run(tmp_path, '--entry=add')
     assert shown == [('NOT YET', dict(kind='warning', report=False))]
     #: Nothing on stderr, so Inkscape adds no "additional data" warning
     assert 'NOT YET' not in capsys.readouterr().err
@@ -94,19 +105,19 @@ def test_add_cutter_problems(tmp_path, monkeypatch, capsys):
         raise cutter.CutterError('No cutter found.')
     monkeypatch.setattr(cutter, 'add', nothing)
     with pytest.raises(SystemExit):
-        run(tmp_path, '--action=add')
+        run(tmp_path, '--entry=add')
     assert 'No cutter found.' in capsys.readouterr().err
     shown = []
     monkeypatch.setattr(notify, 'show',
                         lambda text, **kw: shown.append((text, kw)) or True)
-    run(tmp_path, '--action=add')
+    run(tmp_path, '--entry=add')
     assert shown == [('No cutter found.', dict(kind='warning'))]
 
 
 def test_remove_cutter_action(tmp_path, monkeypatch, capsys):
     from cutscape import cutter
     monkeypatch.setattr(cutter, 'remove', lambda: 'REMOVED')
-    run(tmp_path, '--action=remove')
+    run(tmp_path, '--entry=remove')
     assert 'REMOVED' in capsys.readouterr().err
 
 

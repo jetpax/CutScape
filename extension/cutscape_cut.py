@@ -26,26 +26,36 @@ ADD = dict(model=devices.CUSTOM, address='')
 #: mm; also checks the scale
 TEST_SQUARE = 50.0
 
+#: What Cut's "Apply will" offers
+CUT_ACTIONS = ('preview', 'send', 'test')
+
 
 class CutScape(inkex.EffectExtension):
 
     def add_arguments(self, pars):
         pars.add_argument('--tab')
-        pars.add_argument('--action', default='preview',
-                          choices=('preview', 'send', 'test', 'add',
-                                   'remove', 'clear'))
+        #: Cut's "Apply will". Not choices=: Inkscape passes a saved choice
+        #: the dialog no longer offers (0.2.0's "find", say) as it is, while
+        #: showing Preview as chosen
+        pars.add_argument('--action', default='preview')
+        #: The Add Cutter, Remove Cutter and Remove Preview menu entries run
+        #: this script too, with a fixed, hidden --entry and only their own
+        #: parameters. Inkscape doesn't save hidden parameters, so these
+        #: can't go stale.
+        pars.add_argument('--entry', choices=('add', 'remove', 'clear'))
         for name, default in job.DEFAULTS.items():
             kind = inkex.Boolean if isinstance(default, bool) \
                 else type(default)
             pars.add_argument('--' + name, type=kind, default=default)
-        #: The Add Cutter, Remove Cutter and Remove Preview menu entries run
-        #: this script too, with a fixed --action and only their own
-        #: parameters
         for name, default in list(CONNECTION.items()) + list(ADD.items()):
             pars.add_argument('--' + name, default=default)
 
     def effect(self):
         o = self.options
+        if o.entry:
+            o.action = o.entry
+        elif o.action not in CUT_ACTIONS:
+            o.action = 'preview'
         if o.action == 'clear':
             preview.remove(self.svg)
             return
