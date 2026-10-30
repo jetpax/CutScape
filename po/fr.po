@@ -374,12 +374,12 @@ msgstr "Prévisualiser ou découper la sélection sur une découpeuse vinyle ou 
 msgid "CutScape"
 msgstr "CutScape"
 
-#: extension/cutscape_cut.py:84
+#: extension/cutscape_cut.py:85
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr "{width:.0f} × {height:.0f} mm envoyés, soit {metres:.2f} m de découpe ({size} octets), vers {where}."
 
-#: extension/cutscape_cut.py:78
+#: extension/cutscape_cut.py:79
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
 msgstr "Carré test de {size:.0f} mm envoyé à {where}. Mesurez-le : s’il ne fait pas {size:.0f} mm, le nombre de pas par mm de la découpeuse est faux."

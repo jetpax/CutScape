@@ -61,11 +61,30 @@ def test_test_square(tmp_path):
     assert data.count(b'PD') == 4
 
 
-def test_find_cutters_action(tmp_path, monkeypatch):
+def test_find_cutters_action(tmp_path, monkeypatch, capsys):
     from cutscape import transports
     monkeypatch.setattr(transports, 'find_cutters', lambda: 'REPORT')
     ext, out = run(tmp_path, '--action=find')
     assert not (tmp_path / 'job.plt').exists()
+    #: CUTSCAPE_STDERR (conftest) keeps it out of a window
+    assert 'REPORT' in capsys.readouterr().err
+
+
+def test_messages_use_a_window_when_possible(tmp_path, monkeypatch, capsys):
+    from cutscape import notify, transports
+    shown = []
+    monkeypatch.setattr(notify, 'show',
+                        lambda text, **kw: shown.append((text, kw)) or True)
+    monkeypatch.setattr(transports, 'find_cutters', lambda: 'REPORT')
+    run(tmp_path, '--action=find')
+    assert shown == [('REPORT', dict(kind='info', report=True))]
+    #: Nothing on stderr, so Inkscape adds no "additional data" warning
+    assert 'REPORT' not in capsys.readouterr().err
+
+
+def test_notify_respects_cutscape_stderr():
+    from cutscape import notify
+    assert notify.show('hello') is False
 
 
 def test_manage_printers_action(tmp_path, monkeypatch):

@@ -134,6 +134,12 @@ inkex path ops is the main porting cost.
   - Preset invert flags reflect the job in place, and park stays at the
     origin.
   - HPGL defaults to 40 steps/mm; Inkcut used 1021 dpi.
+  - Reports and confirmations open in CutScape's own GTK window
+    (`cutscape/notify.py`), not stderr. Inkscape 1.4 attaches "received
+    additional data … results will not be as expected" to any stderr
+    from a successful effect, and `show-stderr` only applies to
+    custom-GUI effects (it still showed the warning when tried). Without
+    GTK, or with CUTSCAPE_STDERR=1 (tests), it falls back to stderr.
 - **Folded in from unmerged upstream PRs:** #382, #388, #427, #428, #441 and
   #442. The README credits them.
 - **Released** as [v0.1.0](https://github.com/jetpax/CutScape/releases/tag/v0.1.0),

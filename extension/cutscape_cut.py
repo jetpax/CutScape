@@ -12,7 +12,8 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 import inkex  # noqa: E402
 
-from cutscape import document, job, preview, printers, transports  # noqa: E402
+from cutscape import (  # noqa: E402
+    document, job, notify, preview, printers, transports)
 from cutscape.i18n import _  # noqa: E402
 
 CONNECTION = dict(transport='printer', printer='', device='/dev/usb/lp0',
@@ -44,11 +45,11 @@ class CutScape(inkex.EffectExtension):
             preview.remove(self.svg)
             return
         if o.action == 'find':
-            self.msg(transports.find_cutters())
+            self.say(transports.find_cutters(), report=True)
             return
         if o.action == 'printers':
             try:
-                self.msg(printers.manage(o.printer_task, o.printer.strip(),
+                self.say(printers.manage(o.printer_task, o.printer.strip(),
                                          o.printer_uri.strip()))
             except printers.PrinterError as e:
                 raise inkex.AbortExtension(str(e))
@@ -63,7 +64,7 @@ class CutScape(inkex.EffectExtension):
             if o.action == 'preview':
                 preview.draw(self.svg, plan)
                 if problems:
-                    self.msg('\n'.join(problems))
+                    self.say('\n'.join(problems), notify.WARNING)
                 return
             if problems:
                 raise inkex.AbortExtension('\n'.join(problems))
@@ -75,16 +76,23 @@ class CutScape(inkex.EffectExtension):
         except (ValueError, transports.TransportError) as e:
             raise inkex.AbortExtension(str(e))
         if o.action == 'test':
-            self.msg(_("Sent a {size:.0f} mm test square to {where}. Measure "
+            self.say(_("Sent a {size:.0f} mm test square to {where}. Measure "
                        "it: if it isn't {size:.0f} mm, the cutter's steps "
                        "per mm are wrong.").format(size=TEST_SQUARE,
                                                    where=where))
             return
         x0, y0, x1, y1 = plan.bbox
-        self.msg(_("Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of "
+        self.say(_("Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of "
                    "cuts ({size} bytes) to {where}.").format(
             width=x1 - x0, height=y1 - y0, metres=plan.cut_length / 1000,
             size=len(data), where=where))
+
+    def say(self, text, kind=notify.INFO, report=False):
+        """ Tell the user something that isn't an error, in CutScape's own
+        window when possible (see notify)
+        """
+        if not notify.show(text, kind=kind, report=report):
+            self.msg(text)
 
     @staticmethod
     def test_plan(settings):
