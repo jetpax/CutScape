@@ -148,7 +148,8 @@ inkex path ops is the main porting cost.
   stall timeouts, test square, and managing the CUPS queue: create, restart,
   remove, in `extension/cutscape/printers.py`), then
   [v0.3.0](https://github.com/jetpax/CutScape/releases/tag/v0.3.0) (Add Cutter / Remove Cutter, reports in
-  CutScape's own window). The Extensions > CutScape
+  CutScape's own window) and [v0.3.1](https://github.com/jetpax/CutScape/releases/tag/v0.3.1) (Cut failed with a
+  usage message when 0.2.0 had saved an action it no longer offers). The Extensions > CutScape
   submenu has four entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
   square), and Add Cutter…, Remove Cutter… and Remove Preview (no dialog)
