@@ -146,13 +146,15 @@ inkex path ops is the main porting cost.
   then [v0.1.1](https://github.com/jetpax/CutScape/releases/tag/v0.1.1) (docs and repo cleanup)
   and [v0.2.0](https://github.com/jetpax/CutScape/releases/tag/v0.2.0) (connections: find cutters, USB ids,
   stall timeouts, test square, and managing the CUPS queue: create, restart,
-  remove, in `extension/cutscape/printers.py`). The Extensions > CutScape
+  remove, in `extension/cutscape/printers.py`), then
+  [v0.3.0](https://github.com/jetpax/CutScape/releases/tag/v0.3.0) (Add Cutter / Remove Cutter, reports in
+  CutScape's own window). The Extensions > CutScape
   submenu has four entries, each an .inx running `cutscape_cut.py` with a
   hidden `--action`: Add Cutter…, Cut… (preview, send, test square),
   Remove Cutter… and Remove Preview (no dialog). Inkscape stores settings
   per entry, so anything that needs the device or connection settings
   stays in Cut….
-- **Add Cutter** (`extension/cutscape/cutter.py`, after 0.2.0) replaced the
+- **Add Cutter** (`extension/cutscape/cutter.py`, 0.3.0) replaced the
   0.2.0 Find Connected Cutters report and Printer Queue dialog. It picks
   the best connection it finds (usblp device by USB id, then a raw CUPS
   queue for a USB printer with no queue, then the queue it made before,
