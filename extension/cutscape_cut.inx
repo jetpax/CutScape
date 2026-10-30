@@ -7,6 +7,7 @@
     <option value="send">Send to the cutter</option>
     <option value="test">Send a 50 mm test square</option>
     <option value="find">Find connected cutters</option>
+    <option value="printers">Manage the printer queue</option>
     <option value="clear">Remove the preview</option>
   </param>
   <param name="tab" type="notebook">
@@ -114,7 +115,14 @@
         <option value="serial">Serial port</option>
         <option value="file">File</option>
       </param>
-      <param name="printer" type="string" gui-text="Printer queue:" gui-description="A raw queue; leave empty to list the available ones"></param>
+      <param name="printer" type="string" gui-text="Printer queue:" gui-description="A raw queue; leave empty to list the available ones. Managing the queue uses cutter when this is empty"></param>
+      <param name="printer_task" type="optiongroup" appearance="combo" gui-text="Manage the queue:" gui-description="Done when Apply will is set to Manage the printer queue">
+        <option value="create">Create it for the USB cutter</option>
+        <option value="restart">Restart it and clear stuck jobs</option>
+        <option value="remove">Remove it</option>
+      </param>
+      <param name="printer_uri" type="string" gui-text="Cutter's USB address:" gui-description="Only needed to create a queue when more than one USB printer has none. Find connected cutters lists the addresses (usb://…)"></param>
+      <separator/>
       <param name="device" type="string" gui-text="Device file:" gui-description="eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes. Find connected cutters lists them">/dev/usb/lp0</param>
       <param name="port" type="string" gui-text="Serial port:" gui-description="eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3, or a USB id such as usb:1a86:7523"></param>
       <param name="baud" type="optiongroup" appearance="combo" gui-text="Baud rate:">

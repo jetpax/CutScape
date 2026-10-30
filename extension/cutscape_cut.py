@@ -12,12 +12,13 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 import inkex  # noqa: E402
 
-from cutscape import document, job, preview, transports  # noqa: E402
+from cutscape import document, job, preview, printers, transports  # noqa: E402
 from cutscape.i18n import _  # noqa: E402
 
 CONNECTION = dict(transport='printer', printer='', device='/dev/usb/lp0',
                   port='', baud='9600', flow='xonxoff',
-                  file='~/cutscape.plt')
+                  file='~/cutscape.plt', printer_task='create',
+                  printer_uri='')
 
 #: mm; also checks the scale
 TEST_SQUARE = 50.0
@@ -29,7 +30,7 @@ class CutScape(inkex.EffectExtension):
         pars.add_argument('--tab')
         pars.add_argument('--action', default='preview',
                           choices=('preview', 'send', 'test', 'find',
-                                   'clear'))
+                                   'printers', 'clear'))
         for name, default in job.DEFAULTS.items():
             kind = inkex.Boolean if isinstance(default, bool) \
                 else type(default)
@@ -44,6 +45,13 @@ class CutScape(inkex.EffectExtension):
             return
         if o.action == 'find':
             self.msg(transports.find_cutters())
+            return
+        if o.action == 'printers':
+            try:
+                self.msg(printers.manage(o.printer_task, o.printer.strip(),
+                                         o.printer_uri.strip()))
+            except printers.PrinterError as e:
+                raise inkex.AbortExtension(str(e))
             return
         settings = job.Settings(**{k: getattr(o, k) for k in job.DEFAULTS})
         try:

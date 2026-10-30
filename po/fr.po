@@ -33,6 +33,10 @@ msgid "Find connected cutters"
 msgstr "recherche les découpeuses connectées"
 
 #: extension/cutscape_cut.inx
+msgid "Manage the printer queue"
+msgstr "gère la file d’impression"
+
+#: extension/cutscape_cut.inx
 msgid "Remove the preview"
 msgstr "supprime l’aperçu"
 
@@ -287,8 +291,36 @@ msgid "Printer queue:"
 msgstr "File d’impression :"
 
 #: extension/cutscape_cut.inx
-msgid "A raw queue; leave empty to list the available ones"
-msgstr "Une file brute (raw) ; laisser vide pour lister celles disponibles"
+msgid "A raw queue; leave empty to list the available ones. Managing the queue uses cutter when this is empty"
+msgstr "Une file brute (raw) ; laisser vide pour lister celles disponibles. La gestion de la file utilise « cutter » si ce champ est vide"
+
+#: extension/cutscape_cut.inx
+msgid "Manage the queue:"
+msgstr "Gérer la file :"
+
+#: extension/cutscape_cut.inx
+msgid "Done when Apply will is set to Manage the printer queue"
+msgstr "Effectué quand le bouton Appliquer « gère la file d’impression »"
+
+#: extension/cutscape_cut.inx
+msgid "Create it for the USB cutter"
+msgstr "La créer pour la découpeuse USB"
+
+#: extension/cutscape_cut.inx
+msgid "Restart it and clear stuck jobs"
+msgstr "La redémarrer et vider les travaux bloqués"
+
+#: extension/cutscape_cut.inx
+msgid "Remove it"
+msgstr "La supprimer"
+
+#: extension/cutscape_cut.inx
+msgid "Cutter's USB address:"
+msgstr "Adresse USB de la découpeuse :"
+
+#: extension/cutscape_cut.inx
+msgid "Only needed to create a queue when more than one USB printer has none. Find connected cutters lists the addresses (usb://…)"
+msgstr "Utile seulement pour créer une file quand plusieurs imprimantes USB n’en ont pas. « recherche les découpeuses connectées » liste les adresses (usb://…)"
 
 #: extension/cutscape_cut.inx
 msgid "Device file:"
@@ -342,12 +374,12 @@ msgstr "Prévisualiser ou découper la sélection sur une découpeuse vinyle ou 
 msgid "CutScape"
 msgstr "CutScape"
 
-#: extension/cutscape_cut.py:76
+#: extension/cutscape_cut.py:84
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr "{width:.0f} × {height:.0f} mm envoyés, soit {metres:.2f} m de découpe ({size} octets), vers {where}."
 
-#: extension/cutscape_cut.py:70
+#: extension/cutscape_cut.py:78
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
 msgstr "Carré test de {size:.0f} mm envoyé à {where}. Mesurez-le : s’il ne fait pas {size:.0f} mm, le nombre de pas par mm de la découpeuse est faux."
@@ -401,7 +433,96 @@ msgstr "Déplacements"
 msgid "Cuts"
 msgstr "Découpes"
 
-#: extension/cutscape/transports.py:452
+#: extension/cutscape/printers.py:88
+msgid "No USB cutter without a printer queue was found. Check that it is plugged in and switched on, or enter its address (usb://…) in the Cutter's USB address field."
+msgstr "Aucune découpeuse USB sans file d’impression n’a été trouvée. Vérifiez qu’elle est branchée et allumée, ou saisissez son adresse (usb://…) dans le champ « Adresse USB de la découpeuse »."
+
+#: extension/cutscape/printers.py:128
+#, python-brace-format
+msgid "Created the printer queue {queue} for {uri}. On the Connection tab, choose Printer queue and enter {queue}."
+msgstr "File d’impression {queue} créée pour {uri}. Dans l’onglet Connexion, choisissez « File d’impression » et saisissez {queue}."
+
+#: extension/cutscape/printers.py:156
+#, python-brace-format
+msgid "Restarted the printer queue {queue}."
+msgstr "File d’impression {queue} redémarrée."
+
+#: extension/cutscape/printers.py:163
+#, python-brace-format
+msgid "Removed the printer queue {queue}."
+msgstr "File d’impression {queue} supprimée."
+
+#: extension/cutscape/printers.py:169
+msgid "On Windows, add or remove printers in Settings > Printers & scanners."
+msgstr "Sous Windows, ajoutez ou supprimez les imprimantes dans Paramètres > Imprimantes et scanners."
+
+#: extension/cutscape/printers.py:59
+#, python-brace-format
+msgid ""
+"CUPS won't let this account change printers. Run this in a terminal instead:\n"
+"  sudo {command}"
+msgstr ""
+"CUPS n’autorise pas ce compte à modifier les imprimantes. Lancez plutôt ceci dans un terminal :\n"
+"  sudo {command}"
+
+#: extension/cutscape/printers.py:63
+msgid "Or allow it for good: sudo usermod -aG lpadmin $USER, then log out and back in."
+msgstr "Ou autorisez-le définitivement : sudo usermod -aG lpadmin $USER, puis déconnectez-vous et reconnectez-vous."
+
+#: extension/cutscape/printers.py:67
+#, python-brace-format
+msgid "{command} failed: {error}"
+msgstr "{command} a échoué : {error}"
+
+#: extension/cutscape/printers.py:115
+#, python-brace-format
+msgid "The printer queue {queue} is already set up for {uri}."
+msgstr "La file d’impression {queue} est déjà configurée pour {uri}."
+
+#: extension/cutscape/printers.py:118
+msgid "It is stopped; choose Restart it and clear stuck jobs to start it."
+msgstr "Elle est arrêtée ; choisissez « La redémarrer et vider les travaux bloqués » pour la démarrer."
+
+#: extension/cutscape/printers.py:126
+#, python-brace-format
+msgid "Moved the printer queue {queue} to {uri}."
+msgstr "File d’impression {queue} déplacée vers {uri}."
+
+#: extension/cutscape/printers.py:154
+#, python-brace-format
+msgid "Restarted the printer queue {queue} and cleared {count} waiting job(s)."
+msgstr "File d’impression {queue} redémarrée ; travaux en attente supprimés : {count}."
+
+#: extension/cutscape/printers.py:74
+#, python-brace-format
+msgid "A printer queue name may only use letters, digits, '.', '-' and '_'; got {queue}"
+msgstr "Un nom de file d’impression ne peut contenir que des lettres, des chiffres, « . », « - » et « _ » ; reçu : {queue}"
+
+#: extension/cutscape/printers.py:93
+#, python-brace-format
+msgid ""
+"More than one USB printer has no queue. Enter the cutter's address in the Cutter's USB address field:\n"
+"{uris}"
+msgstr ""
+"Plusieurs imprimantes USB n’ont pas de file. Saisissez l’adresse de la découpeuse dans le champ « Adresse USB de la découpeuse » :\n"
+"{uris}"
+
+#: extension/cutscape/printers.py:135
+#, python-brace-format
+msgid "There is no printer queue called {queue}."
+msgstr "Il n’y a pas de file d’impression nommée {queue}."
+
+#: extension/cutscape/printers.py:38
+#, python-brace-format
+msgid "Could not run {command}: {error}"
+msgstr "Impossible de lancer {command} : {error}"
+
+#: extension/cutscape/printers.py:41
+#, python-brace-format
+msgid "{command} did not answer; is CUPS running?"
+msgstr "{command} ne répond pas ; CUPS est-il lancé ?"
+
+#: extension/cutscape/transports.py:460
 msgid "No cutters found. Check that it is plugged in and switched on. On Linux, serial ports need pyserial: sudo apt install python3-serial."
 msgstr "Aucune découpeuse trouvée. Vérifiez qu’elle est branchée et allumée. Sous Linux, les ports série nécessitent pyserial : sudo apt install python3-serial."
 
@@ -409,54 +530,54 @@ msgstr "Aucune découpeuse trouvée. Vérifiez qu’elle est branchée et allum�
 msgid "No output file set"
 msgstr "Aucun fichier de sortie défini"
 
-#: extension/cutscape/transports.py:152
+#: extension/cutscape/transports.py:154
 msgid "No serial port set"
 msgstr "Aucun port série défini"
 
-#: extension/cutscape/transports.py:199
+#: extension/cutscape/transports.py:203
 #, python-brace-format
 msgid "{where} stopped accepting data for {seconds:.0f} s. Is the cutter online, with material loaded? Check its panel."
 msgstr "{where} n’accepte plus de données depuis {seconds:.0f} s. La découpeuse est-elle en ligne, avec le support chargé ? Vérifiez son panneau."
 
-#: extension/cutscape/transports.py:233
+#: extension/cutscape/transports.py:237
 msgid "No device file set"
 msgstr "Aucun fichier de périphérique défini"
 
-#: extension/cutscape/transports.py:283
+#: extension/cutscape/transports.py:287
 #, python-brace-format
 msgid "Could not write to {path}: {error}"
 msgstr "Impossible d’écrire sur {path} : {error}"
 
-#: extension/cutscape/transports.py:415
+#: extension/cutscape/transports.py:419
 msgid "USB cutters (choose Device file):"
 msgstr "Découpeuses USB (choisissez Fichier de périphérique) :"
 
-#: extension/cutscape/transports.py:431
+#: extension/cutscape/transports.py:435
 msgid "Printer queues (choose Printer queue):"
 msgstr "Files d’impression (choisissez File d’impression) :"
 
-#: extension/cutscape/transports.py:440
-msgid "USB printers with no queue yet; to make one:"
-msgstr "Imprimantes USB sans file d’impression ; pour en créer une :"
+#: extension/cutscape/transports.py:445
+msgid "USB printers with no queue yet. To make one, choose Manage the printer queue, then Create (enter the address if there are several), or run:"
+msgstr "Imprimantes USB encore sans file. Pour en créer une, choisissez « gère la file d’impression » puis « La créer » (saisissez l’adresse s’il y en a plusieurs), ou lancez :"
 
-#: extension/cutscape/transports.py:446
+#: extension/cutscape/transports.py:454
 msgid "Serial ports (choose Serial port):"
 msgstr "Ports série (choisissez Port série) :"
 
-#: extension/cutscape/transports.py:122
+#: extension/cutscape/transports.py:124
 msgid "Printing on Windows needs pywin32"
 msgstr "L’impression sous Windows nécessite pywin32"
 
-#: extension/cutscape/transports.py:150
+#: extension/cutscape/transports.py:152
 msgid "Serial output needs pyserial (python3-serial on Linux)"
 msgstr "La sortie série nécessite pyserial (python3-serial sous Linux)"
 
-#: extension/cutscape/transports.py:276
+#: extension/cutscape/transports.py:280
 #, python-brace-format
 msgid "No permission to write to {path}. Add a udev rule for the cutter (choose \"Find connected cutters\" for one), or join the lp group: sudo usermod -aG lp $USER, then log out and back in."
 msgstr "Pas le droit d’écrire sur {path}. Ajoutez une règle udev pour la découpeuse (« Recherche les découpeuses connectées » en propose une), ou rejoignez le groupe lp : sudo usermod -aG lp $USER, puis déconnectez-vous et reconnectez-vous."
 
-#: extension/cutscape/transports.py:281
+#: extension/cutscape/transports.py:285
 #, python-brace-format
 msgid "{path} isn't there. Is the cutter plugged in and switched on?"
 msgstr "{path} est introuvable. La découpeuse est-elle branchée et allumée ?"
@@ -468,66 +589,66 @@ msgstr "Aucune file d’impression définie. Files disponibles : {queues}"
 
 #: extension/cutscape/transports.py:102
 #, python-brace-format
-msgid "The printer queue {queue} is stopped, so the job would wait in it. Run: cupsenable {queue}"
-msgstr "La file d’impression {queue} est arrêtée : la tâche y resterait en attente. Lancez : cupsenable {queue}"
+msgid "The printer queue {queue} is stopped, so the job would wait in it. Choose Manage the printer queue, then Restart it and clear stuck jobs, or run: cupsenable {queue}"
+msgstr "La file d’impression {queue} est arrêtée, le travail y resterait en attente. Choisissez « gère la file d’impression » puis « La redémarrer et vider les travaux bloqués », ou lancez : cupsenable {queue}"
 
-#: extension/cutscape/transports.py:111
+#: extension/cutscape/transports.py:113
 #, python-brace-format
 msgid "lp failed ({code}): {error}"
 msgstr "lp a échoué ({code}) : {error}"
 
-#: extension/cutscape/transports.py:339
+#: extension/cutscape/transports.py:343
 #, python-brace-format
 msgid "A USB id looks like usb:0483:5750, optionally followed by :SERIAL; got {path}"
 msgstr "Un identifiant USB a la forme usb:0483:5750, éventuellement suivi de :NUMÉRO_DE_SÉRIE ; reçu {path}"
 
-#: extension/cutscape/transports.py:348
+#: extension/cutscape/transports.py:352
 #, python-brace-format
 msgid "No USB printer {path} is connected. Is the cutter plugged in and switched on?"
 msgstr "Aucune imprimante USB {path} n’est connectée. La découpeuse est-elle branchée et allumée ?"
 
-#: extension/cutscape/transports.py:352
+#: extension/cutscape/transports.py:356
 #, python-brace-format
 msgid "More than one USB printer matches {path}: {paths}. Add the serial number to tell them apart."
 msgstr "Plusieurs imprimantes USB correspondent à {path} : {paths}. Ajoutez le numéro de série pour les distinguer."
 
-#: extension/cutscape/transports.py:388
+#: extension/cutscape/transports.py:392
 #, python-brace-format
 msgid "No single serial port matches {port}; found {count}."
 msgstr "Aucun port série unique ne correspond à {port} ; {count} trouvé(s)."
 
-#: extension/cutscape/transports.py:434
-msgid "(stopped)"
-msgstr "(arrêtée)"
+#: extension/cutscape/transports.py:438
+msgid "(stopped: choose Manage the printer queue, then Restart)"
+msgstr "(arrêtée : choisissez « gère la file d’impression » puis « La redémarrer »)"
 
 #: extension/cutscape/transports.py:99
 msgid "none found"
 msgstr "aucune"
 
-#: extension/cutscape/transports.py:109
+#: extension/cutscape/transports.py:111
 #, python-brace-format
 msgid "Could not run lp: {error}"
 msgstr "Impossible de lancer lp : {error}"
 
-#: extension/cutscape/transports.py:168
+#: extension/cutscape/transports.py:170
 #, python-brace-format
 msgid "Serial port {port}: {error}"
 msgstr "Port série {port} : {error}"
 
-#: extension/cutscape/transports.py:420
+#: extension/cutscape/transports.py:424
 msgid "You can't write to it yet. To fix that for everyone who logs in, and to always find it at /dev/cutter, save this line as /etc/udev/rules.d/70-cutter.rules:"
 msgstr "Vous ne pouvez pas encore y écrire. Pour corriger cela pour toute personne connectée, et la trouver toujours en /dev/cutter, enregistrez cette ligne dans /etc/udev/rules.d/70-cutter.rules :"
 
-#: extension/cutscape/transports.py:425
+#: extension/cutscape/transports.py:429
 msgid "then run: sudo udevadm control --reload && sudo udevadm trigger"
 msgstr "puis lancez : sudo udevadm control --reload && sudo udevadm trigger"
 
-#: extension/cutscape/transports.py:214
+#: extension/cutscape/transports.py:218
 #, python-brace-format
 msgid "No reply to {command} within {seconds} s"
 msgstr "Pas de réponse à {command} en {seconds} s"
 
-#: extension/cutscape/transports.py:263
+#: extension/cutscape/transports.py:267
 #, python-brace-format
 msgid "{sent} of {total} bytes were sent."
 msgstr "{sent} octets sur {total} ont été envoyés."

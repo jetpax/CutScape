@@ -247,7 +247,8 @@ def test_find_cutters(tmp_path, monkeypatch):
     assert '/dev/usb/lp4  usb:0483:5750  SAGACNC SAGA Cutter Plotter' in report
     #: Not writable here, so the udev rule is offered
     assert 'ATTRS{product}=="SAGA Cutter Plotter"' in report
-    assert 'cutter  usb://SAGACNC/A?serial=x  (stopped)' in report
+    assert 'cutter  usb://SAGACNC/A?serial=x  (stopped: choose Manage '\
+        'the printer queue, then Restart)' in report
     #: Only the printer without a queue gets an lpadmin line
     assert "-v 'usb://Other/B' -m raw" in report
     assert "usb://SAGACNC/A?serial=x' -m raw" not in report

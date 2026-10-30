@@ -100,7 +100,9 @@ def to_printer(data, queue):
     if queue_state(queue) == 'disabled':
         raise TransportError(
             _("The printer queue {queue} is stopped, so the job would wait "
-              "in it. Run: cupsenable {queue}").format(queue=queue))
+              "in it. Choose Manage the printer queue, then Restart it and "
+              "clear stuck jobs, or run: cupsenable {queue}").format(
+                queue=queue))
     try:
         p = subprocess.run(['lp', '-d', queue, '-o', 'raw'], input=data,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -433,15 +435,19 @@ def find_cutters(sysfs=None):
         lines.append(_("Printer queues (choose Printer queue):"))
         for name, uri in sorted(queues.items()):
             state = queue_state(name)
-            note = '  ' + _("(stopped)") if state == 'disabled' else ''
+            note = '  ' + _("(stopped: choose Manage the printer queue, "
+                            "then Restart)") if state == 'disabled' else ''
             lines.append('  %s  %s%s' % (name, uri, note))
         lines.append('')
     known = set(queues.values())
     loose = [u for u in unconfigured_usb_uris() if u not in known]
     if loose:
-        lines.append(_("USB printers with no queue yet; to make one:"))
+        lines.append(_("USB printers with no queue yet. To make one, "
+                       "choose Manage the printer queue, then Create (enter "
+                       "the address if there are several), or run:"))
         for uri in loose:
-            lines.append("  sudo lpadmin -p cutter -E -v '%s' -m raw" % uri)
+            lines.append('  ' + uri)
+            lines.append("    sudo lpadmin -p cutter -E -v '%s' -m raw" % uri)
         lines.append('')
     ports = serial_ports()
     if ports:

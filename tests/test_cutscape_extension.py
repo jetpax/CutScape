@@ -68,6 +68,16 @@ def test_find_cutters_action(tmp_path, monkeypatch):
     assert not (tmp_path / 'job.plt').exists()
 
 
+def test_manage_printers_action(tmp_path, monkeypatch):
+    from cutscape import printers
+    calls = []
+    monkeypatch.setattr(printers, 'manage',
+                        lambda *a: calls.append(a) or 'done')
+    run(tmp_path, '--action=printers', '--printer_task=restart',
+        '--printer= vinyl ', '--printer_uri=')
+    assert calls == [('restart', 'vinyl', '')]
+
+
 def test_whole_drawing_skips_hidden(tmp_path):
     svg = inkex.load_svg(SAMPLE).getroot()
     roots = document.selected_roots(svg)

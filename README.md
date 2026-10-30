@@ -90,6 +90,7 @@ To send again with the same settings, use **Extensions → Previous Extension**.
 | | Feed past the job | Where the head parks when it's done. 0 returns it to the origin. |
 | Device | Cutter | A preset for your model, or *Custom* to set the command language (HPGL, DMPL, GP-GL, CAMM-GL, G-code), resolution and axes yourself. |
 | Connection | Send through | A printer queue, a device file, a serial port, or a file to check the output. |
+| | Manage the queue | Create, restart or remove the cutter's printer queue, when *Apply will* is *Manage the printer queue*. |
 
 ## Languages
 
@@ -138,20 +139,33 @@ If the cutter stops taking data for 30 seconds (it's offline, paused or out of
 material), CutScape stops with an error rather than leaving Inkscape waiting.
 
 **Printer queue (macOS, or Linux with CUPS).** macOS has no `/dev/usb/lp…`, so
-use a *raw* CUPS queue, which passes the commands through untouched. *Find
-connected cutters* lists USB printers that have no queue yet, with the
-command to create one:
+use a *raw* CUPS queue, which passes the commands through untouched. CutScape
+can set it up for you:
+
+1. Plug in the cutter and switch it on.
+2. On the **Connection** tab, enter a queue name under **Printer queue**, or
+   leave it empty to use `cutter`. Choose **Manage the queue: Create it for the
+   USB cutter**.
+3. Under *Apply will:*, choose **Manage the printer queue** and click Apply.
+4. Set **Send through** to **Printer queue**.
+
+If more than one USB printer has no queue, CutScape lists their addresses. Paste
+the cutter's address (`usb://…`) into **Cutter's USB address** and apply again.
+
+The same action can also **Restart** a stopped queue (clearing any jobs stuck in
+it) or **Remove** the queue. Changing printers needs CUPS admin rights. On
+Ubuntu, the first user account has them. If CUPS refuses, CutScape shows the
+`sudo` command to run in a terminal instead, for example:
 
 ```bash
 sudo lpadmin -p cutter -E -v 'usb://YOUR/CUTTER?serial=…' -m raw
 ```
 
 CUPS warns that raw queues are deprecated. They still work, but this is why
-Device file is the better choice on Linux. In CutScape, choose **Printer queue**
-and enter `cutter`. CutScape stops if the queue is stopped. It can't tell
-whether the cutter is online, though: CUPS accepts the job either way. If
-nothing moves, check the cutter's panel. `lpstat -o` shows the job waiting at
-"Sending data to printer".
+Device file is the better choice on Linux. CutScape won't send to a stopped
+queue. It can't tell whether the cutter is online, though: CUPS accepts the job
+either way. If nothing moves, check the cutter's panel. `lpstat -o` shows the
+job waiting at "Sending data to printer".
 
 **Serial and USB-serial cutters.** Choose **Serial port** and enter the port
 (`/dev/ttyUSB0` on Linux, `/dev/cu.usbserial-…` on macOS, `COM3` on Windows), or
