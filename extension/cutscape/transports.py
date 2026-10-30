@@ -100,8 +100,9 @@ def to_printer(data, queue):
     if queue_state(queue) == 'disabled':
         raise TransportError(
             _("The printer queue {queue} is stopped, so the job would wait "
-              "in it. Restart it with Extensions > CutScape > Printer Queue, "
-              "or run: cupsenable {queue}").format(queue=queue))
+              "in it. Run Extensions > CutScape > Add Cutter again to "
+              "restart it and clear the stuck jobs, or run: cupsenable "
+              "{queue}").format(queue=queue))
     try:
         p = subprocess.run(['lp', '-d', queue, '-o', 'raw'], input=data,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -276,10 +277,10 @@ def to_device(data, path, timeout=STALL_TIMEOUT):
 
 def _device_error(path, e):
     if e.errno in (errno.EACCES, errno.EPERM):
-        return _("No permission to write to {path}. Add a udev rule for the "
-                 "cutter (choose \"Find connected cutters\" for one), or "
-                 "join the lp group: sudo usermod -aG lp $USER, then log out "
-                 "and back in.").format(path=path)
+        return _("No permission to write to {path}. Extensions > CutScape > "
+                 "Add Cutter fixes that with a udev rule; or join the lp "
+                 "group: sudo usermod -aG lp $USER, then log out and back "
+                 "in.").format(path=path)
     if e.errno in (errno.ENOENT, errno.ENODEV, errno.ENXIO):
         return _("{path} isn't there. Is the cutter plugged in and switched "
                  "on?").format(path=path)
@@ -393,13 +394,6 @@ def resolve_serial(port):
     return matches[0]['path']
 
 
-def unconfigured_usb_uris():
-    """ USB printer URIs CUPS can see, configured or not (lpinfo) """
-    out = _run(['lpinfo', '--include-schemes', 'usb', '-v'], timeout=20)
-    return [line.split(None, 1)[1] for line in (out or '').splitlines()
-            if line.startswith('direct usb://')]
-
-
 def udev_rule(d):
     """ A rule giving the logged-in user access, and a stable /dev/cutter """
     rule = ('SUBSYSTEM=="usbmisc", KERNEL=="lp[0-9]*", '
@@ -408,58 +402,6 @@ def udev_rule(d):
     if d.get('product'):
         rule += ', ATTRS{product}=="%s"' % d['product'].replace('"', '')
     return rule + ', SYMLINK+="cutter", TAG+="uaccess"'
-
-
-def find_cutters(sysfs=None):
-    """ A report of everything a cutter could be connected through """
-    lines = []
-    printers = usb_printers(sysfs)
-    if printers:
-        lines.append(_("USB cutters (choose Device file):"))
-        for d in printers:
-            name = ' '.join(x for x in (d['manufacturer'], d['product']) if x)
-            lines.append('  %s  %s  %s' % (d['path'], usb_id(d), name))
-            if not os.access(d['path'], os.W_OK):
-                lines.append('    ' + _(
-                    "You can't write to it yet. To fix that for everyone "
-                    "who logs in, and to always find it at /dev/cutter, "
-                    "save this line as /etc/udev/rules.d/70-cutter.rules:"))
-                lines.append('    ' + udev_rule(d))
-                lines.append('    ' + _(
-                    "then run: sudo udevadm control --reload && sudo udevadm "
-                    "trigger"))
-        lines.append('')
-    queues = queue_devices()
-    if queues:
-        lines.append(_("Printer queues (choose Printer queue):"))
-        for name, uri in sorted(queues.items()):
-            state = queue_state(name)
-            note = '  ' + _("(stopped: restart it with Printer "
-                            "Queue)") if state == 'disabled' else ''
-            lines.append('  %s  %s%s' % (name, uri, note))
-        lines.append('')
-    known = set(queues.values())
-    loose = [u for u in unconfigured_usb_uris() if u not in known]
-    if loose:
-        lines.append(_("USB printers with no queue yet. To make one, use "
-                       "Extensions > CutScape > Printer Queue (enter the "
-                       "address if there are several), or run:"))
-        for uri in loose:
-            lines.append('  ' + uri)
-            lines.append("    sudo lpadmin -p cutter -E -v '%s' -m raw" % uri)
-        lines.append('')
-    ports = serial_ports()
-    if ports:
-        lines.append(_("Serial ports (choose Serial port):"))
-        for p in ports:
-            ident = '  usb:%s:%s' % (p['vid'], p['pid']) if p['vid'] else ''
-            lines.append('  %s  %s%s' % (p['path'], p['description'], ident))
-        lines.append('')
-    if not lines:
-        return _("No cutters found. Check that it is plugged in and "
-                 "switched on. On Linux, serial ports need pyserial: sudo "
-                 "apt install python3-serial.")
-    return '\n'.join(lines).rstrip()
 
 
 def send(data, transport, **options):

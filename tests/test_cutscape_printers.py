@@ -1,27 +1,25 @@
 """
-Managing the cutter's CUPS queue. CUPS itself is never touched: either its
-commands are stubbed, or fake lpadmin/lpstat/lpinfo programs come first on
-PATH and record how they were called.
+The cutter's CUPS queue. CUPS itself is never touched: either its commands
+are stubbed, or fake lpadmin/lpstat programs come first on PATH and record
+how they were called. The password prompt is stubbed too.
 """
 import os
 import sys
 
 import pytest
 
-from cutscape import printers, transports
+from cutscape import admin, printers
 from cutscape.printers import PrinterError
 
 URI = 'usb://SAGACNC/SAGA%20Cutter%20Plotter?serial=x'
-OTHER = 'usb://Brother/HL-3140CW?serial=y'
 
 pytestmark = pytest.mark.skipif(sys.platform == 'win32', reason='CUPS')
 
 
 @pytest.fixture
 def cups(monkeypatch):
-    """ Stub CUPS: queues and USB URIs it reports, and commands run """
-    state = dict(queues={}, usb=[URI], disabled=set(), jobs=0,
-                 calls=[], fail=None)
+    """ Stub CUPS: jobs waiting, commands run, and an error to refuse with """
+    state = dict(jobs=0, calls=[], fail=None, prompts=[])
 
     def cups_run(args, timeout=30):
         state['calls'].append(args)
@@ -34,117 +32,91 @@ def cups(monkeypatch):
         return 0, '', ''
 
     monkeypatch.setattr(printers, '_cups', cups_run)
-    monkeypatch.setattr(transports, 'queue_devices',
-                        lambda: dict(state['queues']))
-    monkeypatch.setattr(transports, 'unconfigured_usb_uris',
-                        lambda: list(state['usb']))
-    monkeypatch.setattr(transports, 'queue_state', lambda q: (
-        'disabled' if q in state['disabled'] else 'enabled'))
+    monkeypatch.setattr(admin, 'available', lambda: False)
     return state
+
+
+@pytest.fixture
+def prompt(cups, monkeypatch):
+    """ A password prompt that the user answers """
+    monkeypatch.setattr(admin, 'available', lambda: True)
+    monkeypatch.setattr(admin, 'run', lambda script, reason:
+                        cups['prompts'].append(script) or '')
+    return cups['prompts']
 
 
 def admin_calls(state):
     return [c for c in state['calls'] if c[0] != 'lpstat']
 
 
-def test_create_for_the_only_usb_cutter(cups):
-    msg = printers.manage('create')
+def test_create(cups):
+    printers.create('cutter', URI)
     assert admin_calls(cups) == [[
         'lpadmin', '-p', 'cutter', '-E', '-v', URI, '-m', 'raw',
         '-D', 'Cutter (CutScape)', '-o', 'printer-is-shared=false']]
-    assert 'Created the printer queue cutter' in msg
-
-
-def test_create_needs_an_address_when_several(cups):
-    cups['usb'] = [URI, OTHER]
-    with pytest.raises(PrinterError) as e:
-        printers.manage('create')
-    assert URI in str(e.value) and OTHER in str(e.value)
-    assert not admin_calls(cups)
-    printers.manage('create', 'vinyl', OTHER)
-    assert admin_calls(cups)[0][:6] == [
-        'lpadmin', '-p', 'vinyl', '-E', '-v', OTHER]
-
-
-def test_create_skips_printers_with_a_queue(cups):
-    cups['queues'] = {'office': OTHER}
-    cups['usb'] = [URI, OTHER]
-    printers.manage('create')
-    assert admin_calls(cups)[0][5] == URI
-
-
-def test_create_nothing_connected(cups):
-    cups['usb'] = []
-    with pytest.raises(PrinterError, match='plugged in'):
-        printers.manage('create')
-
-
-def test_create_already_done(cups):
-    cups['queues'] = {'cutter': URI}
-    cups['disabled'] = {'cutter'}
-    msg = printers.manage('create')
-    assert 'already set up' in msg and 'Restart' in msg
-    assert not admin_calls(cups)
-
-
-def test_create_moves_existing_queue(cups):
-    cups['queues'] = {'cutter': OTHER}
-    msg = printers.manage('create', 'cutter', URI)
-    assert admin_calls(cups)[0][5] == URI
-    assert 'Moved' in msg
-
-
-def test_not_allowed_gives_the_sudo_command(cups, monkeypatch):
-    monkeypatch.setattr(printers.sys, 'platform', 'linux')
-    cups['fail'] = 'lpadmin: Forbidden'
-    with pytest.raises(PrinterError) as e:
-        printers.manage('create')
-    msg = str(e.value)
-    assert "sudo lpadmin -p cutter -E -v '%s' -m raw" % URI in msg
-    assert 'usermod -aG lpadmin' in msg
-
-
-def test_other_failures_are_reported(cups):
-    cups['fail'] = 'lpadmin: Unable to connect to server'
-    with pytest.raises(PrinterError, match='Unable to connect'):
-        printers.manage('create')
 
 
 def test_restart_clears_stuck_jobs(cups):
-    cups['queues'] = {'cutter': URI}
     cups['jobs'] = 2
-    msg = printers.manage('restart')
+    assert printers.restart('cutter') == 2
     assert admin_calls(cups) == [['cupsenable', '-c', 'cutter'],
                                  ['cupsaccept', 'cutter']]
-    assert 'cleared 2' in msg
-
-
-def test_restart_unknown_queue(cups):
-    with pytest.raises(PrinterError, match='no printer queue called cutter'):
-        printers.manage('restart')
 
 
 def test_remove(cups):
-    cups['queues'] = {'vinyl': URI}
-    assert 'Removed' in printers.manage('remove', 'vinyl')
+    printers.remove('vinyl')
     assert admin_calls(cups) == [['lpadmin', '-x', 'vinyl']]
 
 
 @pytest.mark.parametrize('name', ['my cutter', "x'; rm", 'a/b'])
 def test_queue_names_are_checked(cups, name):
     with pytest.raises(PrinterError, match='letters, digits'):
-        printers.manage('remove', name)
+        printers.remove(name)
     assert not admin_calls(cups)
 
 
-def test_windows(monkeypatch):
-    monkeypatch.setattr(printers.sys, 'platform', 'win32')
-    with pytest.raises(PrinterError, match='Settings'):
-        printers.manage('create')
+def test_refused_asks_for_the_password(cups, prompt):
+    cups['fail'] = 'lpadmin: Forbidden'
+    printers.create('cutter', URI)
+    assert prompt == ["lpadmin -p cutter -E -v '%s' -m raw -D "
+                      "'Cutter (CutScape)' -o printer-is-shared=false" % URI]
+
+
+def test_restart_asks_once(cups, prompt):
+    cups['fail'] = 'cupsenable: Forbidden'
+    printers.restart('cutter')
+    assert prompt == ['cupsenable -c cutter && cupsaccept cutter']
+
+
+def test_password_prompt_cancelled(cups, monkeypatch):
+    cups['fail'] = 'lpadmin: Forbidden'
+    monkeypatch.setattr(admin, 'available', lambda: True)
+
+    def cancel(script, reason):
+        raise admin.Cancelled('The password prompt was cancelled.')
+    monkeypatch.setattr(admin, 'run', cancel)
+    with pytest.raises(PrinterError, match='cancelled'):
+        printers.remove('cutter')
+
+
+def test_no_prompt_gives_the_sudo_commands(cups, monkeypatch):
+    monkeypatch.setattr(printers.sys, 'platform', 'linux')
+    cups['fail'] = 'cupsenable: Forbidden'
+    with pytest.raises(PrinterError) as e:
+        printers.restart('cutter')
+    msg = str(e.value)
+    assert '  sudo cupsenable -c cutter\n  sudo cupsaccept cutter' in msg
+    assert 'usermod -aG lpadmin' in msg
+
+
+def test_other_failures_are_reported(cups, prompt):
+    cups['fail'] = 'lpadmin: Unable to connect to server'
+    with pytest.raises(PrinterError, match='Unable to connect'):
+        printers.create('cutter', URI)
+    assert not prompt
 
 
 FAKE = {
-    'lpinfo': "echo 'network ipp'; echo 'direct %s'" % URI,
     'lpstat': 'exit 0',
     'lpadmin': 'echo "$@" >> "{log}"',
 }
@@ -158,7 +130,7 @@ def test_create_with_fake_cups_programs(tmp_path, monkeypatch):
         tool.write_text('#!/bin/sh\n' + body.format(log=log) + '\n')
         tool.chmod(0o755)
     monkeypatch.setenv('PATH', str(tmp_path), prepend=os.pathsep)
-    assert 'Created' in printers.manage('create')
+    printers.create('cutter', URI)
     assert log.read_text().split() == [
         '-p', 'cutter', '-E', '-v', URI, '-m', 'raw', '-D', 'Cutter',
         '(CutScape)', '-o', 'printer-is-shared=false']

@@ -148,10 +148,24 @@ inkex path ops is the main porting cost.
   stall timeouts, test square, and managing the CUPS queue: create, restart,
   remove, in `extension/cutscape/printers.py`). The Extensions > CutScape
   submenu has four entries, each an .inx running `cutscape_cut.py` with a
-  hidden `--action`: Cut… (preview, send, test square), Find Connected
-  Cutters and Remove Preview (no dialog), and Printer Queue… (its own
-  small dialog). Inkscape stores settings per entry, so anything that
-  needs the device or connection settings stays in Cut….
+  hidden `--action`: Add Cutter…, Cut… (preview, send, test square),
+  Remove Cutter… and Remove Preview (no dialog). Inkscape stores settings
+  per entry, so anything that needs the device or connection settings
+  stays in Cut….
+- **Add Cutter** (`extension/cutscape/cutter.py`, after 0.2.0) replaced the
+  0.2.0 Find Connected Cutters report and Printer Queue dialog. It picks
+  the best connection it finds (usblp device by USB id, then a raw CUPS
+  queue for a USB printer with no queue, then the queue it made before,
+  then a USB serial port), sets it up, and saves model + connection in
+  `cutter.json` (`CUTSCAPE_CONFIG` overrides the path; the tests use it).
+  Cut's Device and Connection default to "The cutter you added". Admin
+  steps (lpadmin, the udev rule) go through the system's own password
+  prompt (`cutscape/admin.py`: osascript on macOS, pkexec on Linux), with
+  the sudo commands as the fallback. Running it again restarts a stopped
+  queue. Remove Cutter has a label-only dialog so it takes a second
+  click. "No cutter found" and other add/remove problems show in
+  CutScape's window, not as an Inkscape error. Not yet tried against a
+  real cutter, CUPS or polkit: only fakes.
   (zip built by `tools/package_extension.py`); `dev` is the default branch.
   The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
   compiled catalogs in `extension/locale/`, and `tools/i18n.py` does

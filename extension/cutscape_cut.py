@@ -13,15 +13,15 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import inkex  # noqa: E402
 
 from cutscape import (  # noqa: E402
-    document, job, notify, preview, printers, transports)
+    cutter, devices, document, job, notify, preview, transports)
 from cutscape.i18n import _  # noqa: E402
 
-CONNECTION = dict(transport='printer', printer='', device='/dev/usb/lp0',
+CONNECTION = dict(transport=cutter.ADDED, printer='', device='/dev/usb/lp0',
                   port='', baud='9600', flow='xonxoff',
                   file='~/cutscape.plt')
 
-#: Extensions > CutScape > Printer Queue
-QUEUE = dict(printer_task='create', printer_uri='')
+#: Extensions > CutScape > Add Cutter
+ADD = dict(model=devices.CUSTOM, address='')
 
 #: mm; also checks the scale
 TEST_SQUARE = 50.0
@@ -32,15 +32,16 @@ class CutScape(inkex.EffectExtension):
     def add_arguments(self, pars):
         pars.add_argument('--tab')
         pars.add_argument('--action', default='preview',
-                          choices=('preview', 'send', 'test', 'find',
-                                   'printers', 'clear'))
+                          choices=('preview', 'send', 'test', 'add',
+                                   'remove', 'clear'))
         for name, default in job.DEFAULTS.items():
             kind = inkex.Boolean if isinstance(default, bool) \
                 else type(default)
             pars.add_argument('--' + name, type=kind, default=default)
-        #: The Find, Printer Queue and Remove Preview menu entries run this
-        #: script too, with a fixed --action and only their own parameters
-        for name, default in list(CONNECTION.items()) + list(QUEUE.items()):
+        #: The Add Cutter, Remove Cutter and Remove Preview menu entries run
+        #: this script too, with a fixed --action and only their own
+        #: parameters
+        for name, default in list(CONNECTION.items()) + list(ADD.items()):
             pars.add_argument('--' + name, default=default)
 
     def effect(self):
@@ -48,16 +49,23 @@ class CutScape(inkex.EffectExtension):
         if o.action == 'clear':
             preview.remove(self.svg)
             return
-        if o.action == 'find':
-            self.say(transports.find_cutters(), report=True)
-            return
-        if o.action == 'printers':
+        if o.action in ('add', 'remove'):
             try:
-                self.say(printers.manage(o.printer_task, o.printer.strip(),
-                                         o.printer_uri.strip()))
-            except printers.PrinterError as e:
-                raise inkex.AbortExtension(str(e))
+                if o.action == 'add':
+                    text, ready = cutter.add(o.model, o.address)
+                else:
+                    text, ready = cutter.remove(), True
+            except (ValueError, cutter.CutterError) as e:
+                #: "No cutter found" is an answer, not a crash
+                if not notify.show(str(e), kind=notify.WARNING):
+                    raise inkex.AbortExtension(str(e))
+                return
+            self.say(text, notify.INFO if ready else notify.WARNING)
             return
+        try:
+            cutter.use(o, sending=o.action != 'preview')
+        except (ValueError, cutter.CutterError) as e:
+            raise inkex.AbortExtension(str(e))
         settings = job.Settings(**{k: getattr(o, k) for k in job.DEFAULTS})
         try:
             if o.action == 'test':

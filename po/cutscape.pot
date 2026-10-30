@@ -5,19 +5,51 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: extension/cutscape_add.inx
+msgid "Add Cutter"
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "Plug the cutter in and switch it on, choose its model, and click Apply. CutScape finds the cutter and sets up the connection. From then on, Cut sends to it."
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "Model:"
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "Not listed (set it up on Cut's Device tab)"
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "Address (optional):"
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "Leave empty and CutScape finds the cutter. If it finds more than one, it lists their addresses to enter here. The name of a printer queue, a device file or a serial port also works"
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "If the connection needs an administrator to set it up, the system asks for the password itself."
+msgstr ""
+
+#: extension/cutscape_add.inx
+msgid "Find the cutter that is plugged in and set it up for Cut"
+msgstr ""
+
+#: extension/cutscape_add.inx
+#: extension/cutscape_clear.inx
+#: extension/cutscape_cut.inx
+#: extension/cutscape_remove.inx
+msgid "CutScape"
+msgstr ""
+
 #: extension/cutscape_clear.inx
 msgid "Remove Preview"
 msgstr ""
 
 #: extension/cutscape_clear.inx
 msgid "Remove the CutScape toolpath preview from the drawing"
-msgstr ""
-
-#: extension/cutscape_clear.inx
-#: extension/cutscape_cut.inx
-#: extension/cutscape_find.inx
-#: extension/cutscape_queue.inx
-msgid "CutScape"
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -204,6 +236,11 @@ msgid "Cutter:"
 msgstr ""
 
 #: extension/cutscape_cut.inx
+#: extension/cutscape_cut.inx
+msgid "The cutter you added"
+msgstr ""
+
+#: extension/cutscape_cut.inx
 msgid "Custom (settings below)"
 msgstr ""
 
@@ -292,7 +329,7 @@ msgid "Printer queue:"
 msgstr ""
 
 #: extension/cutscape_cut.inx
-msgid "A raw queue; leave empty to list the available ones. Extensions > CutScape > Printer Queue sets one up"
+msgid "A raw queue; leave empty to list the available ones"
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -300,7 +337,7 @@ msgid "Device file:"
 msgstr ""
 
 #: extension/cutscape_cut.inx
-msgid "eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes. Extensions > CutScape > Find Connected Cutters lists them"
+msgid "eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes"
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -343,70 +380,177 @@ msgstr ""
 msgid "Preview or cut the selection on a vinyl cutter or plotter"
 msgstr ""
 
-#: extension/cutscape_cut.py:89
+#: extension/cutscape_cut.py:97
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:83
+#: extension/cutscape_cut.py:91
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
 msgstr ""
 
-#: extension/cutscape_find.inx
-msgid "Find Connected Cutters"
+#: extension/cutscape_remove.inx
+msgid "Remove Cutter"
 msgstr ""
 
-#: extension/cutscape_find.inx
-msgid "List the cutters, printer queues and serial ports CutScape can send to"
+#: extension/cutscape_remove.inx
+msgid "Forgets the cutter you added, and removes the printer queue Add Cutter made for it. You can add it again at any time."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Printer Queue"
+#: extension/cutscape_remove.inx
+msgid "Forget the cutter you added"
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Sets up the CUPS printer queue CutScape sends to, for a cutter connected by USB."
+#: extension/cutscape/admin.py:68
+msgid "The password prompt was cancelled."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Action:"
+#: extension/cutscape/admin.py:61
+msgid "Nobody answered the password prompt."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Create the queue for the USB cutter"
+#: extension/cutscape/cutter.py:370
+msgid "cutter"
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Restart the queue and clear stuck jobs"
+#: extension/cutscape/cutter.py:392
+msgid "No cutter has been added."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Remove the queue"
+#: extension/cutscape/cutter.py:393
+msgid "Removed the cutter you added."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Queue name:"
+#: extension/cutscape/cutter.py:142
+msgid "No cutter found. Check that it is plugged in and switched on, then try again."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Enter the same name under Printer queue on the Connection tab of Cut"
+#: extension/cutscape/cutter.py:275
+#, python-brace-format
+msgid ""
+"You can't write to {path} yet. To fix that, run this in a terminal, then unplug the cutter and plug it back in:\n"
+"  {command}"
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Cutter's USB address:"
+#: extension/cutscape/cutter.py:302
+msgid "Set its baud rate and flow control on Cut's Connection tab."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Only needed when more than one USB printer has no queue. Find Connected Cutters lists the addresses (usb://…)"
+#: extension/cutscape/cutter.py:335
+#, python-brace-format
+msgid "the printer queue {queue}"
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Changing printers needs CUPS admin rights. If CUPS refuses, CutScape shows the sudo command to run instead."
+#: extension/cutscape/cutter.py:378
+msgid "Set its language and steps per mm on Cut's Device tab."
 msgstr ""
 
-#: extension/cutscape_queue.inx
-msgid "Create, restart or remove the printer queue for a USB cutter"
+#: extension/cutscape/cutter.py:381
+msgid "To check it, open Extensions > CutScape > Cut, choose Send a 50 mm test square and click Apply."
+msgstr ""
+
+#: extension/cutscape/cutter.py:88
+msgid "No cutter has been added yet. Plug it in and switch it on, then use Extensions > CutScape > Add Cutter. Or choose how to reach it on Cut's Connection tab."
+msgstr ""
+
+#: extension/cutscape/cutter.py:145
+msgid "CUPS wouldn't list USB printers for this account, so a cutter that needs a printer queue can't be found."
+msgstr ""
+
+#: extension/cutscape/cutter.py:153
+msgid "A USB cutter must be added to Windows first: Settings > Bluetooth & devices > Printers & scanners, with the Generic / Text Only driver. Then enter the printer's name in the Address field."
+msgstr ""
+
+#: extension/cutscape/cutter.py:166
+msgid "Cutters on a serial port need pyserial: sudo apt install python3-serial"
+msgstr ""
+
+#: extension/cutscape/cutter.py:264
+msgid "CutScape needs to let you use your cutter."
+msgstr ""
+
+#: extension/cutscape/cutter.py:332
+#, python-brace-format
+msgid "USB, as {device}"
+msgstr ""
+
+#: extension/cutscape/cutter.py:334
+#, python-brace-format
+msgid "the serial port {port}"
+msgstr ""
+
+#: extension/cutscape/cutter.py:371
+#, python-brace-format
+msgid "Added your {model}, connected through {connection}."
+msgstr ""
+
+#: extension/cutscape/cutter.py:149
+msgid "To allow it: sudo usermod -aG lpadmin $USER, then log out and back in."
+msgstr ""
+
+#: extension/cutscape/cutter.py:202
+#, python-brace-format
+msgid "CutScape doesn't know {address}. Enter the name of a printer queue, a usb://… address, a USB id such as usb:0483:5750, a device file or a serial port."
+msgstr ""
+
+#: extension/cutscape/cutter.py:374
+#, python-brace-format
+msgid "It calls itself {device}."
+msgstr ""
+
+#: extension/cutscape/cutter.py:401
+#, python-brace-format
+msgid "Removed its printer queue {queue}."
+msgstr ""
+
+#: extension/cutscape/cutter.py:162
+msgid "If it is connected another way, enter one of these in the Address field:"
+msgstr ""
+
+#: extension/cutscape/cutter.py:272
+#, python-brace-format
+msgid "Added a udev rule ({file}) to give you access. Unplug the cutter and plug it back in to apply it."
+msgstr ""
+
+#: extension/cutscape/cutter.py:319
+#, python-brace-format
+msgid "Its printer queue {queue} had stopped: restarted it and cleared {count} stuck job(s)."
+msgstr ""
+
+#: extension/cutscape/cutter.py:321
+#, python-brace-format
+msgid "Its printer queue {queue} had stopped: restarted it."
+msgstr ""
+
+#: extension/cutscape/cutter.py:356
+msgid "More than one possible cutter is connected. Enter the address of yours in the Address field and click Apply again:"
+msgstr ""
+
+#: extension/cutscape/cutter.py:198
+#: extension/cutscape/transports.py:285
+#, python-brace-format
+msgid "{path} isn't there. Is the cutter plugged in and switched on?"
+msgstr ""
+
+#: extension/cutscape/cutter.py:270
+#, python-brace-format
+msgid "Gave you access to it with a udev rule ({file})."
+msgstr ""
+
+#: extension/cutscape/cutter.py:297
+#, python-brace-format
+msgid "You can't write to {path} yet."
+msgstr ""
+
+#: extension/cutscape/cutter.py:310
+#, python-brace-format
+msgid "Pointed the printer queue {queue} at it."
+msgstr ""
+
+#: extension/cutscape/cutter.py:312
+#, python-brace-format
+msgid "Created the printer queue {queue} for it."
 msgstr ""
 
 #: extension/cutscape/document.py:106
@@ -458,149 +602,74 @@ msgstr ""
 msgid "Cuts"
 msgstr ""
 
-#: extension/cutscape/printers.py:88
-msgid "No USB cutter without a printer queue was found. Check that it is plugged in and switched on, or enter its address (usb://…) in the Cutter's USB address field."
-msgstr ""
-
-#: extension/cutscape/printers.py:128
-#, python-brace-format
-msgid "Created the printer queue {queue} for {uri}. In Cut, on the Connection tab, choose Printer queue and enter {queue}."
-msgstr ""
-
-#: extension/cutscape/printers.py:156
-#, python-brace-format
-msgid "Restarted the printer queue {queue}."
-msgstr ""
-
-#: extension/cutscape/printers.py:163
-#, python-brace-format
-msgid "Removed the printer queue {queue}."
-msgstr ""
-
-#: extension/cutscape/printers.py:169
-msgid "On Windows, add or remove printers in Settings > Printers & scanners."
-msgstr ""
-
-#: extension/cutscape/printers.py:59
+#: extension/cutscape/printers.py:79
 #, python-brace-format
 msgid ""
-"CUPS won't let this account change printers. Run this in a terminal instead:\n"
-"  sudo {command}"
+"CUPS won't let this account change printers ({error}). Run this in a terminal instead:\n"
+"{commands}"
 msgstr ""
 
-#: extension/cutscape/printers.py:63
+#: extension/cutscape/printers.py:84
 msgid "Or allow it for good: sudo usermod -aG lpadmin $USER, then log out and back in."
 msgstr ""
 
-#: extension/cutscape/printers.py:67
-#, python-brace-format
-msgid "{command} failed: {error}"
+#: extension/cutscape/printers.py:71
+msgid "CutScape needs to change the printer queue for your cutter."
 msgstr ""
 
-#: extension/cutscape/printers.py:115
-#, python-brace-format
-msgid "The printer queue {queue} is already set up for {uri}."
-msgstr ""
-
-#: extension/cutscape/printers.py:118
-msgid "It is stopped; choose Restart the queue and clear stuck jobs to start it."
-msgstr ""
-
-#: extension/cutscape/printers.py:126
-#, python-brace-format
-msgid "Moved the printer queue {queue} to {uri}."
-msgstr ""
-
-#: extension/cutscape/printers.py:154
-#, python-brace-format
-msgid "Restarted the printer queue {queue} and cleared {count} waiting job(s)."
-msgstr ""
-
-#: extension/cutscape/printers.py:74
+#: extension/cutscape/printers.py:92
 #, python-brace-format
 msgid "A printer queue name may only use letters, digits, '.', '-' and '_'; got {queue}"
 msgstr ""
 
-#: extension/cutscape/printers.py:93
-#, python-brace-format
-msgid ""
-"More than one USB printer has no queue. Enter the cutter's address in the Cutter's USB address field:\n"
-"{uris}"
-msgstr ""
-
-#: extension/cutscape/printers.py:135
-#, python-brace-format
-msgid "There is no printer queue called {queue}."
-msgstr ""
-
-#: extension/cutscape/printers.py:38
+#: extension/cutscape/printers.py:39
 #, python-brace-format
 msgid "Could not run {command}: {error}"
 msgstr ""
 
-#: extension/cutscape/printers.py:41
+#: extension/cutscape/printers.py:42
 #, python-brace-format
 msgid "{command} did not answer; is CUPS running?"
 msgstr ""
 
-#: extension/cutscape/transports.py:459
-msgid "No cutters found. Check that it is plugged in and switched on. On Linux, serial ports need pyserial: sudo apt install python3-serial."
+#: extension/cutscape/printers.py:62
+#, python-brace-format
+msgid "{command} failed: {error}"
 msgstr ""
 
 #: extension/cutscape/transports.py:35
 msgid "No output file set"
 msgstr ""
 
-#: extension/cutscape/transports.py:153
+#: extension/cutscape/transports.py:154
 msgid "No serial port set"
 msgstr ""
 
-#: extension/cutscape/transports.py:202
+#: extension/cutscape/transports.py:203
 #, python-brace-format
 msgid "{where} stopped accepting data for {seconds:.0f} s. Is the cutter online, with material loaded? Check its panel."
 msgstr ""
 
-#: extension/cutscape/transports.py:236
+#: extension/cutscape/transports.py:237
 msgid "No device file set"
 msgstr ""
 
-#: extension/cutscape/transports.py:286
+#: extension/cutscape/transports.py:287
 #, python-brace-format
 msgid "Could not write to {path}: {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:418
-msgid "USB cutters (choose Device file):"
-msgstr ""
-
-#: extension/cutscape/transports.py:434
-msgid "Printer queues (choose Printer queue):"
-msgstr ""
-
-#: extension/cutscape/transports.py:444
-msgid "USB printers with no queue yet. To make one, use Extensions > CutScape > Printer Queue (enter the address if there are several), or run:"
-msgstr ""
-
-#: extension/cutscape/transports.py:453
-msgid "Serial ports (choose Serial port):"
-msgstr ""
-
-#: extension/cutscape/transports.py:123
+#: extension/cutscape/transports.py:124
 msgid "Printing on Windows needs pywin32"
 msgstr ""
 
-#: extension/cutscape/transports.py:151
+#: extension/cutscape/transports.py:152
 msgid "Serial output needs pyserial (python3-serial on Linux)"
 msgstr ""
 
-#: extension/cutscape/transports.py:279
+#: extension/cutscape/transports.py:280
 #, python-brace-format
-msgid "No permission to write to {path}. Add a udev rule for the cutter (choose \"Find connected cutters\" for one), or join the lp group: sudo usermod -aG lp $USER, then log out and back in."
-msgstr ""
-
-#: extension/cutscape/transports.py:284
-#, python-brace-format
-msgid "{path} isn't there. Is the cutter plugged in and switched on?"
+msgid "No permission to write to {path}. Extensions > CutScape > Add Cutter fixes that with a udev rule; or join the lp group: sudo usermod -aG lp $USER, then log out and back in."
 msgstr ""
 
 #: extension/cutscape/transports.py:98
@@ -610,66 +679,54 @@ msgstr ""
 
 #: extension/cutscape/transports.py:102
 #, python-brace-format
-msgid "The printer queue {queue} is stopped, so the job would wait in it. Restart it with Extensions > CutScape > Printer Queue, or run: cupsenable {queue}"
+msgid "The printer queue {queue} is stopped, so the job would wait in it. Run Extensions > CutScape > Add Cutter again to restart it and clear the stuck jobs, or run: cupsenable {queue}"
 msgstr ""
 
-#: extension/cutscape/transports.py:112
+#: extension/cutscape/transports.py:113
 #, python-brace-format
 msgid "lp failed ({code}): {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:342
+#: extension/cutscape/transports.py:343
 #, python-brace-format
 msgid "A USB id looks like usb:0483:5750, optionally followed by :SERIAL; got {path}"
 msgstr ""
 
-#: extension/cutscape/transports.py:351
+#: extension/cutscape/transports.py:352
 #, python-brace-format
 msgid "No USB printer {path} is connected. Is the cutter plugged in and switched on?"
 msgstr ""
 
-#: extension/cutscape/transports.py:355
+#: extension/cutscape/transports.py:356
 #, python-brace-format
 msgid "More than one USB printer matches {path}: {paths}. Add the serial number to tell them apart."
 msgstr ""
 
-#: extension/cutscape/transports.py:391
+#: extension/cutscape/transports.py:392
 #, python-brace-format
 msgid "No single serial port matches {port}; found {count}."
-msgstr ""
-
-#: extension/cutscape/transports.py:437
-msgid "(stopped: restart it with Printer Queue)"
 msgstr ""
 
 #: extension/cutscape/transports.py:99
 msgid "none found"
 msgstr ""
 
-#: extension/cutscape/transports.py:110
+#: extension/cutscape/transports.py:111
 #, python-brace-format
 msgid "Could not run lp: {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:169
+#: extension/cutscape/transports.py:170
 #, python-brace-format
 msgid "Serial port {port}: {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:423
-msgid "You can't write to it yet. To fix that for everyone who logs in, and to always find it at /dev/cutter, save this line as /etc/udev/rules.d/70-cutter.rules:"
-msgstr ""
-
-#: extension/cutscape/transports.py:428
-msgid "then run: sudo udevadm control --reload && sudo udevadm trigger"
-msgstr ""
-
-#: extension/cutscape/transports.py:217
+#: extension/cutscape/transports.py:218
 #, python-brace-format
 msgid "No reply to {command} within {seconds} s"
 msgstr ""
 
-#: extension/cutscape/transports.py:266
+#: extension/cutscape/transports.py:267
 #, python-brace-format
 msgid "{sent} of {total} bytes were sent."
 msgstr ""

@@ -9,9 +9,9 @@ and nothing to `pip install`.
 
 | Extensions → CutScape → | |
 |---|---|
+| **Add Cutter…** | Find the cutter that's plugged in and set it up, so Cut can send to it |
 | **Cut…** | Preview the toolpath on your canvas, send it to the cutter, or send a 50 mm test square |
-| **Find Connected Cutters** | List the cutters, printer queues and serial ports CutScape can send to |
-| **Printer Queue…** | Create, restart or remove the printer queue for a USB cutter |
+| **Remove Cutter…** | Forget the cutter you added |
 | **Remove Preview** | Take the toolpath preview off the drawing |
 
 *En français :* CutScape est une extension Inkscape, pas une application. Son
@@ -56,12 +56,17 @@ equivalent. Nothing else is needed.
 
 ## Use
 
+First, add your cutter: plug it in, switch it on, and use
+**Extensions → CutScape → Add Cutter…** (see
+[Connecting your cutter](#connecting-your-cutter)). You only do this once.
+
 1. Select what you want to cut. If nothing is selected, the whole drawing is
    cut. Hidden objects are skipped, and text is converted to paths for you;
    your document isn't changed.
 2. Open **Extensions → CutScape → Cut…**
-3. On **Device**, pick your cutter. On **Connection**, say how it's attached
-   (see below). Inkscape remembers both.
+3. **Device** and **Connection** are already set to *The cutter you added*.
+   Change them only to use a different cutter or connection. Inkscape
+   remembers what you choose.
 4. Choose **Preview the toolpath on the canvas** and click **Apply**.
    - Red lines are cuts.
    - Dashed blue lines are moves with the blade up.
@@ -95,8 +100,8 @@ To send again with the same settings, use **Extensions → Previous Extension**.
 | | Copies, Weed line | Repeat the job across the material, and draw a box around it for weeding. |
 | | Pre-feed | Pull the job's length of material through and back first, so a roll tracks straight. |
 | | Feed past the job | Where the head parks when it's done. 0 returns it to the origin. |
-| Device | Cutter | A preset for your model, or *Custom* to set the command language (HPGL, DMPL, GP-GL, CAMM-GL, G-code), resolution and axes yourself. |
-| Connection | Send through | A printer queue, a device file, a serial port, or a file to check the output. |
+| Device | Cutter | *The cutter you added*, a preset for your model, or *Custom* to set the command language (HPGL, DMPL, GP-GL, CAMM-GL, G-code), resolution and axes yourself. |
+| Connection | Send through | *The cutter you added*, a printer queue, a device file, a serial port, or a file to check the output. |
 
 ## Languages
 
@@ -118,71 +123,71 @@ translations.
 
 ## Connecting your cutter
 
-**Start with Extensions → CutScape → Find Connected Cutters.** It runs straight
-away. CutScape lists every USB cutter, printer queue and serial port it can see,
-with what to enter on the **Connection** tab. If something needs setting up, it
-says how. Then, in **Cut…**, choose **Send a 50 mm test square**: it uses your Device and
-Connection settings, ignores the drawing, and checks the scale.
+1. Plug the cutter in and switch it on.
+2. Open **Extensions → CutScape → Add Cutter…**, choose your model, and click
+   **Apply**.
+3. In **Cut…**, choose **Send a 50 mm test square** and click **Apply**. It
+   ignores the drawing. Measure the square to check the scale.
 
-**USB cutters on Linux: Device file (recommended).** Most HPGL cutters are USB
-printers, and Linux makes them `/dev/usb/lp0`, `lp1` and so on. The number can
-change when you plug things in, so use one of these instead:
+<img src="docs/images/cutscape-add-cutter.png" width="420" alt="The Add Cutter dialog: the cutter's model, and an optional address">
 
-- **A USB id** such as `usb:0483:5750`, as listed by *Find Connected Cutters*.
-  CutScape looks it up each time.
-- **`/dev/cutter`**, using a udev rule. *Find Connected Cutters* prints the rule
-  for your cutter when you can't write to it yet. Save it as
-  `/etc/udev/rules.d/70-cutter.rules`, then run:
+Add Cutter finds the cutter and sets up the best connection for your system:
 
-  ```bash
-  sudo udevadm control --reload && sudo udevadm trigger
-  ```
+- **Linux:** the cutter's USB printer device (`/dev/usb/lp0`, `lp1` and so
+  on), found by its USB id, such as `usb:0483:5750`, so it still works when
+  the number changes. If your account can't write to it, CutScape installs a
+  udev rule (`/etc/udev/rules.d/70-cutscape.rules`) that lets whoever is
+  logged in use the cutter, and also makes `/dev/cutter`.
+- **macOS, or Linux through CUPS:** a *raw* printer queue called `cutter`,
+  which passes the commands through untouched.
+- **USB-serial cutters:** the serial port, found by its USB id. Set the baud
+  rate and flow control on Cut's **Connection** tab, from the cutter's
+  manual.
 
-  The rule also lets whoever is logged in use the cutter, so you don't need the
-  `lp` group, and it works for every account. Keep the file's number below 73.
+If this needs an administrator, the system asks for the password in its own
+prompt, and CutScape never sees it. Where there's no prompt (over SSH, say),
+CutScape shows the commands to run with `sudo` instead.
 
-If the cutter stops taking data for 30 seconds (it's offline, paused or out of
-material), CutScape stops with an error rather than leaving Inkscape waiting.
+**If CutScape finds more than one possible cutter,** it lists their addresses.
+Enter yours in **Address** and click **Apply** again. **Address** also takes
+the name of a printer queue, a device file such as `/dev/cutter`, or a serial
+port such as `/dev/ttyUSB0` or `COM3`, for a cutter connected some other way.
+If CutScape finds nothing, it says so, and lists any printer queues and
+serial ports you could enter instead.
 
-**Printer queue (macOS, or Linux with CUPS).** macOS has no `/dev/usb/lp…`, so
-use a *raw* CUPS queue, which passes the commands through untouched. CutScape
-can set it up for you:
+**If a printer queue stops,** Cut won't send to it, because the job would only
+wait there. CUPS stops a queue when the cutter is off or unplugged during a
+job. Run Add Cutter again: it restarts the queue and clears the stuck jobs.
 
-1. Plug in the cutter and switch it on.
-2. Open **Extensions → CutScape → Printer Queue…**, choose **Create the queue
-   for the USB cutter**, and click Apply. The queue is called `cutter` unless you
-   change **Queue name**.
-3. In **Cut…**, on the **Connection** tab, set **Send through** to **Printer
-   queue** and enter the same name.
+**Remove Cutter…** forgets the cutter, and removes the printer queue Add
+Cutter made for it. CutScape keeps the cutter you added in `cutter.json`, in
+`~/.config/cutscape` on Linux, `~/Library/Application Support/CutScape` on
+macOS, or `%APPDATA%\CutScape` on Windows.
 
-<img src="docs/images/cutscape-printer-queue.png" width="380" alt="The Printer Queue dialog">
+### Choosing the connection yourself
 
-If more than one USB printer has no queue, CutScape lists their addresses. Paste
-the cutter's address (`usb://…`) into **Cutter's USB address** and apply again.
+Cut's **Connection** tab can send somewhere else instead:
 
-The same dialog can also **restart** a stopped queue (clearing any jobs stuck in
-it) or **remove** the queue. Changing printers needs CUPS admin rights. On
-Ubuntu, the first user account has them. If CUPS refuses, CutScape shows the
-`sudo` command to run in a terminal instead, for example:
+- **Device file:** `/dev/usb/lp0`, `/dev/cutter`, or a USB id.
+- **Printer queue:** a raw CUPS queue, or a Windows printer.
+- **Serial port:** `/dev/ttyUSB0`, `/dev/cu.usbserial-…`, `COM3`, or a USB id.
+  G-code controllers such as GRBL are fed one line at a time, waiting for
+  each `ok`.
+- **File:** saves the commands, to check what CutScape produces.
 
-```bash
-sudo lpadmin -p cutter -E -v 'usb://YOUR/CUTTER?serial=…' -m raw
-```
+If the cutter stops taking data for 30 seconds (it's offline, paused or out
+of material), CutScape stops with an error rather than leaving Inkscape
+waiting. A printer queue can't tell: CUPS accepts the job whether or not the
+cutter is online. If nothing moves, check the cutter's panel. `lpstat -o`
+shows the job waiting at "Sending data to printer". CUPS also warns that raw
+queues are deprecated. They still work, but on Linux the device file is
+better.
 
-CUPS warns that raw queues are deprecated. They still work, but this is why
-Device file is the better choice on Linux. CutScape won't send to a stopped
-queue. It can't tell whether the cutter is online, though: CUPS accepts the job
-either way. If nothing moves, check the cutter's panel. `lpstat -o` shows the
-job waiting at "Sending data to printer".
-
-**Serial and USB-serial cutters.** Choose **Serial port** and enter the port
-(`/dev/ttyUSB0` on Linux, `/dev/cu.usbserial-…` on macOS, `COM3` on Windows), or
-the USB id listed by *Find Connected Cutters*. Set the baud rate and flow
-control from the cutter's manual. G-code controllers such as GRBL are fed one
-line at a time, waiting for each `ok`. A port that stops taking data for 30
-seconds ends the job with an error.
-
-**Windows printer queues** need pywin32. They are untested.
+**Windows:** USB-serial cutters are found as above. A cutter that connects as
+a USB printer must first be added in **Settings → Bluetooth & devices →
+Printers & scanners**, with the *Generic / Text Only* driver. Then enter the
+printer's name in Add Cutter's **Address**. Printing on Windows needs pywin32,
+and is untested.
 
 **Not supported yet:** Silhouette cutters over USB (they aren't USB printers),
 and Bluetooth.
@@ -195,7 +200,7 @@ and Bluetooth.
   while fonts are indexed. Converting the text yourself (**Path → Object to
   Path**) skips this step.
 - **Nothing happens on the cutter.** Check that it's online on its panel,
-  run *Find Connected Cutters*, and send the test square. To see what
+  run *Add Cutter* again, and send the test square. To see what
   CutScape produces, set **Send through: File** and open the file.
 - **"stopped accepting data".** The cutter took part of the job and then
   nothing for 30 s. It's usually offline (press its online or enter key),

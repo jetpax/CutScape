@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from cutscape import devices, filters, geometry, job, protocols
+from cutscape import cutter, devices, filters, geometry, job, protocols
 
 SQUARE = [(0, 0), (50, 0), (50, 50), (0, 50), (0, 0)]
 HOLE = [(10, 10), (20, 10), (20, 20), (10, 20), (10, 10)]
@@ -252,6 +252,14 @@ def test_inx_presets_match():
     preset = [p for p in _inx().iter('{%s}param' % NS['i'])
               if p.get('name') == 'preset'][0]
     values = [o.get('value') for o in preset.iter('{%s}option' % NS['i'])]
+    assert values == [cutter.ADDED, devices.CUSTOM] + list(devices.PRESETS)
+
+
+def test_add_cutter_models_match():
+    root = ET.parse('extension/cutscape_add.inx').getroot()
+    model = [p for p in root.iter('{%s}param' % NS['i'])
+             if p.get('name') == 'model'][0]
+    values = [o.get('value') for o in model.iter('{%s}option' % NS['i'])]
     assert values == [devices.CUSTOM] + list(devices.PRESETS)
 
 
@@ -284,13 +292,11 @@ def test_inx_defaults_match_dataclass():
 
 
 # -----------------------------------------------------------------------------
-# The other menu entries: Find Connected Cutters, Printer Queue, Remove Preview
+# The other menu entries: Add Cutter, Remove Cutter, Remove Preview
 # -----------------------------------------------------------------------------
 MENU = {
-    'extension/cutscape_find.inx': ('find', set()),
-    'extension/cutscape_queue.inx': ('printers',
-                                     {'printer', 'printer_task',
-                                      'printer_uri'}),
+    'extension/cutscape_add.inx': ('add', {'model', 'address'}),
+    'extension/cutscape_remove.inx': ('remove', set()),
     'extension/cutscape_clear.inx': ('clear', set()),
 }
 
@@ -315,7 +321,7 @@ def test_menu_entries(inx):
         'cutscape_cut', 'extension/cutscape_cut.py')
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert visible <= set(mod.CONNECTION) | set(mod.QUEUE)
+    assert visible <= set(mod.CONNECTION) | set(mod.ADD)
 
 
 def test_menu_ids_unique():

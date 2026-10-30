@@ -43,6 +43,7 @@
     </page>
     <page name="device" gui-text="Device">
       <param name="preset" type="optiongroup" appearance="combo" gui-text="Cutter:">
+        <option value="added">The cutter you added</option>
         <option value="custom">Custom (settings below)</option>
         <option translatable="no" value="ANAgraph AE-70e">ANAgraph AE-70e</option>
         <option translatable="no" value="Creation PCut CT-630">Creation PCut CT-630</option>
@@ -107,13 +108,14 @@
     </page>
     <page name="connection" gui-text="Connection">
       <param name="transport" type="optiongroup" appearance="radio" gui-text="Send through:">
+        <option value="added">The cutter you added</option>
         <option value="printer">Printer queue (CUPS or Windows)</option>
         <option value="device">Device file</option>
         <option value="serial">Serial port</option>
         <option value="file">File</option>
       </param>
-      <param name="printer" type="string" gui-text="Printer queue:" gui-description="A raw queue; leave empty to list the available ones. Extensions &gt; CutScape &gt; Printer Queue sets one up"></param>
-      <param name="device" type="string" gui-text="Device file:" gui-description="eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes. Extensions &gt; CutScape &gt; Find Connected Cutters lists them">/dev/usb/lp0</param>
+      <param name="printer" type="string" gui-text="Printer queue:" gui-description="A raw queue; leave empty to list the available ones"></param>
+      <param name="device" type="string" gui-text="Device file:" gui-description="eg /dev/usb/lp0 or /dev/cutter on Linux, or a USB id such as usb:0483:5750 that keeps working when the number changes">/dev/usb/lp0</param>
       <param name="port" type="string" gui-text="Serial port:" gui-description="eg /dev/ttyUSB0, /dev/cu.usbserial-…, COM3, or a USB id such as usb:1a86:7523"></param>
       <param name="baud" type="optiongroup" appearance="combo" gui-text="Baud rate:">
         <option translatable="no" value="9600">9600</option>

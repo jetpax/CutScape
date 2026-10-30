@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension translationdomain="cutscape" xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Add Cutter</name>
+  <id>io.github.jetpax.cutscape.add</id>
+  <param name="action" type="string" gui-hidden="true">add</param>
+  <label>Plug the cutter in and switch it on, choose its model, and click Apply. CutScape finds the cutter and sets up the connection. From then on, Cut sends to it.</label>
+  <param name="model" type="optiongroup" appearance="combo" gui-text="Model:">
+    <option value="custom">Not listed (set it up on Cut's Device tab)</option>
+    <option translatable="no" value="ANAgraph AE-70e">ANAgraph AE-70e</option>
+    <option translatable="no" value="Creation PCut CT-630">Creation PCut CT-630</option>
+    <option translatable="no" value="GCC Bobcat 60">GCC Bobcat 60</option>
+    <option translatable="no" value="Graphtec 8000-130">Graphtec 8000-130</option>
+    <option translatable="no" value="Graphtec CE5000-60">Graphtec CE5000-60</option>
+    <option translatable="no" value="Ioline Classic">Ioline Classic</option>
+    <option translatable="no" value="KNK ACS Eagle/Maxx">KNK ACS Eagle/Maxx</option>
+    <option translatable="no" value="Mimaki CG-60ST">Mimaki CG-60ST</option>
+    <option translatable="no" value="Redsail RS1360C">Redsail RS1360C</option>
+    <option translatable="no" value="Rheinstern LB-720A">Rheinstern LB-720A</option>
+    <option translatable="no" value="Roland CM-24">Roland CM-24</option>
+    <option translatable="no" value="Roland CX-24">Roland CX-24</option>
+    <option translatable="no" value="Roland PNC-900">Roland PNC-900</option>
+    <option translatable="no" value="Roland PNC-950">Roland PNC-950</option>
+    <option translatable="no" value="Roland PNC-1000">Roland PNC-1000</option>
+    <option translatable="no" value="Roland Stika SV-8">Roland Stika SV-8</option>
+    <option translatable="no" value="Roland Stika SV-12">Roland Stika SV-12</option>
+    <option translatable="no" value="Roland Stika SV-15">Roland Stika SV-15</option>
+    <option translatable="no" value="Secabo C60 II / C IV">Secabo C60 II / C IV</option>
+    <option translatable="no" value="SeikiTech SK-870T">SeikiTech SK-870T</option>
+    <option translatable="no" value="Sekonic SPL-450">Sekonic SPL-450</option>
+    <option translatable="no" value="Silhouette Cameo 4">Silhouette Cameo 4</option>
+    <option translatable="no" value="Silhouette Cameo 4 Plus">Silhouette Cameo 4 Plus</option>
+    <option translatable="no" value="Silhouette Portrait">Silhouette Portrait</option>
+    <option translatable="no" value="Summa D760">Summa D760</option>
+    <option translatable="no" value="Summa D120R">Summa D120R</option>
+    <option translatable="no" value="Summa T600">Summa T600</option>
+    <option translatable="no" value="US Cutter Laser Point">US Cutter Laser Point</option>
+    <option translatable="no" value="US Cutter Refine MH-721">US Cutter Refine MH-721</option>
+    <option translatable="no" value="US Cutter Refine MH-1351">US Cutter Refine MH-1351</option>
+    <option translatable="no" value="VEVOR KH-720">VEVOR KH-720</option>
+    <option translatable="no" value="VEVOR KH-870">VEVOR KH-870</option>
+    <option translatable="no" value="VEVOR Smart 1">VEVOR Smart 1</option>
+    <option translatable="no" value="Vision VE-810 engraver">Vision VE-810 engraver</option>
+  </param>
+  <param name="address" type="string" gui-text="Address (optional):" gui-description="Leave empty and CutScape finds the cutter. If it finds more than one, it lists their addresses to enter here. The name of a printer queue, a device file or a serial port also works"></param>
+  <separator/>
+  <label>If the connection needs an administrator to set it up, the system asks for the password itself.</label>
+  <effect needs-live-preview="false">
+    <object-type>all</object-type>
+    <icon>cutscape_cut.svg</icon>
+    <menu-tip>Find the cutter that is plugged in and set it up for Cut</menu-tip>
+    <effects-menu>
+      <submenu name="CutScape"/>
+    </effects-menu>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">cutscape_cut.py</command>
+  </script>
+</inkscape-extension>

@@ -61,40 +61,71 @@ def test_test_square(tmp_path):
     assert data.count(b'PD') == 4
 
 
-def test_find_cutters_action(tmp_path, monkeypatch, capsys):
-    from cutscape import transports
-    monkeypatch.setattr(transports, 'find_cutters', lambda: 'REPORT')
-    ext, out = run(tmp_path, '--action=find')
-    assert not (tmp_path / 'job.plt').exists()
+def test_add_cutter_action(tmp_path, monkeypatch, capsys):
+    from cutscape import cutter
+    calls = []
+    monkeypatch.setattr(cutter, 'add', lambda *a: calls.append(a) or (
+        'ADDED', True))
+    run(tmp_path, '--action=add', '--model=Summa D760', '--address= vinyl ')
+    assert calls == [('Summa D760', ' vinyl ')]
     #: CUTSCAPE_STDERR (conftest) keeps it out of a window
-    assert 'REPORT' in capsys.readouterr().err
+    assert 'ADDED' in capsys.readouterr().err
 
 
 def test_messages_use_a_window_when_possible(tmp_path, monkeypatch, capsys):
-    from cutscape import notify, transports
+    from cutscape import cutter, notify
     shown = []
     monkeypatch.setattr(notify, 'show',
                         lambda text, **kw: shown.append((text, kw)) or True)
-    monkeypatch.setattr(transports, 'find_cutters', lambda: 'REPORT')
-    run(tmp_path, '--action=find')
-    assert shown == [('REPORT', dict(kind='info', report=True))]
+    monkeypatch.setattr(cutter, 'add', lambda *a: ('NOT YET', False))
+    run(tmp_path, '--action=add')
+    assert shown == [('NOT YET', dict(kind='warning', report=False))]
     #: Nothing on stderr, so Inkscape adds no "additional data" warning
-    assert 'REPORT' not in capsys.readouterr().err
+    assert 'NOT YET' not in capsys.readouterr().err
 
 
-def test_notify_respects_cutscape_stderr():
-    from cutscape import notify
-    assert notify.show('hello') is False
+def test_add_cutter_problems(tmp_path, monkeypatch, capsys):
+    """ "No cutter found" goes in CutScape's window when there is one,
+    and is an error otherwise
+    """
+    from cutscape import cutter, notify
+
+    def nothing(*a):
+        raise cutter.CutterError('No cutter found.')
+    monkeypatch.setattr(cutter, 'add', nothing)
+    with pytest.raises(SystemExit):
+        run(tmp_path, '--action=add')
+    assert 'No cutter found.' in capsys.readouterr().err
+    shown = []
+    monkeypatch.setattr(notify, 'show',
+                        lambda text, **kw: shown.append((text, kw)) or True)
+    run(tmp_path, '--action=add')
+    assert shown == [('No cutter found.', dict(kind='warning'))]
 
 
-def test_manage_printers_action(tmp_path, monkeypatch):
-    from cutscape import printers
-    calls = []
-    monkeypatch.setattr(printers, 'manage',
-                        lambda *a: calls.append(a) or 'done')
-    run(tmp_path, '--action=printers', '--printer_task=restart',
-        '--printer= vinyl ', '--printer_uri=')
-    assert calls == [('restart', 'vinyl', '')]
+def test_remove_cutter_action(tmp_path, monkeypatch, capsys):
+    from cutscape import cutter
+    monkeypatch.setattr(cutter, 'remove', lambda: 'REMOVED')
+    run(tmp_path, '--action=remove')
+    assert 'REMOVED' in capsys.readouterr().err
+
+
+def test_send_to_the_added_cutter(tmp_path):
+    from cutscape import cutter
+    dev = tmp_path / 'lp0'
+    dev.write_bytes(b'')
+    cutter.save(dict(model='Summa D760', transport='device',
+                     device=str(dev), printer='', port=''))
+    run(tmp_path, '--action=send', '--id=star', '--preset=added',
+        '--transport=added')
+    #: The Summa's DMPL, not the custom settings' HPGL
+    assert dev.read_bytes().startswith(b';:')
+
+
+def test_send_without_an_added_cutter(tmp_path, capsys):
+    with pytest.raises(SystemExit):
+        run(tmp_path, '--action=send', '--id=star', '--transport=added')
+    assert 'Add Cutter' in capsys.readouterr().err
 
 
 def test_whole_drawing_skips_hidden(tmp_path):

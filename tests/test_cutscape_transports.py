@@ -1,5 +1,5 @@
 """
-Connections: finding cutters, USB ids, timeouts, and the CUPS checks.
+Connections: USB ids, timeouts, and the CUPS checks.
 Nothing here touches real hardware; sysfs is faked in a temp folder laid
 out like the kernel's, and a FIFO that nobody reads stands in for a
 cutter that has stopped taking data.
@@ -13,32 +13,7 @@ import pytest
 
 from cutscape import transports
 from cutscape.transports import TransportError
-
-SAGA = dict(vid='0483', pid='5750', serial='SAGAIufI@\x16',
-            manufacturer='SAGACNC', product='SAGA Cutter Plotter')
-
-
-def fake_sysfs(root, *devices):
-    """ /sys/class/usbmisc/lpN/device -> the interface, whose parent is
-    the USB device with its descriptors, as the usblp driver lays it out
-    """
-    usbmisc = root / 'class' / 'usbmisc'
-    usbmisc.mkdir(parents=True)
-    for n, d in enumerate(devices):
-        dev = root / 'devices' / 'usb3' / ('3-1.%d' % (n + 1))
-        iface = dev / ('3-1.%d:1.0' % (n + 1))
-        iface.mkdir(parents=True)
-        for key, attr in (('vid', 'idVendor'), ('pid', 'idProduct'),
-                          ('serial', 'serial'),
-                          ('manufacturer', 'manufacturer'),
-                          ('product', 'product')):
-            if d.get(key) is not None:
-                (dev / attr).write_text(d[key] + '\n')
-        node = usbmisc / ('lp%d' % (n + 4))
-        node.mkdir()
-        os.symlink(str(iface), str(node / 'device'))
-    return str(root)
-
+from fakes import SAGA, fake_sysfs
 
 needs_sysfs_layout = pytest.mark.skipif(
     sys.platform == 'win32', reason='symlinks')
@@ -222,40 +197,3 @@ def test_queue_devices(monkeypatch):
     assert transports.queue_devices() == {
         'cutter': 'usb://SAGACNC/SAGA%20Cutter%20Plotter?serial=x',
         'Samsung': 'dnssd://Samsung._ipp._tcp.local/'}
-
-
-@needs_sysfs_layout
-def test_find_cutters(tmp_path, monkeypatch):
-    sysfs = fake_sysfs(tmp_path, SAGA)
-    outputs = {
-        'lpstat -v': 'device for cutter: usb://SAGACNC/A?serial=x\n',
-        'lpstat -p': 'printer cutter disabled since Thu\n',
-        'lpinfo': 'direct usb://SAGACNC/A?serial=x\n'
-                  'direct usb://Other/B\nnetwork ipp\n',
-    }
-
-    def run(args, timeout=10):
-        for key, out in outputs.items():
-            if ' '.join(args).startswith(key):
-                return out
-        return None
-    monkeypatch.setattr(transports, '_run', run)
-    monkeypatch.setattr(transports, 'serial_ports', lambda: [
-        dict(path='/dev/ttyUSB0', description='USB Serial', vid='1a86',
-             pid='7523', serial='')])
-    report = transports.find_cutters(sysfs)
-    assert '/dev/usb/lp4  usb:0483:5750  SAGACNC SAGA Cutter Plotter' in report
-    #: Not writable here, so the udev rule is offered
-    assert 'ATTRS{product}=="SAGA Cutter Plotter"' in report
-    assert 'cutter  usb://SAGACNC/A?serial=x  (stopped: restart it with '\
-        'Printer Queue)' in report
-    #: Only the printer without a queue gets an lpadmin line
-    assert "-v 'usb://Other/B' -m raw" in report
-    assert "usb://SAGACNC/A?serial=x' -m raw" not in report
-    assert '/dev/ttyUSB0  USB Serial  usb:1a86:7523' in report
-
-
-def test_find_cutters_nothing(tmp_path, monkeypatch):
-    monkeypatch.setattr(transports, '_run', lambda *a, **k: None)
-    monkeypatch.setattr(transports, 'serial_ports', lambda: [])
-    assert 'No cutters found' in transports.find_cutters(str(tmp_path))
