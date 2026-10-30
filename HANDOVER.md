@@ -138,6 +138,8 @@ inkex path ops is the main porting cost.
   #442. The README credits them.
 - **Released** as [v0.1.0](https://github.com/jetpax/CutScape/releases/tag/v0.1.0),
   then [v0.1.1](https://github.com/jetpax/CutScape/releases/tag/v0.1.1) (docs and repo cleanup)
+  and [v0.2.0](https://github.com/jetpax/CutScape/releases/tag/v0.2.0) (connections: find cutters, USB ids,
+  stall timeouts, test square)
   (zip built by `tools/package_extension.py`); `dev` is the default branch.
   The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
   compiled catalogs in `extension/locale/`, and `tools/i18n.py` does
