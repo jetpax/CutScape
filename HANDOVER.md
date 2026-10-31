@@ -149,7 +149,9 @@ inkex path ops is the main porting cost.
   remove, in `extension/cutscape/printers.py`), then
   [v0.3.0](https://github.com/jetpax/CutScape/releases/tag/v0.3.0) (Add Cutter / Remove Cutter, reports in
   CutScape's own window) and [v0.3.1](https://github.com/jetpax/CutScape/releases/tag/v0.3.1) (Cut failed with a
-  usage message when 0.2.0 had saved an action it no longer offers). The Extensions > CutScape
+  usage message when 0.2.0 had saved an action it no longer offers), then
+  [v0.4.0](https://github.com/jetpax/CutScape/releases/tag/v0.4.0) (desktop CNC: Z lift for G-code, CNC 3018
+  preset, GRBL streaming). The Extensions > CutScape
   submenu has four entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
   square), and Add Cutter…, Remove Cutter… and Remove Preview (no dialog)
@@ -176,7 +178,7 @@ inkex path ops is the main porting cost.
   click. "No cutter found" and other add/remove problems show in
   CutScape's window, not as an Inkscape error. Not yet tried against a
   real cutter, CUPS or polkit: only fakes.
-- **Desktop CNC / GRBL** (after 0.3.1): G-code lifts to `gcode_z_up` and
+- **Desktop CNC / GRBL** (0.4.0): G-code lifts to `gcode_z_up` and
   plunges to `gcode_z_down` (Device tab; the same value = no Z moves, the
   old behaviour), with the feed rate on the plunge too. A plan for G-code
   with Speed 0 reports a problem, since GRBL answers a G1 without a feed
