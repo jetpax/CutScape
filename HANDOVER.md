@@ -157,7 +157,11 @@ inkex path ops is the main porting cost.
   that needs the device or connection settings stays in Cut…. It also
   passes a saved choice the dialog no longer offers as it is (0.2.0 saved
   `action="find"`), while showing the first option as chosen; the script
-  treats any other `--action` as preview.
+  treats any other `--action` as preview. Each release's zip is built by
+  `tools/package_extension.py`; `dev` is the default branch.
+- **Translations.** The UI is translated (`translationdomain="cutscape"`):
+  sources live in `po/`, compiled catalogs in `extension/locale/`, and
+  `tools/i18n.py` does extract/compile. French is complete.
 - **Add Cutter** (`extension/cutscape/cutter.py`, 0.3.0) replaced the
   0.2.0 Find Connected Cutters report and Printer Queue dialog. It picks
   the best connection it finds (usblp device by USB id, then a raw CUPS
@@ -172,10 +176,16 @@ inkex path ops is the main porting cost.
   click. "No cutter found" and other add/remove problems show in
   CutScape's window, not as an Inkscape error. Not yet tried against a
   real cutter, CUPS or polkit: only fakes.
-  (zip built by `tools/package_extension.py`); `dev` is the default branch.
-  The UI is translated (`translationdomain="cutscape"`): sources live in `po/`,
-  compiled catalogs in `extension/locale/`, and `tools/i18n.py` does
-  extract/compile. French is complete.
+- **Desktop CNC / GRBL** (after 0.3.1): G-code lifts to `gcode_z_up` and
+  plunges to `gcode_z_down` (Device tab; the same value = no Z moves, the
+  old behaviour), with the feed rate on the plunge too. A plan for G-code
+  with Speed 0 reports a problem, since GRBL answers a G1 without a feed
+  rate with error:22. The `CNC 3018 (GRBL)` preset is 300 x 180 mm, no
+  axis swap; presets can carry `serial` (baud, flow), which Add Cutter
+  saves for a serial connection and `cutter.use` applies. `_send_acked`
+  sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
+  reboot after the port opens, and drops its welcome. Only tested against
+  a fake GRBL.
 - **The Qt app is gone from `dev`.** The `inkcut/` package, its tests, docs,
   packaging, the old Inkscape plugin and the Qt CI were all removed. CI now runs
   only the CutScape tests. The `fix/*` branches still sit on upstream `master`

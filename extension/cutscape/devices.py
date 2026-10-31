@@ -8,6 +8,8 @@ feed; width and length are in millimetres (0 = unknown).
 
 Orientation maps material space to the device's axes: swap_xy exchanges
 them, invert_x/invert_y reflect the job in place (it stays at the origin).
+serial is the baud rate and flow control Add Cutter sets up when it finds
+the cutter on a serial port.
 Inkcut's "swap_xy" was a 90 degree rotation, which is swap_xy + invert_y
 here. Orientations marked unverified are translated from Inkcut and have
 not been checked against hardware.
@@ -21,14 +23,24 @@ CUSTOM = 'custom'
 
 
 def _preset(name, protocol='hpgl', width=0.0, length=0.0, steps=None,
-            swap_xy=False, invert_x=False, invert_y=False, **options):
+            swap_xy=False, invert_x=False, invert_y=False, serial=None,
+            **options):
     return name, dict(protocol=protocol, width=width, length=length,
                       steps=steps, swap_xy=swap_xy, invert_x=invert_x,
-                      invert_y=invert_y, options=options)
+                      invert_y=invert_y, serial=serial, options=options)
+
+
+#: What GRBL speaks over USB
+GRBL = dict(baud='115200', flow='none')
 
 
 PRESETS = OrderedDict([
     _preset('ANAgraph AE-70e', width=760),
+    #: The common desktop CNC, with a drag knife or pen in the spindle
+    #: clamp: 300 x 180 mm, X to the right and Y away from you, as material
+    #: space. Unverified on hardware.
+    _preset('CNC 3018 (GRBL)', 'gcode', width=300, length=180,
+            serial=GRBL),
     #: Start/end sequence from inkcut/inkcut#382 by LDP-Soft
     _preset('Creation PCut CT-630', 'dmpl', width=610, dmpl_mode=7),
     _preset('GCC Bobcat 60', width=600),

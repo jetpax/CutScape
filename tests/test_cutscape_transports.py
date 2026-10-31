@@ -162,6 +162,55 @@ def test_serial_drain_stall():
         transports._drain_serial(FakePort(waiting=10), 0.2)
 
 
+class FakeGrbl(FakePort):
+    """ Says hello when the port opens, then answers each line """
+    def __init__(self, answer=lambda line: b'ok'):
+        super(FakeGrbl, self).__init__()
+        self.answer = answer
+        self.replies = [b"Grbl 1.1h ['$' for help]\r\n"]
+        self.lines = []
+
+    def write(self, data):
+        n = super(FakeGrbl, self).write(data)
+        for line in bytes(data).splitlines():
+            self.lines.append(line)
+            self.replies.append(self.answer(line) + b'\r\n')
+        return n
+
+    def reset_input_buffer(self):
+        self.replies = []
+
+    def readline(self):
+        return self.replies.pop(0) if self.replies else b''
+
+
+def test_send_acked(monkeypatch):
+    monkeypatch.setattr(transports, 'WAKE_DELAY', 0)
+    s = FakeGrbl()
+    transports._send_acked(s, b'G21\nG90 ; absolute\n\nG00 X0 Y0\n', 1)
+    #: Woken first; the welcome and the blank lines' replies are dropped
+    assert s.written.startswith(b'\r\n\r\n')
+    assert s.lines[-3:] == [b'G21', b'G90', b'G00 X0 Y0']
+    assert not s.replies
+
+
+def test_send_acked_error(monkeypatch):
+    monkeypatch.setattr(transports, 'WAKE_DELAY', 0)
+    s = FakeGrbl(lambda line: b'error:22' if line.startswith(b'G01') else
+                 b'ok')
+    with pytest.raises(TransportError, match="'G01 X1 Y1': error:22"):
+        transports._send_acked(s, b'G21\nG01 X1 Y1\nG00 X0 Y0\n', 1)
+    assert s.lines[-1] == b'G01 X1 Y1'
+
+
+def test_send_acked_no_reply(monkeypatch):
+    monkeypatch.setattr(transports, 'WAKE_DELAY', 0)
+    s = FakeGrbl(lambda line: b'')
+    s.readline = lambda: b''
+    with pytest.raises(TransportError, match='No reply to G21'):
+        transports._send_acked(s, b'G21\n', 1)
+
+
 # -----------------------------------------------------------------------------
 # Printer queues
 # -----------------------------------------------------------------------------

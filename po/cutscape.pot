@@ -245,7 +245,7 @@ msgid "Custom (settings below)"
 msgstr ""
 
 #: extension/cutscape_cut.inx
-msgid "With a cutter chosen, only Tool and the HPGL options below apply."
+msgid "With a cutter chosen, only Tool and the HPGL and G-code options below apply."
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -298,6 +298,22 @@ msgstr ""
 
 #: extension/cutscape_cut.inx
 msgid "HPGL: separate pen up/down from moves"
+msgstr ""
+
+#: extension/cutscape_cut.inx
+msgid "G-code: Z for travel (mm):"
+msgstr ""
+
+#: extension/cutscape_cut.inx
+msgid "Height the tool lifts to between cuts"
+msgstr ""
+
+#: extension/cutscape_cut.inx
+msgid "G-code: Z for cutting (mm):"
+msgstr ""
+
+#: extension/cutscape_cut.inx
+msgid "Zero Z on the machine where the blade or pen should cut, and leave this at 0. Make both heights the same to send no Z moves."
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -380,12 +396,12 @@ msgstr ""
 msgid "Preview or cut the selection on a vinyl cutter or plotter"
 msgstr ""
 
-#: extension/cutscape_cut.py:97
+#: extension/cutscape_cut.py:107
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:91
+#: extension/cutscape_cut.py:101
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
 msgstr ""
@@ -410,145 +426,150 @@ msgstr ""
 msgid "Nobody answered the password prompt."
 msgstr ""
 
-#: extension/cutscape/cutter.py:370
+#: extension/cutscape/cutter.py:383
 msgid "cutter"
 msgstr ""
 
-#: extension/cutscape/cutter.py:392
+#: extension/cutscape/cutter.py:405
 msgid "No cutter has been added."
 msgstr ""
 
-#: extension/cutscape/cutter.py:393
+#: extension/cutscape/cutter.py:406
 msgid "Removed the cutter you added."
 msgstr ""
 
-#: extension/cutscape/cutter.py:142
+#: extension/cutscape/cutter.py:149
 msgid "No cutter found. Check that it is plugged in and switched on, then try again."
 msgstr ""
 
-#: extension/cutscape/cutter.py:275
+#: extension/cutscape/cutter.py:283
 #, python-brace-format
 msgid ""
 "You can't write to {path} yet. To fix that, run this in a terminal, then unplug the cutter and plug it back in:\n"
 "  {command}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:302
+#: extension/cutscape/cutter.py:316
 msgid "Set its baud rate and flow control on Cut's Connection tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:335
+#: extension/cutscape/cutter.py:349
 #, python-brace-format
 msgid "the printer queue {queue}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:378
+#: extension/cutscape/cutter.py:391
 msgid "Set its language and steps per mm on Cut's Device tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:381
+#: extension/cutscape/cutter.py:394
 msgid "To check it, open Extensions > CutScape > Cut, choose Send a 50 mm test square and click Apply."
 msgstr ""
 
-#: extension/cutscape/cutter.py:88
+#: extension/cutscape/cutter.py:91
 msgid "No cutter has been added yet. Plug it in and switch it on, then use Extensions > CutScape > Add Cutter. Or choose how to reach it on Cut's Connection tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:145
+#: extension/cutscape/cutter.py:152
 msgid "CUPS wouldn't list USB printers for this account, so a cutter that needs a printer queue can't be found."
 msgstr ""
 
-#: extension/cutscape/cutter.py:153
+#: extension/cutscape/cutter.py:160
 msgid "A USB cutter must be added to Windows first: Settings > Bluetooth & devices > Printers & scanners, with the Generic / Text Only driver. Then enter the printer's name in the Address field."
 msgstr ""
 
-#: extension/cutscape/cutter.py:166
+#: extension/cutscape/cutter.py:174
 msgid "Cutters on a serial port need pyserial: sudo apt install python3-serial"
 msgstr ""
 
-#: extension/cutscape/cutter.py:264
+#: extension/cutscape/cutter.py:272
 msgid "CutScape needs to let you use your cutter."
 msgstr ""
 
-#: extension/cutscape/cutter.py:332
+#: extension/cutscape/cutter.py:346
 #, python-brace-format
 msgid "USB, as {device}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:334
+#: extension/cutscape/cutter.py:348
 #, python-brace-format
 msgid "the serial port {port}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:371
+#: extension/cutscape/cutter.py:384
 #, python-brace-format
 msgid "Added your {model}, connected through {connection}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:149
+#: extension/cutscape/cutter.py:156
 msgid "To allow it: sudo usermod -aG lpadmin $USER, then log out and back in."
 msgstr ""
 
-#: extension/cutscape/cutter.py:202
+#: extension/cutscape/cutter.py:210
 #, python-brace-format
 msgid "CutScape doesn't know {address}. Enter the name of a printer queue, a usb://… address, a USB id such as usb:0483:5750, a device file or a serial port."
 msgstr ""
 
-#: extension/cutscape/cutter.py:374
+#: extension/cutscape/cutter.py:387
 #, python-brace-format
 msgid "It calls itself {device}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:401
+#: extension/cutscape/cutter.py:414
 #, python-brace-format
 msgid "Removed its printer queue {queue}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:162
+#: extension/cutscape/cutter.py:170
 msgid "If it is connected another way, enter one of these in the Address field:"
 msgstr ""
 
-#: extension/cutscape/cutter.py:272
+#: extension/cutscape/cutter.py:280
 #, python-brace-format
 msgid "Added a udev rule ({file}) to give you access. Unplug the cutter and plug it back in to apply it."
 msgstr ""
 
-#: extension/cutscape/cutter.py:319
+#: extension/cutscape/cutter.py:312
+#, python-brace-format
+msgid "It talks at {baud} baud."
+msgstr ""
+
+#: extension/cutscape/cutter.py:333
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it and cleared {count} stuck job(s)."
 msgstr ""
 
-#: extension/cutscape/cutter.py:321
+#: extension/cutscape/cutter.py:335
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it."
 msgstr ""
 
-#: extension/cutscape/cutter.py:356
+#: extension/cutscape/cutter.py:369
 msgid "More than one possible cutter is connected. Enter the address of yours in the Address field and click Apply again:"
 msgstr ""
 
-#: extension/cutscape/cutter.py:198
-#: extension/cutscape/transports.py:285
+#: extension/cutscape/cutter.py:206
+#: extension/cutscape/transports.py:295
 #, python-brace-format
 msgid "{path} isn't there. Is the cutter plugged in and switched on?"
 msgstr ""
 
-#: extension/cutscape/cutter.py:270
+#: extension/cutscape/cutter.py:278
 #, python-brace-format
 msgid "Gave you access to it with a udev rule ({file})."
 msgstr ""
 
-#: extension/cutscape/cutter.py:297
+#: extension/cutscape/cutter.py:306
 #, python-brace-format
 msgid "You can't write to {path} yet."
 msgstr ""
 
-#: extension/cutscape/cutter.py:310
+#: extension/cutscape/cutter.py:324
 #, python-brace-format
 msgid "Pointed the printer queue {queue} at it."
 msgstr ""
 
-#: extension/cutscape/cutter.py:312
+#: extension/cutscape/cutter.py:326
 #, python-brace-format
 msgid "Created the printer queue {queue} for it."
 msgstr ""
@@ -567,21 +588,25 @@ msgstr ""
 msgid "Text {id} must be converted to a path first"
 msgstr ""
 
-#: extension/cutscape/job.py:156
+#: extension/cutscape/job.py:163
 msgid "Nothing to cut"
 msgstr ""
 
-#: extension/cutscape/job.py:118
+#: extension/cutscape/job.py:127
+msgid "Set a speed on the Cut tab: G-code controllers such as GRBL won't cut without one."
+msgstr ""
+
+#: extension/cutscape/job.py:122
 #, python-brace-format
 msgid "The job extends {distance:.1f} mm past the origin; move it onto the page or turn on \"Move the job to the origin\"."
 msgstr ""
 
-#: extension/cutscape/job.py:124
+#: extension/cutscape/job.py:131
 #, python-brace-format
 msgid "The job is {size:.1f} mm wide but the material is only {limit:.1f} mm."
 msgstr ""
 
-#: extension/cutscape/job.py:127
+#: extension/cutscape/job.py:134
 #, python-brace-format
 msgid "The job is {size:.1f} mm long but the material is only {limit:.1f} mm."
 msgstr ""
@@ -650,11 +675,11 @@ msgstr ""
 msgid "{where} stopped accepting data for {seconds:.0f} s. Is the cutter online, with material loaded? Check its panel."
 msgstr ""
 
-#: extension/cutscape/transports.py:237
+#: extension/cutscape/transports.py:247
 msgid "No device file set"
 msgstr ""
 
-#: extension/cutscape/transports.py:287
+#: extension/cutscape/transports.py:297
 #, python-brace-format
 msgid "Could not write to {path}: {error}"
 msgstr ""
@@ -667,7 +692,7 @@ msgstr ""
 msgid "Serial output needs pyserial (python3-serial on Linux)"
 msgstr ""
 
-#: extension/cutscape/transports.py:280
+#: extension/cutscape/transports.py:290
 #, python-brace-format
 msgid "No permission to write to {path}. Extensions > CutScape > Add Cutter fixes that with a udev rule; or join the lp group: sudo usermod -aG lp $USER, then log out and back in."
 msgstr ""
@@ -687,22 +712,22 @@ msgstr ""
 msgid "lp failed ({code}): {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:343
+#: extension/cutscape/transports.py:353
 #, python-brace-format
 msgid "A USB id looks like usb:0483:5750, optionally followed by :SERIAL; got {path}"
 msgstr ""
 
-#: extension/cutscape/transports.py:352
+#: extension/cutscape/transports.py:362
 #, python-brace-format
 msgid "No USB printer {path} is connected. Is the cutter plugged in and switched on?"
 msgstr ""
 
-#: extension/cutscape/transports.py:356
+#: extension/cutscape/transports.py:366
 #, python-brace-format
 msgid "More than one USB printer matches {path}: {paths}. Add the serial number to tell them apart."
 msgstr ""
 
-#: extension/cutscape/transports.py:392
+#: extension/cutscape/transports.py:402
 #, python-brace-format
 msgid "No single serial port matches {port}; found {count}."
 msgstr ""
@@ -721,12 +746,12 @@ msgstr ""
 msgid "Serial port {port}: {error}"
 msgstr ""
 
-#: extension/cutscape/transports.py:218
+#: extension/cutscape/transports.py:228
 #, python-brace-format
 msgid "No reply to {command} within {seconds} s"
 msgstr ""
 
-#: extension/cutscape/transports.py:267
+#: extension/cutscape/transports.py:277
 #, python-brace-format
 msgid "{sent} of {total} bytes were sent."
 msgstr ""

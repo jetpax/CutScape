@@ -56,10 +56,45 @@ def test_gpgl_terminates_commands():
 
 
 def test_gcode():
-    p = protocols.get('gcode', speed=2, z_mode=True, z_up=5, z_down=-1)
-    assert p.encode([[(0, 0), (10.25, 3)]], (0, 0)) == (
-        b"G21\nG90\nG00 Z5\nG00 X0 Y0\nG01 Z-1\nG01 X10.25 Y3 F1200\n"
+    p = protocols.get('gcode', speed=2, z_up=5, z_down=-1)
+    #: The plunge needs a feed rate too: GRBL refuses a G1 without one
+    assert p.encode([[(0, 0), (10.25, 3)], [(20, 0), (25, 0)]], (0, 0)) == (
+        b"G21\nG90\nG00 Z5\nG00 X0 Y0\nG01 Z-1 F1200\nG01 X10.25 Y3 F1200\n"
+        b"G00 Z5\nG00 X20 Y0\nG01 Z-1 F1200\nG01 X25 Y0 F1200\n"
         b"G00 Z5\nG00 X0 Y0\nM2\n")
+
+
+def test_gcode_without_z():
+    """ The same height for both: G0/G1 alone mean up and down """
+    p = protocols.get('gcode', speed=1, z_up=0, z_down=0)
+    assert p.encode([[(0, 0), (1, 2)]], (0, 0)) == (
+        b"G21\nG90\nG00 X0 Y0\nG01 X1 Y2 F600\nG00 X0 Y0\nM2\n")
+
+
+def test_3018_preset():
+    s = job.Settings(preset='CNC 3018 (GRBL)', speed=2)
+    plan = job.plan([page(SQUARE)], 100, s)
+    assert not plan.problems()
+    out = job.encode(plan, s).decode()
+    #: Millimetres, lifted to the default 5 mm and cut at 0
+    assert out.startswith('G21\nG90\nG00 Z5\nG00 X0 Y0\nG01 Z0 F1200\n')
+    assert 'G01 X50 Y0 F1200\n' in out
+    assert s.device()['serial'] == dict(baud='115200', flow='none')
+
+
+def test_3018_too_big():
+    s = job.Settings(preset='CNC 3018 (GRBL)', speed=2)
+    plan = job.plan([page([(0, 0), (250, 0), (250, 200)], 300)], 300, s)
+    assert plan.problems() == [
+        'The job is 200.0 mm long but the material is only 180.0 mm.']
+
+
+def test_gcode_needs_a_speed():
+    s = job.Settings(protocol='gcode')
+    plan = job.plan([page(SQUARE)], 100, s)
+    assert any('Set a speed' in p for p in plan.problems())
+    s = job.Settings(protocol='hpgl')
+    assert not job.plan([page(SQUARE)], 100, s).problems()
 
 
 # -----------------------------------------------------------------------------

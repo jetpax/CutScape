@@ -95,6 +95,10 @@ def use(o, sending):
         o.transport = added['transport']
         for key in ('printer', 'device', 'port'):
             setattr(o, key, added.get(key, ''))
+        #: Only from a preset that knows them (see devices)
+        for key in ('baud', 'flow'):
+            if added.get(key):
+                setattr(o, key, added[key])
 
 
 # -----------------------------------------------------------------------------
@@ -285,9 +289,10 @@ def _grant_access(usb, path):
     return note, False
 
 
-def _connect(c, scan, saved):
-    """ Make the connection c work. Returns (the settings Cut needs, what
-    was done, whether it is ready)
+def _connect(c, scan, saved, serial=None):
+    """ Make the connection c work; serial is the model's baud rate and
+    flow control, if its preset has them. Returns (the settings Cut needs,
+    what was done, whether it is ready)
     """
     kind, address = c['kind'], c['address']
     notes, ready = [], True
@@ -303,6 +308,11 @@ def _connect(c, scan, saved):
             notes.append(note)
         return dict(transport='device', device=address), notes, ready
     if kind == 'serial':
+        if serial:
+            notes.append(_("It talks at {baud} baud.").format(
+                baud=serial['baud']))
+            return dict(transport='serial', port=address, **serial), \
+                notes, ready
         notes.append(_("Set its baud rate and flow control on Cut's "
                        "Connection tab."))
         return dict(transport='serial', port=address), notes, ready
@@ -344,8 +354,7 @@ def add(model, address='', sysfs=None):
     model. Returns (a message for the user, whether it is ready to use).
     """
     model = model or devices.CUSTOM
-    if model != devices.CUSTOM:
-        devices.get(model)
+    preset = devices.get(model) if model != devices.CUSTOM else {}
     saved = load()
     scan = Scan(sysfs)
     address = address.strip()
@@ -363,7 +372,7 @@ def add(model, address='', sysfs=None):
                     '  %s  %s' % (f['address'], f['label']) for f in found))
         c = found[0]
     try:
-        conn, notes, ready = _connect(c, scan, saved)
+        conn, notes, ready = _connect(c, scan, saved, preset.get('serial'))
     except printers.PrinterError as e:
         raise CutterError(str(e))
     cutter = dict(model=model, label=c['label'], transport='', printer='',

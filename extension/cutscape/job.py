@@ -23,6 +23,8 @@ DEFAULTS = dict(
     dmpl_mode=1,
     hpgl_newline=False,
     hpgl_separate_z=False,
+    gcode_z_up=5.0,        # mm; the same as gcode_z_down = no Z moves
+    gcode_z_down=0.0,
     #: Material
     width=0.0,             # mm, 0 = device width or unlimited
     length=0.0,
@@ -89,7 +91,7 @@ class NoPathsError(ValueError):
 
 class Plan(object):
     """ A toolpath in material space """
-    def __init__(self, paths, design, park, device, prefeed=()):
+    def __init__(self, paths, design, park, device, prefeed=(), speed=0):
         #: What the tool axis follows, in cut order (blade offset applied)
         self.paths = paths
         #: The shapes being cut, in cut order (no blade offset)
@@ -99,6 +101,7 @@ class Plan(object):
         self.device = device
         #: Pen-up points visited before cutting to pull the material through
         self.prefeed = list(prefeed)
+        self.speed = speed
         self.bbox = geometry.bbox(design)
         self.cut_length = sum(geometry.length(p) for p in paths)
         pos, travel = (0.0, 0.0), 0.0
@@ -111,7 +114,8 @@ class Plan(object):
         self.travel_length = travel + geometry.dist(pos, park)
 
     def problems(self):
-        """ Reasons the job won't fit the material """
+        """ Reasons the job can't be sent as set up: it won't fit the
+        material, or the device needs a setting """
         out = []
         x0, y0, x1, y1 = geometry.bbox(self.paths)
         if x0 < -geometry.EPSILON or y0 < -geometry.EPSILON:
@@ -119,6 +123,9 @@ class Plan(object):
                          "origin; move it onto the page or turn on \"Move "
                          "the job to the origin\".").format(
                 distance=-min(x0, y0)))
+        if self.device['protocol'] == 'gcode' and not self.speed:
+            out.append(_("Set a speed on the Cut tab: G-code controllers "
+                         "such as GRBL won't cut without one."))
         w, l = self.device['width'], self.device['length']
         if w and x1 > w + geometry.EPSILON:
             out.append(_("The job is {size:.1f} mm wide but the material "
@@ -192,7 +199,7 @@ def plan(page_polys, page_height, s):
     else:
         park = (0.0, 0.0)
     result = Plan(paths, design, park, device,
-                  _prefeed(paths) if s.prefeed else ())
+                  _prefeed(paths) if s.prefeed else (), s.speed)
     #: Where the drawing was on the page (mm, y down), for the preview
     result.page_bbox = (x0, page_height - y1, x1, page_height - y0)
     return result
@@ -235,5 +242,6 @@ def encode(job, s):
     proto = protocols.get(
         d['protocol'], speed=s.speed, force=s.force, pen=s.pen,
         mode=d['options']['dmpl_mode'], newline=s.hpgl_newline,
-        separate_z=s.hpgl_separate_z)
+        separate_z=s.hpgl_separate_z, z_up=s.gcode_z_up,
+        z_down=s.gcode_z_down)
     return proto.encode(pts, (park[0] * sx, park[1] * sy))

@@ -7,6 +7,7 @@
   <param name="model" type="optiongroup" appearance="combo" gui-text="Model:">
     <option value="custom">Not listed (set it up on Cut's Device tab)</option>
     <option translatable="no" value="ANAgraph AE-70e">ANAgraph AE-70e</option>
+    <option translatable="no" value="CNC 3018 (GRBL)">CNC 3018 (GRBL)</option>
     <option translatable="no" value="Creation PCut CT-630">Creation PCut CT-630</option>
     <option translatable="no" value="GCC Bobcat 60">GCC Bobcat 60</option>
     <option translatable="no" value="Graphtec 8000-130">Graphtec 8000-130</option>

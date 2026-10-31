@@ -205,7 +205,17 @@ def _stalled(where, seconds):
         where=where, seconds=seconds)
 
 
+#: s. Opening the port restarts an Arduino-based controller such as GRBL,
+#: which drops anything sent while it boots.
+WAKE_DELAY = 2.0
+
+
 def _send_acked(s, data, timeout):
+    #: Wake it, let it boot, then drop its welcome message and the replies
+    #: to the blank lines
+    s.write(b'\r\n\r\n')
+    time.sleep(WAKE_DELAY)
+    s.reset_input_buffer()
     for line in data.decode('ascii').splitlines():
         line = line.split(';', 1)[0].strip()
         if not line:

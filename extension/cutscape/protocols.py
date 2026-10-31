@@ -177,8 +177,9 @@ class CAMMGL1(Protocol):
 
 
 class GCode(Protocol):
-    """ G-code in millimetres. With z_down/z_up set the tool is lifted on
-    the Z axis, otherwise G0/G1 alone imply up/down.
+    """ G-code in millimetres, for GRBL and similar controllers. The tool
+    is lifted to z_up for travel and lowered to z_down to cut; with both
+    the same, no Z moves are sent and G0/G1 alone imply up/down.
     """
     name = 'gcode'
     steps_per_mm = 1.0
@@ -195,17 +196,24 @@ class GCode(Protocol):
         self._down = None
         return 'G21\nG90\n'
 
+    def _feed(self):
+        #: speed is cm/s, feed rate is mm/min. GRBL refuses a G1 until it
+        #: has one (error:22).
+        return ' F%s' % self._num(self.speed * 600) if self.speed else ''
+
     def move(self, x, y, down):
         out = ''
-        z_mode = self.options.get('z_mode')
-        if z_mode and down != self._down:
-            z = self.options.get('z_down' if down else 'z_up', 0)
-            out += 'G0%i Z%s\n' % (1 if down else 0, self._num(z))
+        z_up = float(self.options.get('z_up', 0))
+        z_down = float(self.options.get('z_down', 0))
+        if z_up != z_down and down != self._down:
+            if down:
+                out += 'G01 Z%s%s\n' % (self._num(z_down), self._feed())
+            else:
+                out += 'G00 Z%s\n' % self._num(z_up)
         self._down = down
         line = 'G0%i X%s Y%s' % (1 if down else 0, self._num(x), self._num(y))
-        if down and self.speed:
-            #: speed is cm/s, feed rate is mm/min
-            line += ' F%s' % self._num(self.speed * 600)
+        if down:
+            line += self._feed()
         return out + line + '\n'
 
     def end(self, x, y):

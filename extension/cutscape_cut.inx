@@ -46,6 +46,7 @@
         <option value="added">The cutter you added</option>
         <option value="custom">Custom (settings below)</option>
         <option translatable="no" value="ANAgraph AE-70e">ANAgraph AE-70e</option>
+        <option translatable="no" value="CNC 3018 (GRBL)">CNC 3018 (GRBL)</option>
         <option translatable="no" value="Creation PCut CT-630">Creation PCut CT-630</option>
         <option translatable="no" value="GCC Bobcat 60">GCC Bobcat 60</option>
         <option translatable="no" value="Graphtec 8000-130">Graphtec 8000-130</option>
@@ -80,7 +81,7 @@
         <option translatable="no" value="VEVOR Smart 1">VEVOR Smart 1</option>
         <option translatable="no" value="Vision VE-810 engraver">Vision VE-810 engraver</option>
       </param>
-      <label>With a cutter chosen, only Tool and the HPGL options below apply.</label>
+      <label>With a cutter chosen, only Tool and the HPGL and G-code options below apply.</label>
       <param name="protocol" type="optiongroup" appearance="combo" gui-text="Language:">
         <option translatable="no" value="hpgl">HPGL</option>
         <option translatable="no" value="dmpl">DMPL</option>
@@ -105,6 +106,8 @@
       <param name="pen" type="int" min="0" max="99" gui-text="Tool:" gui-description="Pen or tool number; 0 sends none">1</param>
       <param name="hpgl_newline" type="bool" gui-text="HPGL: newline after each command">false</param>
       <param name="hpgl_separate_z" type="bool" gui-text="HPGL: separate pen up/down from moves">false</param>
+      <param name="gcode_z_up" type="float" min="-100" max="100" precision="2" gui-text="G-code: Z for travel (mm):" gui-description="Height the tool lifts to between cuts">5</param>
+      <param name="gcode_z_down" type="float" min="-100" max="100" precision="2" gui-text="G-code: Z for cutting (mm):" gui-description="Zero Z on the machine where the blade or pen should cut, and leave this at 0. Make both heights the same to send no Z moves.">0</param>
     </page>
     <page name="connection" gui-text="Connection">
       <param name="transport" type="optiongroup" appearance="radio" gui-text="Send through:">

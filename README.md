@@ -89,7 +89,7 @@ To send again with the same settings, use **Extensions → Previous Extension**.
 
 | Tab | Setting | |
 |---|---|---|
-| Cut | Speed, Force | Sent to the cutter. 0 leaves the cutter's own setting. |
+| Cut | Speed, Force | Sent to the cutter. 0 leaves the cutter's own setting. G-code needs a speed. |
 | | Passes | Cut everything this many times. Closed shapes are cut as one continuous loop. |
 | | Overcut | Run past the start of closed shapes so the ends meet (1 mm by default). |
 | | Blade offset | Drag-knife correction: about 0.25 mm for a 45° blade, 0.5 mm for 60°. Leave at 0 if your cutter corrects for it itself. |
@@ -101,6 +101,7 @@ To send again with the same settings, use **Extensions → Previous Extension**.
 | | Pre-feed | Pull the job's length of material through and back first, so a roll tracks straight. |
 | | Feed past the job | Where the head parks when it's done. 0 returns it to the origin. |
 | Device | Cutter | *The cutter you added*, a preset for your model, or *Custom* to set the command language (HPGL, DMPL, GP-GL, CAMM-GL, G-code), resolution and axes yourself. |
+| | G-code: Z for travel, Z for cutting | The tool lifts to the first between cuts and lowers to the second to cut. Make them the same to send no Z moves. See [Desktop CNC machines](#desktop-cnc-machines-grbl). |
 | Connection | Send through | *The cutter you added*, a printer queue, a device file, a serial port, or a file to check the output. |
 
 ## Languages
@@ -142,7 +143,8 @@ Add Cutter finds the cutter and sets up the best connection for your system:
   which passes the commands through untouched.
 - **USB-serial cutters:** the serial port, found by its USB id. Set the baud
   rate and flow control on Cut's **Connection** tab, from the cutter's
-  manual.
+  manual. For the *CNC 3018 (GRBL)* preset, CutScape sets 115200 baud
+  itself.
 
 If this needs an administrator, the system asks for the password in its own
 prompt, and CutScape never sees it. Where there's no prompt (over SSH, say),
@@ -192,6 +194,30 @@ and is untested.
 **Not supported yet:** Silhouette cutters over USB (they aren't USB printers),
 and Bluetooth.
 
+## Desktop CNC machines (GRBL)
+
+A desktop CNC with a drag knife or a pen in the spindle clamp can cut too.
+Choose the **CNC 3018 (GRBL)** preset (300 × 180 mm), or *Custom* with
+**G-code** for another GRBL machine.
+
+- **Set a speed** on the Cut tab: GRBL won't cut without a feed rate.
+  1 cm/s is 600 mm/min.
+- **Zero Z** where the blade should cut, or where the pen touches the paper.
+  CutScape lifts to *Z for travel* (5 mm) between cuts and lowers to *Z for
+  cutting* (0) to cut. For a spring-loaded knife holder, set *Z for cutting*
+  a little below zero to press the blade in.
+- **Corners need nothing extra.** A drag knife turns by itself. Set **Blade
+  offset** and CutScape swings the tool round each sharp corner so the blade
+  turns on the spot. Tangential knives, turned by a motor, aren't
+  supported.
+- Leave the spindle off: CutScape never starts it.
+
+The job starts at the machine's work zero, with X to the right and Y away
+from you. CutScape waits 2 seconds after opening the port, because GRBL
+restarts then, and stops on the first `error` or `ALARM` it reports. This
+hasn't been run on a real machine yet. Save to a **File** first to check the
+G-code, then try a pen before a knife.
+
 ## Troubleshooting
 
 - **Text takes a little longer.** CutScape converts text with a second, hidden
@@ -210,8 +236,8 @@ and Bluetooth.
 
 The **Cutter** list holds presets for ANAgraph, Creation, GCC, Graphtec, Ioline,
 KNK, Mimaki, Redsail, Rheinstern, Roland, Secabo, SeikiTech, Sekonic, Silhouette,
-Summa, US Cutter, VEVOR and Vision models. Any HPGL or DMPL cutter should work
-with *Custom*.
+Summa, US Cutter, VEVOR and Vision models, and a desktop CNC 3018 running GRBL.
+Any HPGL or DMPL cutter should work with *Custom*.
 
 The orientation of the Roland Stika and Silhouette presets was converted from
 Inkcut and hasn't been checked against the machines. Do a small test cut first.

@@ -187,6 +187,17 @@ def test_serial_cutter(world):
     assert 'baud rate' in text
 
 
+def test_grbl_cutter_gets_its_baud_rate(world):
+    world['ports'] = [CH340]
+    text, ready = add(world, model='CNC 3018 (GRBL)')
+    assert 'It talks at 115200 baud.' in text
+    assert 'baud rate and flow control' not in text
+    o = options(baud='9600', flow='xonxoff')
+    cutter.use(o, sending=True)
+    assert (o.preset, o.transport, o.port, o.baud, o.flow) == (
+        'CNC 3018 (GRBL)', 'serial', 'usb:1a86:7523', '115200', 'none')
+
+
 def test_not_listed_model(world):
     world['ports'] = [CH340]
     text, ready = add(world, model='custom')
