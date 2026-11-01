@@ -424,7 +424,9 @@ def send(data, transport, **options):
         return to_serial(data, options.get('port', ''),
                          options.get('baud', 9600),
                          options.get('flow', 'xonxoff'),
-                         options.get('ack', False))
+                         options.get('ack', False),
+                         options.get('timeout', STALL_TIMEOUT))
     if transport == 'device':
-        return to_device(data, options.get('device', ''))
+        return to_device(data, options.get('device', ''),
+                         options.get('timeout', STALL_TIMEOUT))
     raise TransportError("Unknown transport %r" % transport)

@@ -327,12 +327,14 @@ def test_inx_defaults_match_dataclass():
 
 
 # -----------------------------------------------------------------------------
-# The other menu entries: Add Cutter, Remove Cutter, Remove Preview
+# The other menu entries: Add Cutter, Remove Cutter, Remove Preview, Add
+# Crop Marks
 # -----------------------------------------------------------------------------
 MENU = {
     'extension/cutscape_add.inx': ('add', {'model', 'address'}),
     'extension/cutscape_remove.inx': ('remove', set()),
     'extension/cutscape_clear.inx': ('clear', set()),
+    'extension/cutscape_marks.inx': ('marks', set()),
 }
 
 
@@ -378,4 +380,4 @@ def test_cut_actions_match():
 def test_menu_ids_unique():
     ids = [ET.parse(p).getroot().find('{%s}id' % NS['i']).text
            for p in sorted(glob.glob('extension/*.inx'))]
-    assert len(ids) == len(set(ids)) == 4
+    assert len(ids) == len(set(ids)) == 5

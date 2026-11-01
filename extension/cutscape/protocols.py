@@ -39,19 +39,23 @@ class Protocol(object):
             return int(round(p[0])), int(round(p[1]))
         return p
 
-    def encode(self, polys, park=(0, 0)):
-        """ Encode polylines of (x, y) in device steps. The first point of
-        each is a pen-up move, the rest are cuts.
+    def path(self, poly):
+        """ The moves for a polyline of (x, y) in device steps. The first
+        point is a pen-up move, the rest are cuts.
         """
+        out, last = [], None
+        for i, p in enumerate(poly):
+            p = self._round(p)
+            if i and p == last:
+                continue
+            out.append(self.move(p[0], p[1], i > 0))
+            last = p
+        return ''.join(out)
+
+    def encode(self, polys, park=(0, 0)):
+        """ Encode polylines of (x, y) in device steps; see path """
         out = [self.begin()]
-        for poly in polys:
-            last = None
-            for i, p in enumerate(poly):
-                p = self._round(p)
-                if i and p == last:
-                    continue
-                out.append(self.move(p[0], p[1], i > 0))
-                last = p
+        out.extend(self.path(poly) for poly in polys)
         out.append(self.end(*self._round(park)))
         return ''.join(out).encode('ascii')
 

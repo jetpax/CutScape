@@ -382,3 +382,17 @@ def test_prompt_run(tmp_path, monkeypatch, body, outcome):
     else:
         with pytest.raises(outcome):
             admin.run('echo hi', 'Why')
+
+
+def test_learned_settings(tmp_path, monkeypatch):
+    """ Remembered with or without a cutter, without counting as one """
+    monkeypatch.setenv('CUTSCAPE_CONFIG', str(tmp_path / 'cutter.json'))
+    assert cutter.setting('laser') is None
+    assert cutter.setting('arrow_turn', 0) == 0
+    cutter.remember('laser', [1.5, -2.0])
+    assert cutter.setting('laser') == [1.5, -2.0]
+    assert cutter.load() is None
+    cutter.save(dict(transport='device', device='usb:0483:5750', model='A'))
+    cutter.remember('arrow_turn', 3)
+    assert cutter.load()['device'] == 'usb:0483:5750'
+    assert cutter.setting('arrow_turn') == 3

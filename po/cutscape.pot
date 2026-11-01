@@ -40,6 +40,7 @@ msgstr ""
 #: extension/cutscape_add.inx
 #: extension/cutscape_clear.inx
 #: extension/cutscape_cut.inx
+#: extension/cutscape_marks.inx
 #: extension/cutscape_remove.inx
 msgid "CutScape"
 msgstr ""
@@ -54,6 +55,7 @@ msgstr ""
 
 #: extension/cutscape_cut.inx
 #: extension/cutscape_cut.inx
+#: extension/cutscape/align_window.py:194
 msgid "Cut"
 msgstr ""
 
@@ -71,6 +73,10 @@ msgstr ""
 
 #: extension/cutscape_cut.inx
 msgid "Send a 50 mm test square"
+msgstr ""
+
+#: extension/cutscape_cut.inx
+msgid "Line up with printed crop marks and cut"
 msgstr ""
 
 #: extension/cutscape_cut.inx
@@ -396,14 +402,39 @@ msgstr ""
 msgid "Preview or cut the selection on a vinyl cutter or plotter"
 msgstr ""
 
-#: extension/cutscape_cut.py:107
+#: extension/cutscape_cut.py:128
+msgid "Added four crop marks, and moved the lines to cut to a hidden layer so they don't print."
+msgstr ""
+
+#: extension/cutscape_cut.py:134
+msgid "Next, print it at 100%, with no \"fit to page\". Put the sheet in the cutter and set the cutter's origin below and to the left of mark 1. Then open Extensions > CutScape > Cut, choose Line up with printed crop marks and cut, and click Apply."
+msgstr ""
+
+#: extension/cutscape_cut.py:131
+msgid "The marks don't all fit on the page, leaving room for the printer's margin. Make the page bigger or the design smaller, and add them again."
+msgstr ""
+
+#: extension/cutscape_cut.py:112
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:101
+#: extension/cutscape_cut.py:163
+#, python-brace-format
+msgid "Sent {metres:.2f} m of cuts, lined up with the printed sheet, to {where}."
+msgstr ""
+
+#: extension/cutscape_cut.py:106
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
+msgstr ""
+
+#: extension/cutscape_marks.inx
+msgid "Add Crop Marks"
+msgstr ""
+
+#: extension/cutscape_marks.inx
+msgid "For print and cut: hide the selected lines so they don't print, and add crop marks to line the cut up with the printed sheet"
 msgstr ""
 
 #: extension/cutscape_remove.inx
@@ -426,189 +457,339 @@ msgstr ""
 msgid "Nobody answered the password prompt."
 msgstr ""
 
-#: extension/cutscape/cutter.py:383
+#: extension/cutscape/align.py:35
+msgid "Lining up with printed marks isn't available for G-code machines yet."
+msgstr ""
+
+#: extension/cutscape/align.py:38
+msgid "Lining up needs a direct connection to the cutter, to move the head as you click: its USB device on Linux (Add Cutter sets that up) or a serial port."
+msgstr ""
+
+#: extension/cutscape/align.py:81
+msgid "Two crop marks are in the same place."
+msgstr ""
+
+#: extension/cutscape/align.py:97
+msgid "The crop marks are in a line, so they don't show how the sheet lies."
+msgstr ""
+
+#: extension/cutscape/align.py:244
+msgid "The sheet is stretched more than expected. Was it printed at 100%, with no \"fit to page\"?"
+msgstr ""
+
+#: extension/cutscape/align.py:247
+msgid "The marks don't agree with each other. Go back and check you aimed at each one, in the right order."
+msgstr ""
+
+#: extension/cutscape/align.py:167
+#, python-brace-format
+msgid "Move the head at least {size:.0f} mm from the origin first."
+msgstr ""
+
+#: extension/cutscape/align_window.py:84
+msgid "If the head doesn't go the way the arrow points"
+msgstr ""
+
+#: extension/cutscape/align_window.py:206
+msgid "Lining up needs CutScape's window, and GTK isn't available here."
+msgstr ""
+
+#: extension/cutscape/align_window.py:210
+msgid "Line up with the printed sheet"
+msgstr ""
+
+#: extension/cutscape/align_window.py:75
+msgid "Back"
+msgstr ""
+
+#: extension/cutscape/align_window.py:78
+msgid "Calibrate laser…"
+msgstr ""
+
+#: extension/cutscape/align_window.py:82
+msgid "Turn arrows"
+msgstr ""
+
+#: extension/cutscape/align_window.py:90
+msgid "Cancel"
+msgstr ""
+
+#: extension/cutscape/align_window.py:117
+msgid "That's as far as the cutter's origin. If the mark is further than that, move the origin back on the cutter's panel and start again."
+msgstr ""
+
+#: extension/cutscape/align_window.py:168
+msgid "Cut the cross"
+msgstr ""
+
+#: extension/cutscape/align_window.py:55
+msgid "Each arrow moves:"
+msgstr ""
+
+#: extension/cutscape/align_window.py:154
+#, python-brace-format
+msgid "Head at X {x:.2f} mm, Y {y:.2f} mm"
+msgstr ""
+
+#: extension/cutscape/align_window.py:170
+msgid "Move the laser onto the centre of the cross you just cut."
+msgstr ""
+
+#: extension/cutscape/align_window.py:172
+msgid "Laser is on the cross"
+msgstr ""
+
+#: extension/cutscape/align_window.py:188
+#, python-brace-format
+msgid "All four marks found. The sheet is turned {angle:.2f}° and stretched {x:+.2f}% and {y:+.2f}%; the marks agree to within {error:.2f} mm."
+msgstr ""
+
+#: extension/cutscape/align_window.py:164
+#, python-brace-format
+msgid "Put scrap material under the head. CutScape will cut a {size:.0f} mm cross there, so don't leave your printed sheet under it."
+msgstr ""
+
+#: extension/cutscape/align_window.py:178
+#, python-brace-format
+msgid "Move the laser onto crop mark {number} ({corner})."
+msgstr ""
+
+#: extension/cutscape/align_window.py:180
+#, python-brace-format
+msgid "Move the blade tip onto crop mark {number} ({corner})."
+msgstr ""
+
+#: extension/cutscape/align_window.py:183
+msgid "On the mark"
+msgstr ""
+
+#: extension/cutscape/cutter.py:403
 msgid "cutter"
 msgstr ""
 
-#: extension/cutscape/cutter.py:405
+#: extension/cutscape/cutter.py:425
 msgid "No cutter has been added."
 msgstr ""
 
-#: extension/cutscape/cutter.py:406
+#: extension/cutscape/cutter.py:426
 msgid "Removed the cutter you added."
 msgstr ""
 
-#: extension/cutscape/cutter.py:149
+#: extension/cutscape/cutter.py:166
 msgid "No cutter found. Check that it is plugged in and switched on, then try again."
 msgstr ""
 
-#: extension/cutscape/cutter.py:283
+#: extension/cutscape/cutter.py:300
 #, python-brace-format
 msgid ""
 "You can't write to {path} yet. To fix that, run this in a terminal, then unplug the cutter and plug it back in:\n"
 "  {command}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:316
+#: extension/cutscape/cutter.py:333
 msgid "Set its baud rate and flow control on Cut's Connection tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:349
+#: extension/cutscape/cutter.py:366
 #, python-brace-format
 msgid "the printer queue {queue}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:391
+#: extension/cutscape/cutter.py:411
 msgid "Set its language and steps per mm on Cut's Device tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:394
+#: extension/cutscape/cutter.py:414
 msgid "To check it, open Extensions > CutScape > Cut, choose Send a 50 mm test square and click Apply."
 msgstr ""
 
-#: extension/cutscape/cutter.py:91
+#: extension/cutscape/cutter.py:108
 msgid "No cutter has been added yet. Plug it in and switch it on, then use Extensions > CutScape > Add Cutter. Or choose how to reach it on Cut's Connection tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:152
+#: extension/cutscape/cutter.py:169
 msgid "CUPS wouldn't list USB printers for this account, so a cutter that needs a printer queue can't be found."
 msgstr ""
 
-#: extension/cutscape/cutter.py:160
+#: extension/cutscape/cutter.py:177
 msgid "A USB cutter must be added to Windows first: Settings > Bluetooth & devices > Printers & scanners, with the Generic / Text Only driver. Then enter the printer's name in the Address field."
 msgstr ""
 
-#: extension/cutscape/cutter.py:174
+#: extension/cutscape/cutter.py:191
 msgid "Cutters on a serial port need pyserial: sudo apt install python3-serial"
 msgstr ""
 
-#: extension/cutscape/cutter.py:272
+#: extension/cutscape/cutter.py:289
 msgid "CutScape needs to let you use your cutter."
 msgstr ""
 
-#: extension/cutscape/cutter.py:346
+#: extension/cutscape/cutter.py:363
 #, python-brace-format
 msgid "USB, as {device}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:348
+#: extension/cutscape/cutter.py:365
 #, python-brace-format
 msgid "the serial port {port}"
 msgstr ""
 
-#: extension/cutscape/cutter.py:384
+#: extension/cutscape/cutter.py:404
 #, python-brace-format
 msgid "Added your {model}, connected through {connection}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:156
+#: extension/cutscape/cutter.py:173
 msgid "To allow it: sudo usermod -aG lpadmin $USER, then log out and back in."
 msgstr ""
 
-#: extension/cutscape/cutter.py:210
+#: extension/cutscape/cutter.py:227
 #, python-brace-format
 msgid "CutScape doesn't know {address}. Enter the name of a printer queue, a usb://… address, a USB id such as usb:0483:5750, a device file or a serial port."
 msgstr ""
 
-#: extension/cutscape/cutter.py:387
+#: extension/cutscape/cutter.py:407
 #, python-brace-format
 msgid "It calls itself {device}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:414
+#: extension/cutscape/cutter.py:434
 #, python-brace-format
 msgid "Removed its printer queue {queue}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:170
+#: extension/cutscape/cutter.py:187
 msgid "If it is connected another way, enter one of these in the Address field:"
 msgstr ""
 
-#: extension/cutscape/cutter.py:280
+#: extension/cutscape/cutter.py:297
 #, python-brace-format
 msgid "Added a udev rule ({file}) to give you access. Unplug the cutter and plug it back in to apply it."
 msgstr ""
 
-#: extension/cutscape/cutter.py:312
+#: extension/cutscape/cutter.py:329
 #, python-brace-format
 msgid "It talks at {baud} baud."
 msgstr ""
 
-#: extension/cutscape/cutter.py:333
+#: extension/cutscape/cutter.py:350
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it and cleared {count} stuck job(s)."
 msgstr ""
 
-#: extension/cutscape/cutter.py:335
+#: extension/cutscape/cutter.py:352
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it."
 msgstr ""
 
-#: extension/cutscape/cutter.py:369
+#: extension/cutscape/cutter.py:386
 msgid "More than one possible cutter is connected. Enter the address of yours in the Address field and click Apply again:"
 msgstr ""
 
-#: extension/cutscape/cutter.py:206
+#: extension/cutscape/cutter.py:223
 #: extension/cutscape/transports.py:295
 #, python-brace-format
 msgid "{path} isn't there. Is the cutter plugged in and switched on?"
 msgstr ""
 
-#: extension/cutscape/cutter.py:278
+#: extension/cutscape/cutter.py:295
 #, python-brace-format
 msgid "Gave you access to it with a udev rule ({file})."
 msgstr ""
 
-#: extension/cutscape/cutter.py:306
+#: extension/cutscape/cutter.py:323
 #, python-brace-format
 msgid "You can't write to {path} yet."
 msgstr ""
 
-#: extension/cutscape/cutter.py:324
+#: extension/cutscape/cutter.py:341
 #, python-brace-format
 msgid "Pointed the printer queue {queue} at it."
 msgstr ""
 
-#: extension/cutscape/cutter.py:326
+#: extension/cutscape/cutter.py:343
 #, python-brace-format
 msgid "Created the printer queue {queue} for it."
 msgstr ""
 
-#: extension/cutscape/document.py:106
+#: extension/cutscape/document.py:207
+#: extension/cutscape/job.py:170
+#: extension/cutscape/job.py:225
+msgid "Nothing to cut"
+msgstr ""
+
+#: extension/cutscape/document.py:220
+msgid "Select the lines to cut, then use Extensions > CutScape > Add Crop Marks."
+msgstr ""
+
+#: extension/cutscape/document.py:114
 msgid "None of the selected objects can be cut"
 msgstr ""
 
-#: extension/cutscape/document.py:145
+#: extension/cutscape/document.py:234
+msgid "This drawing has no crop marks. Use Extensions > CutScape > Add Crop Marks and print it first."
+msgstr ""
+
+#: extension/cutscape/document.py:153
 #, python-brace-format
 msgid "Can't convert text {id} to a path; convert it with Path > Object to Path"
 msgstr ""
 
-#: extension/cutscape/document.py:168
+#: extension/cutscape/document.py:176
 #, python-brace-format
 msgid "Text {id} must be converted to a path first"
 msgstr ""
 
-#: extension/cutscape/job.py:163
-msgid "Nothing to cut"
-msgstr ""
-
-#: extension/cutscape/job.py:127
+#: extension/cutscape/job.py:134
 msgid "Set a speed on the Cut tab: G-code controllers such as GRBL won't cut without one."
 msgstr ""
 
-#: extension/cutscape/job.py:122
+#: extension/cutscape/job.py:125
 #, python-brace-format
-msgid "The job extends {distance:.1f} mm past the origin; move it onto the page or turn on \"Move the job to the origin\"."
+msgid "The cut reaches {distance:.1f} mm past the cutter's origin. Move the origin back on the cutter's panel and line up again."
 msgstr ""
 
-#: extension/cutscape/job.py:131
+#: extension/cutscape/job.py:138
 #, python-brace-format
 msgid "The job is {size:.1f} mm wide but the material is only {limit:.1f} mm."
 msgstr ""
 
-#: extension/cutscape/job.py:134
+#: extension/cutscape/job.py:141
 #, python-brace-format
 msgid "The job is {size:.1f} mm long but the material is only {limit:.1f} mm."
+msgstr ""
+
+#: extension/cutscape/job.py:129
+#, python-brace-format
+msgid "The job extends {distance:.1f} mm past the origin; move it onto the page or turn on \"Move the job to the origin\"."
+msgstr ""
+
+#: extension/cutscape/marks.py:25
+msgid "bottom left"
+msgstr ""
+
+#: extension/cutscape/marks.py:25
+msgid "bottom right"
+msgstr ""
+
+#: extension/cutscape/marks.py:25
+msgid "top right"
+msgstr ""
+
+#: extension/cutscape/marks.py:25
+msgid "top left"
+msgstr ""
+
+#: extension/cutscape/marks.py:43
+msgid "CutScape crop marks"
+msgstr ""
+
+#: extension/cutscape/marks.py:31
+msgid "CutScape cut lines"
+msgstr ""
+
+#: extension/cutscape/marks.py:55
+#, python-brace-format
+msgid "Crop mark {number}"
 msgstr ""
 
 #: extension/cutscape/preview.py:85

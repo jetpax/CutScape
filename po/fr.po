@@ -42,6 +42,7 @@ msgstr "Trouver la découpeuse branchée et la configurer pour Découpe"
 #: extension/cutscape_add.inx
 #: extension/cutscape_clear.inx
 #: extension/cutscape_cut.inx
+#: extension/cutscape_marks.inx
 #: extension/cutscape_remove.inx
 msgid "CutScape"
 msgstr "CutScape"
@@ -56,6 +57,7 @@ msgstr "Supprimer du dessin l’aperçu du tracé de coupe CutScape"
 
 #: extension/cutscape_cut.inx
 #: extension/cutscape_cut.inx
+#: extension/cutscape/align_window.py:194
 msgid "Cut"
 msgstr "Découpe"
 
@@ -74,6 +76,10 @@ msgstr "envoie à la découpeuse"
 #: extension/cutscape_cut.inx
 msgid "Send a 50 mm test square"
 msgstr "envoie un carré test de 50 mm"
+
+#: extension/cutscape_cut.inx
+msgid "Line up with printed crop marks and cut"
+msgstr "aligne sur les repères imprimés et découpe"
 
 #: extension/cutscape_cut.inx
 msgid "Cuts the selection, or the whole drawing if nothing is selected."
@@ -398,15 +404,40 @@ msgstr "Fichier :"
 msgid "Preview or cut the selection on a vinyl cutter or plotter"
 msgstr "Prévisualiser ou découper la sélection sur une découpeuse vinyle ou un traceur"
 
-#: extension/cutscape_cut.py:107
+#: extension/cutscape_cut.py:128
+msgid "Added four crop marks, and moved the lines to cut to a hidden layer so they don't print."
+msgstr "Quatre repères de coupe ajoutés, et les lignes à découper déplacées sur un calque masqué pour qu’elles ne s’impriment pas."
+
+#: extension/cutscape_cut.py:134
+msgid "Next, print it at 100%, with no \"fit to page\". Put the sheet in the cutter and set the cutter's origin below and to the left of mark 1. Then open Extensions > CutScape > Cut, choose Line up with printed crop marks and cut, and click Apply."
+msgstr "Ensuite, imprimez à 100 %, sans « ajuster à la page ». Placez la feuille dans la découpeuse et réglez son origine en bas à gauche du repère 1. Puis ouvrez Extensions > CutScape > Découpe, choisissez d’aligner sur les repères imprimés et de découper, et cliquez sur Appliquer."
+
+#: extension/cutscape_cut.py:131
+msgid "The marks don't all fit on the page, leaving room for the printer's margin. Make the page bigger or the design smaller, and add them again."
+msgstr "Les repères ne tiennent pas tous sur la page, marge de l’imprimante comprise. Agrandissez la page ou réduisez le dessin, puis ajoutez-les à nouveau."
+
+#: extension/cutscape_cut.py:112
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr "{width:.0f} × {height:.0f} mm envoyés, soit {metres:.2f} m de découpe ({size} octets), vers {where}."
 
-#: extension/cutscape_cut.py:101
+#: extension/cutscape_cut.py:163
+#, python-brace-format
+msgid "Sent {metres:.2f} m of cuts, lined up with the printed sheet, to {where}."
+msgstr "{metres:.2f} m de découpe, alignés sur la feuille imprimée, envoyés à {where}."
+
+#: extension/cutscape_cut.py:106
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
 msgstr "Carré test de {size:.0f} mm envoyé à {where}. Mesurez-le : s’il ne fait pas {size:.0f} mm, le nombre de pas par mm de la découpeuse est faux."
+
+#: extension/cutscape_marks.inx
+msgid "Add Crop Marks"
+msgstr "Ajouter des repères de coupe"
+
+#: extension/cutscape_marks.inx
+msgid "For print and cut: hide the selected lines so they don't print, and add crop marks to line the cut up with the printed sheet"
+msgstr "Pour l’impression-découpe : masque les lignes sélectionnées pour qu’elles ne s’impriment pas, et ajoute des repères pour aligner la découpe sur la feuille imprimée"
 
 #: extension/cutscape_remove.inx
 msgid "Remove Cutter"
@@ -428,23 +459,129 @@ msgstr "La demande de mot de passe a été annulée."
 msgid "Nobody answered the password prompt."
 msgstr "Personne n’a répondu à la demande de mot de passe."
 
-#: extension/cutscape/cutter.py:383
+#: extension/cutscape/align.py:35
+msgid "Lining up with printed marks isn't available for G-code machines yet."
+msgstr "L’alignement sur des repères imprimés n’est pas encore disponible pour les machines G-code."
+
+#: extension/cutscape/align.py:38
+msgid "Lining up needs a direct connection to the cutter, to move the head as you click: its USB device on Linux (Add Cutter sets that up) or a serial port."
+msgstr "L’alignement nécessite une connexion directe à la découpeuse, pour déplacer la tête à chaque clic : son périphérique USB sous Linux (Ajouter une découpeuse le configure) ou un port série."
+
+#: extension/cutscape/align.py:81
+msgid "Two crop marks are in the same place."
+msgstr "Deux repères de coupe sont au même endroit."
+
+#: extension/cutscape/align.py:97
+msgid "The crop marks are in a line, so they don't show how the sheet lies."
+msgstr "Les repères de coupe sont alignés et ne montrent donc pas la position de la feuille."
+
+#: extension/cutscape/align.py:244
+msgid "The sheet is stretched more than expected. Was it printed at 100%, with no \"fit to page\"?"
+msgstr "La feuille est plus étirée que prévu. A-t-elle été imprimée à 100 %, sans « ajuster à la page » ?"
+
+#: extension/cutscape/align.py:247
+msgid "The marks don't agree with each other. Go back and check you aimed at each one, in the right order."
+msgstr "Les repères ne concordent pas. Revenez en arrière et vérifiez que vous avez visé chacun d’eux, dans le bon ordre."
+
+#: extension/cutscape/align.py:167
+#, python-brace-format
+msgid "Move the head at least {size:.0f} mm from the origin first."
+msgstr "Éloignez d’abord la tête d’au moins {size:.0f} mm de l’origine."
+
+#: extension/cutscape/align_window.py:84
+msgid "If the head doesn't go the way the arrow points"
+msgstr "Si la tête ne va pas dans le sens de la flèche"
+
+#: extension/cutscape/align_window.py:206
+msgid "Lining up needs CutScape's window, and GTK isn't available here."
+msgstr "L’alignement a besoin de la fenêtre de CutScape, et GTK n’est pas disponible ici."
+
+#: extension/cutscape/align_window.py:210
+msgid "Line up with the printed sheet"
+msgstr "Aligner sur la feuille imprimée"
+
+#: extension/cutscape/align_window.py:75
+msgid "Back"
+msgstr "Retour"
+
+#: extension/cutscape/align_window.py:78
+msgid "Calibrate laser…"
+msgstr "Calibrer le laser…"
+
+#: extension/cutscape/align_window.py:82
+msgid "Turn arrows"
+msgstr "Tourner les flèches"
+
+#: extension/cutscape/align_window.py:90
+msgid "Cancel"
+msgstr "Annuler"
+
+#: extension/cutscape/align_window.py:117
+msgid "That's as far as the cutter's origin. If the mark is further than that, move the origin back on the cutter's panel and start again."
+msgstr "La tête est à l’origine de la découpeuse. Si le repère est plus loin, reculez l’origine sur le panneau de la découpeuse et recommencez."
+
+#: extension/cutscape/align_window.py:168
+msgid "Cut the cross"
+msgstr "Découper la croix"
+
+#: extension/cutscape/align_window.py:55
+msgid "Each arrow moves:"
+msgstr "Chaque flèche déplace de :"
+
+#: extension/cutscape/align_window.py:154
+#, python-brace-format
+msgid "Head at X {x:.2f} mm, Y {y:.2f} mm"
+msgstr "Tête à X {x:.2f} mm, Y {y:.2f} mm"
+
+#: extension/cutscape/align_window.py:170
+msgid "Move the laser onto the centre of the cross you just cut."
+msgstr "Placez le laser sur le centre de la croix que vous venez de découper."
+
+#: extension/cutscape/align_window.py:172
+msgid "Laser is on the cross"
+msgstr "Le laser est sur la croix"
+
+#: extension/cutscape/align_window.py:188
+#, python-brace-format
+msgid "All four marks found. The sheet is turned {angle:.2f}° and stretched {x:+.2f}% and {y:+.2f}%; the marks agree to within {error:.2f} mm."
+msgstr "Les quatre repères sont trouvés. La feuille est tournée de {angle:.2f}° et étirée de {x:+.2f} % et {y:+.2f} % ; les repères concordent à {error:.2f} mm près."
+
+#: extension/cutscape/align_window.py:164
+#, python-brace-format
+msgid "Put scrap material under the head. CutScape will cut a {size:.0f} mm cross there, so don't leave your printed sheet under it."
+msgstr "Placez une chute sous la tête. CutScape va y découper une croix de {size:.0f} mm : n’y laissez pas votre feuille imprimée."
+
+#: extension/cutscape/align_window.py:178
+#, python-brace-format
+msgid "Move the laser onto crop mark {number} ({corner})."
+msgstr "Placez le laser sur le repère {number} ({corner})."
+
+#: extension/cutscape/align_window.py:180
+#, python-brace-format
+msgid "Move the blade tip onto crop mark {number} ({corner})."
+msgstr "Placez la pointe de la lame sur le repère {number} ({corner})."
+
+#: extension/cutscape/align_window.py:183
+msgid "On the mark"
+msgstr "Sur le repère"
+
+#: extension/cutscape/cutter.py:403
 msgid "cutter"
 msgstr "découpeuse"
 
-#: extension/cutscape/cutter.py:405
+#: extension/cutscape/cutter.py:425
 msgid "No cutter has been added."
 msgstr "Aucune découpeuse n’a été ajoutée."
 
-#: extension/cutscape/cutter.py:406
+#: extension/cutscape/cutter.py:426
 msgid "Removed the cutter you added."
 msgstr "La découpeuse ajoutée a été retirée."
 
-#: extension/cutscape/cutter.py:149
+#: extension/cutscape/cutter.py:166
 msgid "No cutter found. Check that it is plugged in and switched on, then try again."
 msgstr "Aucune découpeuse trouvée. Vérifiez qu’elle est branchée et allumée, puis réessayez."
 
-#: extension/cutscape/cutter.py:283
+#: extension/cutscape/cutter.py:300
 #, python-brace-format
 msgid ""
 "You can't write to {path} yet. To fix that, run this in a terminal, then unplug the cutter and plug it back in:\n"
@@ -453,167 +590,211 @@ msgstr ""
 "Vous ne pouvez pas encore écrire dans {path}. Pour y remédier, lancez ceci dans un terminal, puis débranchez la découpeuse et rebranchez-la :\n"
 "  {command}"
 
-#: extension/cutscape/cutter.py:316
+#: extension/cutscape/cutter.py:333
 msgid "Set its baud rate and flow control on Cut's Connection tab."
 msgstr "Réglez son débit et son contrôle de flux dans l’onglet Connexion de Découpe."
 
-#: extension/cutscape/cutter.py:349
+#: extension/cutscape/cutter.py:366
 #, python-brace-format
 msgid "the printer queue {queue}"
 msgstr "la file d’impression {queue}"
 
-#: extension/cutscape/cutter.py:391
+#: extension/cutscape/cutter.py:411
 msgid "Set its language and steps per mm on Cut's Device tab."
 msgstr "Réglez son langage et ses pas par mm dans l’onglet Machine de Découpe."
 
-#: extension/cutscape/cutter.py:394
+#: extension/cutscape/cutter.py:414
 msgid "To check it, open Extensions > CutScape > Cut, choose Send a 50 mm test square and click Apply."
 msgstr "Pour la vérifier, ouvrez Extensions > CutScape > Découpe et envoyez un carré test de 50 mm."
 
-#: extension/cutscape/cutter.py:91
+#: extension/cutscape/cutter.py:108
 msgid "No cutter has been added yet. Plug it in and switch it on, then use Extensions > CutScape > Add Cutter. Or choose how to reach it on Cut's Connection tab."
 msgstr "Aucune découpeuse n’a encore été ajoutée. Branchez-la et allumez-la, puis utilisez Extensions > CutScape > Ajouter une découpeuse. Ou choisissez comment la joindre dans l’onglet Connexion de Découpe."
 
-#: extension/cutscape/cutter.py:152
+#: extension/cutscape/cutter.py:169
 msgid "CUPS wouldn't list USB printers for this account, so a cutter that needs a printer queue can't be found."
 msgstr "CUPS refuse de lister les imprimantes USB pour ce compte : une découpeuse qui a besoin d’une file d’impression ne peut donc pas être trouvée."
 
-#: extension/cutscape/cutter.py:160
+#: extension/cutscape/cutter.py:177
 msgid "A USB cutter must be added to Windows first: Settings > Bluetooth & devices > Printers & scanners, with the Generic / Text Only driver. Then enter the printer's name in the Address field."
 msgstr "Une découpeuse USB doit d’abord être ajoutée à Windows : Paramètres > Bluetooth et appareils > Imprimantes et scanners, avec le pilote Generic / Text Only. Saisissez ensuite le nom de l’imprimante dans le champ Adresse."
 
-#: extension/cutscape/cutter.py:174
+#: extension/cutscape/cutter.py:191
 msgid "Cutters on a serial port need pyserial: sudo apt install python3-serial"
 msgstr "Les découpeuses sur port série ont besoin de pyserial : sudo apt install python3-serial"
 
-#: extension/cutscape/cutter.py:272
+#: extension/cutscape/cutter.py:289
 msgid "CutScape needs to let you use your cutter."
 msgstr "CutScape doit vous donner accès à votre découpeuse."
 
-#: extension/cutscape/cutter.py:346
+#: extension/cutscape/cutter.py:363
 #, python-brace-format
 msgid "USB, as {device}"
 msgstr "USB, sous {device}"
 
-#: extension/cutscape/cutter.py:348
+#: extension/cutscape/cutter.py:365
 #, python-brace-format
 msgid "the serial port {port}"
 msgstr "le port série {port}"
 
-#: extension/cutscape/cutter.py:384
+#: extension/cutscape/cutter.py:404
 #, python-brace-format
 msgid "Added your {model}, connected through {connection}."
 msgstr "Votre {model} est ajoutée, connectée via {connection}."
 
-#: extension/cutscape/cutter.py:156
+#: extension/cutscape/cutter.py:173
 msgid "To allow it: sudo usermod -aG lpadmin $USER, then log out and back in."
 msgstr "Pour l’autoriser : sudo usermod -aG lpadmin $USER, puis déconnectez-vous et reconnectez-vous."
 
-#: extension/cutscape/cutter.py:210
+#: extension/cutscape/cutter.py:227
 #, python-brace-format
 msgid "CutScape doesn't know {address}. Enter the name of a printer queue, a usb://… address, a USB id such as usb:0483:5750, a device file or a serial port."
 msgstr "CutScape ne connaît pas {address}. Saisissez le nom d’une file d’impression, une adresse usb://…, un identifiant USB comme usb:0483:5750, un fichier de périphérique ou un port série."
 
-#: extension/cutscape/cutter.py:387
+#: extension/cutscape/cutter.py:407
 #, python-brace-format
 msgid "It calls itself {device}."
 msgstr "Elle se présente comme {device}."
 
-#: extension/cutscape/cutter.py:414
+#: extension/cutscape/cutter.py:434
 #, python-brace-format
 msgid "Removed its printer queue {queue}."
 msgstr "Sa file d’impression {queue} a été supprimée."
 
-#: extension/cutscape/cutter.py:170
+#: extension/cutscape/cutter.py:187
 msgid "If it is connected another way, enter one of these in the Address field:"
 msgstr "Si elle est connectée autrement, saisissez l’une de ces adresses dans le champ Adresse :"
 
-#: extension/cutscape/cutter.py:280
+#: extension/cutscape/cutter.py:297
 #, python-brace-format
 msgid "Added a udev rule ({file}) to give you access. Unplug the cutter and plug it back in to apply it."
 msgstr "Règle udev ajoutée ({file}) pour vous donner accès. Débranchez la découpeuse et rebranchez-la pour l’appliquer."
 
-#: extension/cutscape/cutter.py:312
+#: extension/cutscape/cutter.py:329
 #, python-brace-format
 msgid "It talks at {baud} baud."
 msgstr "Elle communique à {baud} bauds."
 
-#: extension/cutscape/cutter.py:333
+#: extension/cutscape/cutter.py:350
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it and cleared {count} stuck job(s)."
 msgstr "Sa file d’impression {queue} était arrêtée : elle a été relancée et {count} travail(aux) bloqué(s) effacé(s)."
 
-#: extension/cutscape/cutter.py:335
+#: extension/cutscape/cutter.py:352
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it."
 msgstr "Sa file d’impression {queue} était arrêtée : elle a été relancée."
 
-#: extension/cutscape/cutter.py:369
+#: extension/cutscape/cutter.py:386
 msgid "More than one possible cutter is connected. Enter the address of yours in the Address field and click Apply again:"
 msgstr "Plusieurs découpeuses possibles sont connectées. Saisissez l’adresse de la vôtre dans le champ Adresse et cliquez de nouveau sur Appliquer :"
 
-#: extension/cutscape/cutter.py:206
+#: extension/cutscape/cutter.py:223
 #: extension/cutscape/transports.py:295
 #, python-brace-format
 msgid "{path} isn't there. Is the cutter plugged in and switched on?"
 msgstr "{path} est introuvable. La découpeuse est-elle branchée et allumée ?"
 
-#: extension/cutscape/cutter.py:278
+#: extension/cutscape/cutter.py:295
 #, python-brace-format
 msgid "Gave you access to it with a udev rule ({file})."
 msgstr "Accès accordé avec une règle udev ({file})."
 
-#: extension/cutscape/cutter.py:306
+#: extension/cutscape/cutter.py:323
 #, python-brace-format
 msgid "You can't write to {path} yet."
 msgstr "Vous ne pouvez pas encore écrire dans {path}."
 
-#: extension/cutscape/cutter.py:324
+#: extension/cutscape/cutter.py:341
 #, python-brace-format
 msgid "Pointed the printer queue {queue} at it."
 msgstr "La file d’impression {queue} pointe désormais vers elle."
 
-#: extension/cutscape/cutter.py:326
+#: extension/cutscape/cutter.py:343
 #, python-brace-format
 msgid "Created the printer queue {queue} for it."
 msgstr "File d’impression {queue} créée pour elle."
 
-#: extension/cutscape/document.py:106
+#: extension/cutscape/document.py:207
+#: extension/cutscape/job.py:170
+#: extension/cutscape/job.py:225
+msgid "Nothing to cut"
+msgstr "Rien à découper"
+
+#: extension/cutscape/document.py:220
+msgid "Select the lines to cut, then use Extensions > CutScape > Add Crop Marks."
+msgstr "Sélectionnez les lignes à découper, puis utilisez Extensions > CutScape > Ajouter des repères de coupe."
+
+#: extension/cutscape/document.py:114
 msgid "None of the selected objects can be cut"
 msgstr "Aucun des objets sélectionnés ne peut être découpé"
 
-#: extension/cutscape/document.py:145
+#: extension/cutscape/document.py:234
+msgid "This drawing has no crop marks. Use Extensions > CutScape > Add Crop Marks and print it first."
+msgstr "Ce dessin n’a pas de repères de coupe. Utilisez d’abord Extensions > CutScape > Ajouter des repères de coupe, puis imprimez-le."
+
+#: extension/cutscape/document.py:153
 #, python-brace-format
 msgid "Can't convert text {id} to a path; convert it with Path > Object to Path"
 msgstr "Impossible de convertir le texte {id} en chemin ; utilisez Chemin > Objet en chemin"
 
-#: extension/cutscape/document.py:168
+#: extension/cutscape/document.py:176
 #, python-brace-format
 msgid "Text {id} must be converted to a path first"
 msgstr "Le texte {id} doit d’abord être converti en chemin"
 
-#: extension/cutscape/job.py:163
-msgid "Nothing to cut"
-msgstr "Rien à découper"
-
-#: extension/cutscape/job.py:127
+#: extension/cutscape/job.py:134
 msgid "Set a speed on the Cut tab: G-code controllers such as GRBL won't cut without one."
 msgstr "Réglez une vitesse dans l’onglet Découpe : les contrôleurs G-code comme GRBL ne découpent pas sans."
 
-#: extension/cutscape/job.py:122
+#: extension/cutscape/job.py:125
 #, python-brace-format
-msgid "The job extends {distance:.1f} mm past the origin; move it onto the page or turn on \"Move the job to the origin\"."
-msgstr "Le travail dépasse l’origine de {distance:.1f} mm ; placez-le sur la page ou activez « Placer le travail à l’origine »."
+msgid "The cut reaches {distance:.1f} mm past the cutter's origin. Move the origin back on the cutter's panel and line up again."
+msgstr "La découpe dépasse de {distance:.1f} mm l’origine de la découpeuse. Reculez l’origine sur le panneau de la découpeuse et alignez à nouveau."
 
-#: extension/cutscape/job.py:131
+#: extension/cutscape/job.py:138
 #, python-brace-format
 msgid "The job is {size:.1f} mm wide but the material is only {limit:.1f} mm."
 msgstr "Le travail fait {size:.1f} mm de large mais le matériau ne fait que {limit:.1f} mm."
 
-#: extension/cutscape/job.py:134
+#: extension/cutscape/job.py:141
 #, python-brace-format
 msgid "The job is {size:.1f} mm long but the material is only {limit:.1f} mm."
 msgstr "Le travail fait {size:.1f} mm de long mais le matériau ne fait que {limit:.1f} mm."
+
+#: extension/cutscape/job.py:129
+#, python-brace-format
+msgid "The job extends {distance:.1f} mm past the origin; move it onto the page or turn on \"Move the job to the origin\"."
+msgstr "Le travail dépasse l’origine de {distance:.1f} mm ; placez-le sur la page ou activez « Placer le travail à l’origine »."
+
+#: extension/cutscape/marks.py:25
+msgid "bottom left"
+msgstr "en bas à gauche"
+
+#: extension/cutscape/marks.py:25
+msgid "bottom right"
+msgstr "en bas à droite"
+
+#: extension/cutscape/marks.py:25
+msgid "top right"
+msgstr "en haut à droite"
+
+#: extension/cutscape/marks.py:25
+msgid "top left"
+msgstr "en haut à gauche"
+
+#: extension/cutscape/marks.py:43
+msgid "CutScape crop marks"
+msgstr "Repères de coupe CutScape"
+
+#: extension/cutscape/marks.py:31
+msgid "CutScape cut lines"
+msgstr "Lignes de découpe CutScape"
+
+#: extension/cutscape/marks.py:55
+#, python-brace-format
+msgid "Crop mark {number}"
+msgstr "Repère {number}"
 
 #: extension/cutscape/preview.py:85
 msgid "Origin"

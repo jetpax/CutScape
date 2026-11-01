@@ -6,6 +6,7 @@
     <option value="preview">Preview the toolpath on the canvas</option>
     <option value="send">Send to the cutter</option>
     <option value="test">Send a 50 mm test square</option>
+    <option value="align">Line up with printed crop marks and cut</option>
   </param>
   <param name="tab" type="notebook">
     <page name="cut" gui-text="Cut">

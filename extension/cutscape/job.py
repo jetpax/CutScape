@@ -91,7 +91,8 @@ class NoPathsError(ValueError):
 
 class Plan(object):
     """ A toolpath in material space """
-    def __init__(self, paths, design, park, device, prefeed=(), speed=0):
+    def __init__(self, paths, design, park, device, prefeed=(), speed=0,
+                 on_sheet=False):
         #: What the tool axis follows, in cut order (blade offset applied)
         self.paths = paths
         #: The shapes being cut, in cut order (no blade offset)
@@ -102,6 +103,8 @@ class Plan(object):
         #: Pen-up points visited before cutting to pull the material through
         self.prefeed = list(prefeed)
         self.speed = speed
+        #: Lined up with a printed sheet rather than laid out on the material
+        self.on_sheet = on_sheet
         self.bbox = geometry.bbox(design)
         self.cut_length = sum(geometry.length(p) for p in paths)
         pos, travel = (0.0, 0.0), 0.0
@@ -118,7 +121,11 @@ class Plan(object):
         material, or the device needs a setting """
         out = []
         x0, y0, x1, y1 = geometry.bbox(self.paths)
-        if x0 < -geometry.EPSILON or y0 < -geometry.EPSILON:
+        if self.on_sheet and min(x0, y0) < -geometry.EPSILON:
+            out.append(_("The cut reaches {distance:.1f} mm past the cutter's "
+                         "origin. Move the origin back on the cutter's panel "
+                         "and line up again.").format(distance=-min(x0, y0)))
+        elif x0 < -geometry.EPSILON or y0 < -geometry.EPSILON:
             out.append(_("The job extends {distance:.1f} mm past the "
                          "origin; move it onto the page or turn on \"Move "
                          "the job to the origin\".").format(
@@ -180,11 +187,7 @@ def plan(page_polys, page_height, s):
         polys.append(filters.weedline(polys, s.weedline_padding))
 
     design = filters.order(polys, s.order)
-    paths = []
-    for p in design:
-        for q in filters.repeat(p, int(s.passes)):
-            paths.append(filters.overcut(q, s.overcut))
-    paths = filters.blade_offset(paths, s.blade_offset, s.blade_cutoff)
+    paths = _toolpath(design, s)
 
     if s.auto_align:
         #: Blade offset and overcut can reach past the margin; shift back
@@ -203,6 +206,35 @@ def plan(page_polys, page_height, s):
     #: Where the drawing was on the page (mm, y down), for the preview
     result.page_bbox = (x0, page_height - y1, x1, page_height - y0)
     return result
+
+
+def plan_on_sheet(page_polys, to_head, s):
+    """ Plan a cut lined up with a printed sheet. to_head takes page
+    millimetres straight to the head's axes (see align), having allowed for
+    the preset's axis settings, and the sheet says where everything goes, so
+    the layout options don't apply.
+    """
+    device = s.device()
+    if device['swap_xy']:
+        device['width'], device['length'] = device['length'], device['width']
+    device.update(swap_xy=False, invert_x=False, invert_y=False)
+    polys = [geometry.dedupe([to_head(x, y) for x, y in p])
+             for p in page_polys]
+    polys = [p for p in polys if len(p) > 1]
+    if not polys:
+        raise NoPathsError(_("Nothing to cut"))
+    design = filters.order(polys, s.order)
+    return Plan(_toolpath(design, s), design, (0.0, 0.0), device,
+                speed=s.speed, on_sheet=True)
+
+
+def _toolpath(design, s):
+    """ What the tool axis follows to cut the shapes in design """
+    paths = []
+    for p in design:
+        for q in filters.repeat(p, int(s.passes)):
+            paths.append(filters.overcut(q, s.overcut))
+    return filters.blade_offset(paths, s.blade_offset, s.blade_cutoff)
 
 
 def _prefeed(paths, step=10.0):
@@ -239,9 +271,13 @@ def encode(job, s):
         pts = [[(x, y0 + y1 - y) for x, y in p] for p in pts]
     sx, sy = d['steps']
     pts = geometry.scale(pts, sx, sy)
-    proto = protocols.get(
-        d['protocol'], speed=s.speed, force=s.force, pen=s.pen,
-        mode=d['options']['dmpl_mode'], newline=s.hpgl_newline,
+    return protocol(d, s).encode(pts, (park[0] * sx, park[1] * sy))
+
+
+def protocol(device, s):
+    """ The encoder for a device with settings s """
+    return protocols.get(
+        device['protocol'], speed=s.speed, force=s.force, pen=s.pen,
+        mode=device['options']['dmpl_mode'], newline=s.hpgl_newline,
         separate_z=s.hpgl_separate_z, z_up=s.gcode_z_up,
         z_down=s.gcode_z_down)
-    return proto.encode(pts, (park[0] * sx, park[1] * sy))

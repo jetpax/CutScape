@@ -15,7 +15,7 @@ import os
 INFO, WARNING = 'info', 'warning'
 
 
-def _gtk():
+def gtk():
     if os.environ.get('CUTSCAPE_STDERR'):
         return None
     try:
@@ -35,7 +35,7 @@ def show(text, title='CutScape', kind=INFO, report=False):
     scrollable text box for listings and commands to copy.
     Returns False if no window could be shown.
     """
-    Gtk = _gtk()
+    Gtk = gtk()
     if Gtk is None:
         return False
     dialog = Gtk.Dialog(title=title)

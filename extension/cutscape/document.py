@@ -14,6 +14,14 @@ from .i18n import _
 
 #: id of the layer the preview is drawn into; never cut
 PREVIEW_ID = 'cutscape-preview'
+#: The crop marks' layer, and each mark, numbered from 1; never cut
+MARKS_ID = 'cutscape-marks'
+MARK_ID = 'cutscape-mark-%d'
+MARK_COUNT = 4
+#: The hidden layer of what is cut when lining up with printed marks
+CUT_LINES_ID = 'cutscape-cut-lines'
+
+NEVER_CUT = {PREVIEW_ID, MARKS_ID}
 
 CONTAINERS = {'g', 'a', 'switch', 'svg'}
 TEXT = {'text', 'flowRoot'}
@@ -45,7 +53,7 @@ def page_box(svg):
 
 def hidden(el):
     while el is not None and isinstance(el, inkex.BaseElement):
-        if el.get('id') == PREVIEW_ID:
+        if el.get('id') in NEVER_CUT:
             return True
         style = el.style if hasattr(el, 'style') else {}
         if style.get('display') == 'none' or el.get('display') == 'none':
@@ -69,7 +77,7 @@ def iter_shapes(el, transform, depth=0):
     under el, expanding groups and clones. Text yields with transform None.
     """
     tag = _tag(el)
-    if tag in SKIP or el.get('id') == PREVIEW_ID or depth > 32:
+    if tag in SKIP or el.get('id') in NEVER_CUT or depth > 32:
         return
     if el.style.get('display') == 'none' or el.get('display') == 'none':
         return
@@ -185,3 +193,46 @@ def page_size(svg):
     k = mm_to_uu(svg)
     w, h = page_box(svg)[2:]
     return w / k, h / k
+
+
+def extent(svg, roots):
+    """ (x0, y0, x1, y1) of roots in page millimetres, pictures and text
+    included, unlike polylines
+    """
+    box = inkex.BoundingBox()
+    for root in roots:
+        if isinstance(root, inkex.ShapeElement):
+            box += root.bounding_box(_parent_transform(root))
+    if not box:
+        raise ValueError(_("Nothing to cut"))
+    k = mm_to_uu(svg)
+    px, py = page_box(svg)[:2]
+    return ((box.left - px) / k, (box.top - py) / k,
+            (box.right - px) / k, (box.bottom - py) / k)
+
+
+def cut_lines(svg):
+    """ What Add Crop Marks set aside to be cut """
+    layer = svg.getElementById(CUT_LINES_ID)
+    els = [] if layer is None else [
+        e for e in layer if isinstance(e, inkex.BaseElement)]
+    if not els:
+        raise ValueError(_("Select the lines to cut, then use Extensions > "
+                           "CutScape > Add Crop Marks."))
+    return els
+
+
+def crop_marks(svg):
+    """ The centres of the crop marks in page millimetres, in order """
+    k = mm_to_uu(svg)
+    px, py = page_box(svg)[:2]
+    centres = []
+    for number in range(1, MARK_COUNT + 1):
+        el = svg.getElementById(MARK_ID % number)
+        box = None if el is None else el.bounding_box(_parent_transform(el))
+        if not box:
+            raise ValueError(_("This drawing has no crop marks. Use "
+                               "Extensions > CutScape > Add Crop Marks and "
+                               "print it first."))
+        centres.append(((box.center_x - px) / k, (box.center_y - py) / k))
+    return centres

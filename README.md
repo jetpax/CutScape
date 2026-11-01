@@ -10,7 +10,8 @@ and nothing to `pip install`.
 | Extensions → CutScape → | |
 |---|---|
 | **Add Cutter…** | Find the cutter that's plugged in and set it up, so Cut can send to it |
-| **Cut…** | Preview the toolpath on your canvas, send it to the cutter, or send a 50 mm test square |
+| **Cut…** | Preview the toolpath on your canvas, send it to the cutter, send a 50 mm test square, or line up with a printed sheet and cut |
+| **Add Crop Marks** | For [print and cut](#print-and-cut): hide the cut lines so they don't print, and add marks to line up with |
 | **Remove Cutter…** | Forget the cutter you added |
 | **Remove Preview** | Take the toolpath preview off the drawing |
 
@@ -193,6 +194,50 @@ and is untested.
 
 **Not supported yet:** Silhouette cutters over USB (they aren't USB printers),
 and Bluetooth.
+
+## Print and cut
+
+Print a design on an ordinary printer, then cut around it, for stickers and
+labels. The sheet never lies exactly where the page says, so CutScape prints
+four crop marks with the design. You move the head onto each one with arrow
+buttons, and CutScape corrects the cut for how the sheet is shifted, turned and
+stretched. This is the way Secabo's LAPOS works, and it needs no sensor.
+
+It needs a **direct connection**, because the head moves as you click: the USB
+device on Linux, which Add Cutter sets up, or a serial port. It doesn't work
+through a printer queue, so not over USB on macOS or Windows yet, or with G-code
+machines.
+
+1. Draw the line to cut, with **Path → Linked Offset** around a shape or **Path →
+   Trace Bitmap** for a picture, and select only that line.
+2. Use **Extensions → CutScape → Add Crop Marks**. The line moves to a hidden
+   layer, *CutScape cut lines*, so it won't print. Four numbered marks appear
+   on a locked layer around the design.
+3. Print at 100%, with no "fit to page".
+4. Put the sheet in the cutter. On the cutter's panel, set its origin below and
+   to the left of mark 1, so the head can reach all four marks.
+5. Open **Extensions → CutScape → Cut…**, choose **Line up with printed crop
+   marks and cut** and click **Apply**. The head goes to the origin and a window
+   opens.
+6. Move onto mark 1 with the arrow buttons or the keyboard's arrow keys, and click
+   **On the mark**. The head then goes close to the next mark by itself.
+7. After mark 4, the window shows how the sheet lies. Click **Cut**, or **Back**
+   to aim again.
+
+**To aim with a laser,** click **Calibrate laser…** once, with scrap under the
+head. CutScape cuts a small cross; move the laser onto its centre and it learns
+how far the laser is from the blade. On a cutter with no laser, aim with the blade
+tip. **If the arrows go the wrong way,** click **Turn arrows**. CutScape remembers
+both.
+
+Speed, Force, Overcut, Blade offset and the other settings on Cut's first tab
+still apply. The Material tab's layout options don't, because the sheet decides
+where everything goes. A plain **Send to the cutter** leaves out the marks and
+the hidden cut lines. To change a cut line, show its layer in **Layer → Layers and
+Objects**.
+
+This hasn't been run on a real cutter yet: only against a stand-in for one. Try it
+on scrap first, with a pen if you can, and please open an issue with what happens.
 
 ## Desktop CNC machines (GRBL)
 

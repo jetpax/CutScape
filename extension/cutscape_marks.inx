@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension translationdomain="cutscape" xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Add Crop Marks</name>
+  <id>io.github.jetpax.cutscape.marks</id>
+  <param name="entry" type="string" gui-hidden="true">marks</param>
+  <effect needs-live-preview="false">
+    <object-type>all</object-type>
+    <icon>cutscape_cut.svg</icon>
+    <menu-tip>For print and cut: hide the selected lines so they don't print, and add crop marks to line the cut up with the printed sheet</menu-tip>
+    <effects-menu>
+      <submenu name="CutScape"/>
+    </effects-menu>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">cutscape_cut.py</command>
+  </script>
+</inkscape-extension>

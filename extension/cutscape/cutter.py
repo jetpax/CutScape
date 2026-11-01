@@ -29,6 +29,9 @@ ADDED = 'added'
 
 UDEV_RULES = '/etc/udev/rules.d/70-cutscape.rules'
 
+#: What adding the same cutter again shouldn't forget (see align)
+LEARNED = ('laser', 'arrow_turn')
+
 #: Serial ports that are never a cutter
 NOT_CUTTERS = re.compile(r'bluetooth|debug-console|wlan', re.I)
 
@@ -57,16 +60,30 @@ def config_path():
     return os.path.join(base, 'cutter.json')
 
 
-def load():
-    """ The cutter you added, or None """
+def _read():
     try:
         with open(config_path(), encoding='utf-8') as f:
             saved = json.load(f)
     except (OSError, ValueError):
-        return None
-    if not isinstance(saved, dict) or not saved.get('transport'):
-        return None
-    return saved
+        return {}
+    return saved if isinstance(saved, dict) else {}
+
+
+def load():
+    """ The cutter you added, or None """
+    saved = _read()
+    return saved if saved.get('transport') else None
+
+
+def setting(name, default=None):
+    """ Something learned about the cutter besides how to reach it """
+    return _read().get(name, default)
+
+
+def remember(name, value):
+    saved = _read()
+    saved[name] = value
+    save(saved)
 
 
 def save(cutter):
@@ -378,6 +395,9 @@ def add(model, address='', sysfs=None):
     cutter = dict(model=model, label=c['label'], transport='', printer='',
                   device='', port='', queue_created=False)
     cutter.update(conn)
+    old = _read()
+    if old.get('model', model) == model:
+        cutter.update({k: old[k] for k in LEARNED if k in old})
     save(cutter)
 
     name = model if model != devices.CUSTOM else _("cutter")

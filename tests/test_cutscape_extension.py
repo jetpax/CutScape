@@ -165,3 +165,158 @@ def test_page_units(tmp_path):
     assert (min(xs), min(ys), max(xs), max(ys)) == pytest.approx(
         (92, 12, 148, 64))
     assert document.page_size(svg) == pytest.approx((160, 90))
+
+
+# -----------------------------------------------------------------------------
+# Print and cut
+# -----------------------------------------------------------------------------
+def marked(tmp_path, monkeypatch, *ids):
+    """ The sample with Add Crop Marks run on it; returns its path """
+    monkeypatch.setenv('CUTSCAPE_STDERR', '1')
+    ext, out = run(tmp_path, '--entry=marks', *['--id=' + i for i in ids])
+    return out
+
+
+def test_add_crop_marks(tmp_path, monkeypatch):
+    before = inkex.load_svg(SAMPLE).getroot()
+    star = before.getElementById('star')
+    was = star.bounding_box(star.getparent().composed_transform())
+    svg = inkex.load_svg(str(marked(tmp_path, monkeypatch, 'star'))).getroot()
+
+    #: The cut lines are hidden, so they don't print, and stay in place
+    layer = svg.getElementById(document.CUT_LINES_ID)
+    assert layer.style.get('display') == 'none'
+    assert [e.get('id') for e in layer] == ['star']
+    star = svg.getElementById('star')
+    now = star.bounding_box(star.getparent().composed_transform())
+    assert now.left == pytest.approx(was.left)
+    assert now.top == pytest.approx(was.top)
+    assert now.width == pytest.approx(was.width)
+
+    #: Four marks at the corners, numbered round from the bottom left
+    (x1, y1), (x2, y2), (x3, y3), (x4, y4) = document.crop_marks(svg)
+    assert x1 == pytest.approx(x4) and x2 == pytest.approx(x3)
+    assert y1 == pytest.approx(y2) and y3 == pytest.approx(y4)
+    assert x1 < x2 and y1 > y4
+
+    #: Everything left in the drawing is inside them
+    left = document.extent(svg, document.selected_roots(svg))
+    assert x1 < left[0] and left[2] < x2 and y4 < left[1] and left[3] < y1
+
+    #: A plain Cut leaves out the marks and the hidden lines
+    roots = document.selected_roots(svg)
+    assert not {e.get('id') for e in roots} & {document.MARKS_ID,
+                                               document.CUT_LINES_ID}
+    for root in roots:
+        for el, t in document.iter_shapes(
+                root, document._parent_transform(root)):
+            assert el.getparent().get('id') != document.MARKS_ID
+
+
+def test_crop_marks_need_something_to_cut(tmp_path, monkeypatch):
+    with pytest.raises(SystemExit):
+        marked(tmp_path, monkeypatch)
+
+
+def test_marks_again_keep_the_cut_lines(tmp_path, monkeypatch):
+    first = marked(tmp_path, monkeypatch, 'star')
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        'cutscape_cut', 'extension/cutscape_cut.py')
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    out = tmp_path / 'again.svg'
+    mod.CutScape().run(['--entry=marks', '--id=plate', '--output=%s' % out,
+                        str(first)])
+    svg = inkex.load_svg(str(out)).getroot()
+    assert [e.get('id') for e in document.cut_lines(svg)] == ['star', 'plate']
+    assert sum(1 for e in svg if e.get('id') == document.MARKS_ID) == 1
+
+
+def align_run(tmp_path, monkeypatch, source, drive, *args):
+    """ Cut's line-up action on source, with drive(session) in place of the
+    window; returns the bytes sent to the cutter
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        'cutscape_cut', 'extension/cutscape_cut.py')
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sent = []
+
+    def send(data, transport, **options):
+        assert transport == 'device'
+        sent.append((data, options.get('timeout')))
+        return '/dev/usb/lp0'
+    monkeypatch.setattr(mod.transports, 'send', send)
+
+    def window(session, problems):
+        session.head.start()
+        return drive(session, problems)
+    monkeypatch.setattr(mod.align_window, 'run', window)
+    monkeypatch.setenv('CUTSCAPE_STDERR', '1')
+    monkeypatch.setenv('CUTSCAPE_CONFIG', str(tmp_path / 'cutter.json'))
+    mod.CutScape().run(
+        ['--action=align', '--preset=custom', '--transport=device',
+         '--device=/dev/usb/lp0', '--overcut=0', '--output=%s' % (
+             tmp_path / 'result.svg')] + list(args) + [str(source)])
+    return sent
+
+
+def test_lined_up_cut(tmp_path, monkeypatch):
+    """ A sheet turned 2° and shifted: the cut lands where the sheet put it """
+    import math
+    source = marked(tmp_path, monkeypatch, 'star')
+    svg = inkex.load_svg(str(source)).getroot()
+    star = document.polylines(svg, document.cut_lines(svg))[0]
+    height = document.page_size(svg)[1]
+    a = math.radians(2)
+
+    def sheet(x, y):
+        """ Where a page point really is on the cutter """
+        y = height - y
+        return (x * math.cos(a) - y * math.sin(a) + 40,
+                x * math.sin(a) + y * math.cos(a) + 20)
+
+    def drive(session, problems):
+        for mark in document.crop_marks(svg):
+            session.head.move(*sheet(*mark))
+            session.on_mark()
+        assert session.done
+        assert session.fit().rotation == pytest.approx(2, abs=0.01)
+        assert not problems()
+        return True
+    sent = align_run(tmp_path, monkeypatch, source, drive)
+
+    #: Moves are quick to give up; the cut isn't
+    assert all(timeout == 5.0 for data, timeout in sent[:-1])
+    assert sent[-1][1] is None
+    job = sent[-1][0].decode()
+    assert job.startswith('IN;SP1;PU')
+    assert job.endswith('PU0,0;IN;')
+    cuts = [tuple(int(v) / 40 for v in c[2:].split(','))
+            for c in job.split(';') if c[:2] in ('PU', 'PD') and c[2:]][:-1]
+    want = [sheet(*p) for p in star]
+    assert len(cuts) == len(want)
+    for got in cuts:
+        assert min(math.hypot(got[0] - w[0], got[1] - w[1])
+                   for w in want) < 0.05
+
+
+def test_closing_the_window_cuts_nothing(tmp_path, monkeypatch):
+    source = marked(tmp_path, monkeypatch, 'star')
+    sent = align_run(tmp_path, monkeypatch, source, lambda s, p: False)
+    assert len(sent) == 1
+    assert b'PD' not in sent[0][0]
+
+
+def test_lining_up_needs_marks(tmp_path, monkeypatch):
+    with pytest.raises(SystemExit):
+        align_run(tmp_path, monkeypatch, SAMPLE, lambda s, p: True)
+
+
+def test_lining_up_needs_a_direct_connection(tmp_path, monkeypatch):
+    source = marked(tmp_path, monkeypatch, 'star')
+    with pytest.raises(SystemExit):
+        align_run(tmp_path, monkeypatch, source, lambda s, p: True,
+                  '--transport=file')

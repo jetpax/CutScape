@@ -188,6 +188,33 @@ inkex path ops is the main porting cost.
   sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
   reboot after the port opens, and drops its welcome. Only tested against
   a fake GRBL.
+- **Print and cut** (not released): LAPOS-style alignment, Linux USB first.
+  - The C IV manual says LAPOS is a laser pointer on the head, not a sensor:
+    DrawCut (Windows) prints 4 crop marks, the user aims at each, and the
+    software does the maths. So nothing here depends on a Secabo protocol, and
+    it works on any cutter, aiming with the blade tip if there's no laser.
+  - `document.py` finds the layers and marks, `marks.py` is Add Crop Marks,
+    `align.py` is the maths, the head and `Session` (no GTK), and
+    `align_window.py` is the window; `job.plan_on_sheet` builds the cut. The fit
+    goes from the page straight to head space, having allowed for the preset's
+    axis settings, so the plan has them turned off.
+  - CutScape can't ask where the head is, so it tracks its own pen-up moves.
+    `OA;` might report it (nobody has tried it on a Secabo; mcmartnor's notes
+    say the VEVOR with the same USB id doesn't answer), and reading a reply
+    needs two-way USB, which a macOS printer queue doesn't give. Moves stop
+    at the origin, in case the firmware would refuse to go past it and the
+    tracking would then be wrong.
+  - **To check on a real cutter, none of it known yet:**
+    - How the laser is switched on. The manual doesn't say; `DrawCut` may send
+      a command for it.
+    - Which way the arrows go. They follow the head's axes, and HPGL X is
+      probably along the feed on the Secabo, so it may want a default turn.
+    - That `IN;` at the start of the job keeps the panel's origin.
+    - That pen-up moves between jobs act straight away.
+  - Rehearsed end to end against a stand-in cutter on a FIFO: real effect
+    script, device-file transport and window contents, a sheet 1.2° crooked and
+    stretched, cut within 0.08 mm of the line. The real window was only opened
+    and cancelled, with scripted clicks.
 - **The Qt app is gone from `dev`.** The `inkcut/` package, its tests, docs,
   packaging, the old Inkscape plugin and the Qt CI were all removed. CI now runs
   only the CutScape tests. The `fix/*` branches still sit on upstream `master`
@@ -204,6 +231,11 @@ inkex path ops is the main porting cost.
   id as the Secabo C IV above. It says that firmware only cuts after CDC
   line-coding and DTR/RTS requests, yet the Secabo cut through usblp/CUPS.
   The two probably run different firmware behind the same id.
+- **GTK under Inkscape's Python on macOS:** outside Inkscape it needs
+  `GI_TYPELIB_PATH`, `DYLD_LIBRARY_PATH`, `GDK_PIXBUF_MODULE_FILE` and
+  `XDG_DATA_DIRS` set as Inkscape sets them. `Gtk.OffscreenWindow.present()`
+  segfaults. The venv has no GTK, so `tests/test_cutscape_align_window.py`
+  skips there.
 - **macOS crash:** Inkscape 1.4 launched from a shell with `ulimit -n` around
   1M crashes in GLib's spawn whenever it runs any extension. Launch it with a
   normal limit.
