@@ -153,7 +153,8 @@ inkex path ops is the main porting cost.
   [v0.4.0](https://github.com/jetpax/CutScape/releases/tag/v0.4.0) (desktop CNC: Z lift for G-code, CNC 3018
   preset, GRBL streaming), then
   [v0.5.0](https://github.com/jetpax/CutScape/releases/tag/v0.5.0) (print and cut: crop marks, lining up
-  with arrow buttons). The Extensions > CutScape
+  with arrow buttons) and [v0.5.1](https://github.com/jetpax/CutScape/releases/tag/v0.5.1) (calibrate the laser
+  with no crop marks). The Extensions > CutScape
   submenu has five entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
   square, line up, calibrate the laser), and Add Cutter…, Remove Cutter…, Add Crop Marks and
