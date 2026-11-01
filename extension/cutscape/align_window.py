@@ -13,6 +13,11 @@ STEP = 1.0
 KEYS = dict(Right=(1, 0), Left=(-1, 0), Up=(0, 1), Down=(0, -1))
 
 
+def _LASER_ON():
+    return _("If you can't see the dot, switch the laser on at the cutter: "
+             "usually a Laser button on its panel.")
+
+
 class Window(object):
     """ The window's contents, in self.content, kept apart from the window
     itself so they can be driven without one
@@ -171,19 +176,26 @@ class Window(object):
                                           size=align.CROSS))
             self.go.set_label(_("Cut the cross"))
         elif s.calibrating == s.AIM_AT_CROSS:
-            self.prompt.set_text(_(
-                "Move the laser onto the centre of the cross you just cut."))
+            self.prompt.set_text(' '.join((_(
+                "Move the laser onto the centre of the cross you just cut."),
+                _LASER_ON())))
             self.go.set_label(_("Laser is on the cross"))
         elif ready:
             self._show_result()
         elif s.expected:
-            number, corner = s.index + 1, marks.corners()[s.index]
+            number, corner = s.number, marks.corners()[s.number - 1]
             if s.laser:
                 text = _("Move the laser onto crop mark {number} ({corner}).")
             else:
                 text = _("Move the blade tip onto crop mark {number} "
                          "({corner}).")
-            self.prompt.set_text(text.format(number=number, corner=corner))
+            text = text.format(number=number, corner=corner)
+            if s.laser and not s.index:
+                text += ' ' + _LASER_ON()
+            if s.assumed:
+                text += '\n\n' + _("This uses your model's usual laser "
+                                    "offset. Calibrate it for a closer cut.")
+            self.prompt.set_text(text)
             self.go.set_label(_("On the mark"))
 
     def _show_result(self):

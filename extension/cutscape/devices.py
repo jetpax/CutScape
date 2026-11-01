@@ -10,6 +10,9 @@ Orientation maps material space to the device's axes: swap_xy exchanges
 them, invert_x/invert_y reflect the job in place (it stays at the origin).
 serial is the baud rate and flow control Add Cutter sets up when it finds
 the cutter on a serial port.
+laser is where a laser pointer's dot is from the blade, along the device's
+axes in millimetres, until the user calibrates it (see align). blade, force
+and speed are its usual blade offset and ranges, for Add Cutter to mention.
 Inkcut's "swap_xy" was a 90 degree rotation, which is swap_xy + invert_y
 here. Orientations marked unverified are translated from Inkcut and have
 not been checked against hardware.
@@ -24,14 +27,24 @@ CUSTOM = 'custom'
 
 def _preset(name, protocol='hpgl', width=0.0, length=0.0, steps=None,
             swap_xy=False, invert_x=False, invert_y=False, serial=None,
-            **options):
+            laser=None, blade=None, force=None, speed=None, **options):
     return name, dict(protocol=protocol, width=width, length=length,
                       steps=steps, swap_xy=swap_xy, invert_x=invert_x,
-                      invert_y=invert_y, serial=serial, options=options)
+                      invert_y=invert_y, serial=serial, laser=laser,
+                      blade=blade, force=force, speed=speed, options=options)
 
 
 #: What GRBL speaks over USB
 GRBL = dict(baud='115200', flow='none')
+
+def saga(speed):
+    """ Secabo's SAGA-built cutters, from the driver data DrawCut ships for
+    them: X runs along the feed and Y to the left from an origin at the front
+    right, with the laser's dot 2.4 mm along X and 33 mm along Y from the
+    blade. Unverified on hardware.
+    """
+    return dict(swap_xy=True, invert_y=True, laser=(2.4, 33.0), blade=0.3,
+                force='50-750 g', speed=speed)
 
 
 PRESETS = OrderedDict([
@@ -50,19 +63,26 @@ PRESETS = OrderedDict([
     _preset('KNK ACS Eagle/Maxx', width=28 * IN),
     _preset('Mimaki CG-60ST', width=600),
     _preset('Redsail RS1360C', width=1200),
-    _preset('Rheinstern LB-720A', width=7200),
+    #: Inkcut's "720cm" was a typo
+    _preset('Rheinstern LB-720A', width=720),
     _preset('Roland CM-24', width=610),
     _preset('Roland CX-24', width=600, length=500),
-    _preset('Roland PNC-900', 'camm-gl1', width=12 * IN),
+    #: Cutting width, as for the Stika below; the media can be wider
+    _preset('Roland PNC-900', 'camm-gl1', width=11 * IN),
     _preset('Roland PNC-950', 'camm-gl1', width=24 * IN),
     _preset('Roland PNC-1000', 'camm-gl1', width=468),
     #: unverified
-    _preset('Roland Stika SV-8', width=8 * IN, swap_xy=True, invert_y=True),
-    _preset('Roland Stika SV-12', width=12 * IN, swap_xy=True,
+    _preset('Roland Stika SV-8', width=157.48, swap_xy=True, invert_y=True),
+    _preset('Roland Stika SV-12', width=248.92, swap_xy=True,
             invert_y=True),
-    _preset('Roland Stika SV-15', width=15 * IN, swap_xy=True,
+    _preset('Roland Stika SV-15', width=337.82, swap_xy=True,
             invert_y=True),
     _preset('Secabo C60 II / C IV', width=600),
+    _preset('Secabo C60 IV', width=630, **saga('10-600 mm/s')),
+    _preset('Secabo C120 IV', width=1260, **saga('10-600 mm/s')),
+    _preset('Secabo S60 / T60', width=630, **saga('10-960 mm/s')),
+    _preset('Secabo S120 / T120', width=1260, **saga('10-960 mm/s')),
+    _preset('Secabo S160 / T160', width=1660, **saga('10-960 mm/s')),
     _preset('SeikiTech SK-870T', width=860),
     _preset('Sekonic SPL-450', width=440, length=300),
     #: unverified; Cameo 4 Plus from inkcut/inkcut#441 by lagnat
@@ -74,7 +94,8 @@ PRESETS = OrderedDict([
     #: From inkcut/inkcut#442 by lukebmay
     _preset('Summa D760', 'dmpl', width=740, dmpl_mode=1),
     _preset('Summa D120R', width=1200),
-    _preset('Summa T600', width=5750),
+    #: Inkcut's "575cm" was a typo
+    _preset('Summa T600', width=575),
     _preset('US Cutter Laser Point', width=610),
     _preset('US Cutter Refine MH-721', width=600),
     _preset('US Cutter Refine MH-1351', width=1200),

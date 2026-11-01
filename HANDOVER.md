@@ -202,19 +202,46 @@ inkex path ops is the main porting cost.
     `align_window.py` is the window; `job.plan_on_sheet` builds the cut. The fit
     goes from the page straight to head space, having allowed for the preset's
     axis settings, so the plan has them turned off.
-  - CutScape can't ask where the head is, so it tracks its own pen-up moves.
-    `OA;` might report it (nobody has tried it on a Secabo; mcmartnor's notes
-    say the VEVOR with the same USB id doesn't answer), and reading a reply
-    needs two-way USB, which a macOS printer queue doesn't give. Moves stop
-    at the origin, in case the firmware would refuse to go past it and the
-    tracking would then be wrong.
+  - CutScape can't ask where the head is, so it tracks its own pen-up moves,
+    as DrawCut does. Moves stop at the origin, as DrawCut's can.
+  - **Read from DrawCut Lite and Pro**, statically and with the user's approval
+    for interoperability; nothing from it is in the repo. The C IV uses driver
+    `saga2a_base`, the S and T series `saga2b_base`, which differs only in speed:
+    - The laser is the **Laser** button on the panel (photo on page 5 of the
+      C IV manual). No laser-on command turned up: `cUseLP` only enables fields
+      and applies the offset.
+    - An arrow press sends one pen-up move from the driver's template,
+      `PU;PA x,y;PU;`. Up = +X, Down = -X, Left = +Y, Right = -Y. X is the feed
+      (its "Roll Forward" macro is `PA4000,0`); the origin is at the front right
+      and DrawCut wants it near the bottom-right mark. That is `swap_xy` +
+      `invert_y`, the `SAGA` settings in `devices.py`. DrawCut's alignment dialog
+      maps its axes this way for every driver, so other presets may be wrong too;
+      they were left alone, since changing them would rotate existing setups.
+    - Driver fields 23 and 24, -33 and -2.4, are the default laser offset, with
+      head = target + offset: the dot is 33 mm along +Y and 2.4 mm along +X from
+      the blade. Only the SAGA drivers have one. `foison_base` and the others
+      are 0.
+    - Replies over USB were only seen for automatic scanning on T-series LAPOS
+      XPT: `CO;:H A L0 ECN U P1;US97; C0 TB;SN1,1;!1:0,0;!2:%d,0;!3:0,%d;!4:%d,%d;`
+      starts it and `CO OZ;` reads `!1:x,y;...!OK;`. No position query was found.
+    - Its widths exposed preset errors, fixed since. `Summa T600` and `Rheinstern
+      LB-720A` were ten times too wide because Inkcut says `575cm` and `720cm`;
+      the reported-cutters list has 575 and 720. DrawCut says 600 for the T600,
+      but 575 is the safer limit. The Stika and `PNC-900` widths were media
+      widths, and are now DrawCut's cutting widths. Others still differ a
+      little, but many of DrawCut's are 584.2, its generic default, so they
+      were left alone.
+    - It also lists 272 detailed models (Foison, Graphtec, Mimaki, Roland, Secabo,
+      Summa) and a table of 3227 entries from 346 brands (brand, model, width,
+      language), including CNC machines and printers. Not copied here.
   - **To check on a real cutter, none of it known yet:**
-    - How the laser is switched on. The manual doesn't say; `DrawCut` may send
-      a command for it.
-    - Which way the arrows go. They follow the head's axes, and HPGL X is
-      probably along the feed on the Secabo, so it may want a default turn.
-    - That `IN;` at the start of the job keeps the panel's origin.
-    - That pen-up moves between jobs act straight away.
+    - That the laser stays on once the cutter is online and the head moves.
+    - The arrow directions, and that a sheet loaded upright lands as described.
+    - Whether `VS` is cm/s or mm/s on this firmware: DrawCut's driver lists speed
+      in mm/s and CutScape sends cm/s, so a cut could run ten times too slow.
+    - DrawCut's jobs start `MK0,0,len,width;IN;` and end `PU;PA0,0;!PG;`.
+      CutScape sends neither `MK` nor `!PG;`; the Secabo cut without them earlier.
+    - Whether `OA;` or `CO OZ;` answer on a C IV.
   - Rehearsed end to end against a stand-in cutter on a FIFO: real effect
     script, device-file transport and window contents, a sheet 1.2° crooked and
     stretched, cut within 0.08 mm of the line. The real window was only opened

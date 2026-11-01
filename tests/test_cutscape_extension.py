@@ -350,3 +350,29 @@ def test_calibrating_needs_a_direct_connection(tmp_path, monkeypatch):
     with pytest.raises(SystemExit):
         align_run(tmp_path, monkeypatch, SAMPLE, lambda s, p: False,
                   '--action=calibrate', '--transport=file')
+
+
+def test_lined_up_with_a_presets_laser(tmp_path, monkeypatch):
+    """ A preset's usual offset applies until one is calibrated """
+    source = marked(tmp_path, monkeypatch, 'star')
+
+    def drive(session, problems):
+        assert session.laser == (2.4, 33.0)
+        assert session.assumed
+        assert session.numbers[0] == 2
+        return False
+    align_run(tmp_path, monkeypatch, source, drive,
+              '--preset=Secabo C120 IV')
+
+
+def test_a_calibrated_laser_beats_the_presets(tmp_path, monkeypatch):
+    source = marked(tmp_path, monkeypatch, 'star')
+    config = tmp_path / 'cutter.json'
+    config.write_text('{"laser": [1.5, 30.0]}')
+
+    def drive(session, problems):
+        assert session.laser == (1.5, 30.0)
+        assert not session.assumed
+        return False
+    align_run(tmp_path, monkeypatch, source, drive,
+              '--preset=Secabo C120 IV')

@@ -21,7 +21,7 @@ PRINTER_MARGIN = 5.0
 
 
 def corners():
-    """ Where each mark is, in the order they're numbered and aimed at """
+    """ Where each mark is, in the order they're numbered """
     return _("bottom left"), _("bottom right"), _("top right"), _("top left")
 
 

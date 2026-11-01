@@ -275,6 +275,22 @@ def test_presets(name):
     assert job.encode(plan, s)
 
 
+@pytest.mark.parametrize('name, width', [
+    ('Summa T600', 575), ('Rheinstern LB-720A', 720),
+    ('Roland Stika SV-8', 157.48), ('Roland Stika SV-12', 248.92),
+    ('Roland Stika SV-15', 337.82), ('Roland PNC-900', 279.4)])
+def test_preset_widths(name, width):
+    assert job.Settings(preset=name).device()['width'] == pytest.approx(width)
+
+
+@pytest.mark.parametrize('name', list(devices.PRESETS))
+def test_preset_width_is_believable(name):
+    """ No cutter here is 2 m wide, so more is a unit typo like Inkcut's
+    "575cm" for the 575 mm Summa T600
+    """
+    assert devices.get(name)['width'] < 2000
+
+
 def test_preset_dmpl_mode():
     d = job.Settings(preset='Summa D760').device()
     assert d['steps'][0] == pytest.approx(1000 / 25.4)

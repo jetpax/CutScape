@@ -214,23 +214,35 @@ machines.
    layer, *CutScape cut lines*, so it won't print. Four numbered marks appear
    on a locked layer around the design.
 3. Print at 100%, with no "fit to page".
-4. Put the sheet in the cutter. On the cutter's panel, set its origin below and
-   to the left of mark 1, so the head can reach all four marks.
+4. Put the sheet in the cutter. On the cutter's panel, set its origin just outside
+   the marks, at the corner where the cutter starts, so the head can reach all
+   four. The head can't go past the origin.
 5. Open **Extensions → CutScape → Cut…**, choose **Line up with printed crop
    marks and cut** and click **Apply**. The head goes to the origin and a window
    opens.
-6. Move onto mark 1 with the arrow buttons or the keyboard's arrow keys, and click
-   **On the mark**. The head then goes close to the next mark by itself.
-7. After mark 4, the window shows how the sheet lies. Click **Cut**, or **Back**
-   to aim again.
+6. The window names the mark nearest the origin. Move onto it with the arrow
+   buttons or the keyboard's arrow keys, and click **On the mark**. The head then
+   goes close to the next mark by itself.
+7. After the fourth mark, the window shows how the sheet lies. Click **Cut**, or
+   **Back** to aim again.
 
-**To aim with a laser,** calibrate it once, with scrap in the cutter: in Cut,
-choose **Calibrate the laser for lining up** and click **Apply**. Any drawing
-will do; it needs no crop marks. Move the head over the scrap and click **Cut the
-cross**, then move the laser onto the centre of the cross, and CutScape learns how
-far the laser is from the blade. On a cutter with no laser, aim with the blade
-tip. **If the arrows go the wrong way,** click **Turn arrows**. CutScape remembers
-both.
+**To aim with a laser,** switch it on at the cutter, usually with a **Laser**
+button on its panel; CutScape can't switch it on for you. Then calibrate it once,
+with scrap in the cutter: in Cut, choose **Calibrate the laser for lining up** and
+click **Apply**. Any drawing will do; it needs no crop marks. Move the head over
+the scrap and click **Cut the cross**, then move the laser onto the centre of the
+cross, and CutScape learns how far the laser is from the blade. On a cutter with
+no laser, aim with the blade tip. **If the arrows go the wrong way,** click **Turn
+arrows**. CutScape remembers both.
+
+This works with any cutter CutScape can reach directly, whatever the brand, using
+its preset or *Custom* settings. The presets for **Secabo's C60 IV, C120 IV, S and
+T series** know more, from the driver data Secabo's own software ships: X runs
+along the feed from an origin at the front right, so x on the Material tab really
+runs across the material. Load the sheet the right way up with its top going into
+the cutter, and set the origin just below and to the right of mark 2, which is
+where the window starts. They also start from those cutters' usual laser offset, so
+the laser is roughly right before you calibrate it.
 
 Speed, Force, Overcut, Blade offset and the other settings on Cut's first tab
 still apply. The Material tab's layout options don't, because the sheet decides
@@ -238,8 +250,10 @@ where everything goes. A plain **Send to the cutter** leaves out the marks and
 the hidden cut lines. To change a cut line, show its layer in **Layer → Layers and
 Objects**.
 
-This hasn't been run on a real cutter yet: only against a stand-in for one. Try it
-on scrap first, with a pen if you can, and please open an issue with what happens.
+This hasn't been run on a real cutter yet: only against a stand-in for one, and
+the Secabo settings come from reading that software, not from testing a machine.
+Try it on scrap first, with a pen if you can, and please open an issue with what
+happens.
 
 ## Desktop CNC machines (GRBL)
 
@@ -288,6 +302,11 @@ Any HPGL or DMPL cutter should work with *Custom*.
 
 The orientation of the Roland Stika and Silhouette presets was converted from
 Inkcut and hasn't been checked against the machines. Do a small test cut first.
+
+On a Secabo C IV, choose **Secabo C60 IV** or **Secabo C120 IV**. They turn the
+job so it lies as you see it on the cutter, so a design comes out rotated 90° from
+what the older **Secabo C60 II / C IV** preset gives. That preset is unchanged, so
+existing setups keep working. Do a small test cut first.
 
 For many more models, see the [cutters Inkcut users reported](docs/inkcut-reported-cutters.md),
 with how each was connected and whether it worked. CutScape sends the same

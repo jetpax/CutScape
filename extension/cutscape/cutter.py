@@ -410,10 +410,24 @@ def add(model, address='', sysfs=None):
     if model == devices.CUSTOM:
         lines.append(_("Set its language and steps per mm on Cut's Device "
                        "tab."))
+    lines += _usual(preset)
     if ready:
         lines.append(_("To check it, open Extensions > CutScape > Cut, "
                        "choose Send a 50 mm test square and click Apply."))
     return '\n\n'.join(lines), ready
+
+
+def _usual(preset):
+    """ What's known of a model that the dialogs don't apply by themselves """
+    lines = []
+    if preset.get('blade'):
+        lines.append(_("Its usual blade offset is {offset:g} mm.").format(
+            offset=preset['blade']))
+    if preset.get('force'):
+        lines.append(_("It's usually listed with force {force} and speed "
+                       "{speed}.").format(force=preset['force'],
+                                          speed=preset['speed']))
+    return lines
 
 
 def remove():

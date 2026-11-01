@@ -41,20 +41,27 @@ def check(device, transport):
                            "serial port."))
 
 
-def base(device, page_height):
-    """ Where a page point would be in head space on a sheet lying square
-    on the origin: the job's y flip, then the preset's axis settings as
-    job.encode applies them. Returns a function of (x, y).
+def axes(device):
+    """ A function taking a direction in material space to the head's axes:
+    the preset's axis settings, as job.encode applies them.
     """
     swap, invert_x = device['swap_xy'], device['invert_x']
     invert_y = device['invert_y']
 
-    def to_base(x, y):
-        y = page_height - y
+    def to_head(x, y):
         if swap:
             x, y = y, x
         return (-x if invert_x else x), (-y if invert_y else y)
-    return to_base
+    return to_head
+
+
+def base(device, page_height):
+    """ Where a page point would be in head space on a sheet lying square
+    on the origin: the job's y flip, then the preset's axis settings.
+    Returns a function of (x, y).
+    """
+    to_head = axes(device)
+    return lambda x, y: to_head(x, page_height - y)
 
 
 class Fit(object):
@@ -132,6 +139,7 @@ class Head(object):
     """ The cutter's head, as far as CutScape has moved it """
     def __init__(self, device, settings, send):
         self.steps = device['steps']
+        self.axes = axes(device)
         self.proto = job.protocol(device, settings)
         self.send = send
         self.x = self.y = 0.0
@@ -181,16 +189,27 @@ class Session(object):
     #: Calibration's steps
     CUT_CROSS, AIM_AT_CROSS = 'cut', 'aim'
 
-    def __init__(self, head, marks, to_base, laser=None, turn=0):
+    def __init__(self, head, marks, to_base, laser=None, turn=0,
+                 assumed=False):
         self.head = head
         self.to_base = to_base
+        expected = [to_base(*m) for m in marks]
+        #: Start at the mark nearest the origin and go round, so the head
+        #: has somewhere to go on every side
+        first = min(range(len(expected)), key=lambda i: sum(expected[i])) \
+            if expected else 0
         #: Where the marks should be, in the order they're aimed at
-        self.expected = [to_base(*m) for m in marks]
+        self.expected = expected[first:] + expected[:first]
+        #: The number printed by each, in the same order
+        self.numbers = [(first + i) % len(expected) + 1
+                        for i in range(len(expected))]
         #: Where the tool would have to go to reach each mark found so far
         self.found = []
         #: From the head with the laser on a spot, to the tool on that spot
         self.laser = tuple(laser) if laser else None
-        #: Quarter turns from the arrows on screen to the head's axes
+        #: The laser offset is the preset's, not measured on this cutter
+        self.assumed = assumed
+        #: Quarter turns from the arrows on screen to material space
         self.turn = turn % 4
         self.calibrating = None
 
@@ -206,6 +225,11 @@ class Session(object):
         return len(self.found)
 
     @property
+    def number(self):
+        """ The number printed by the mark being aimed at """
+        return self.numbers[self.index]
+
+    @property
     def done(self):
         return bool(self.expected) and len(self.found) == len(self.expected)
 
@@ -213,8 +237,8 @@ class Session(object):
         """ Move by step along the arrow (right, up); see Head.move """
         for _turn in range(self.turn):
             right, up = -up, right
-        return self.head.move(self.head.x + right * step,
-                              self.head.y + up * step)
+        dx, dy = self.head.axes(right, up)
+        return self.head.move(self.head.x + dx * step, self.head.y + dy * step)
 
     def on_mark(self):
         """ What's being aimed is on the next mark. Head to the one after,
@@ -277,5 +301,6 @@ class Session(object):
         self.laser = (self.cross_at[0] - self.head.x,
                       self.cross_at[1] - self.head.y)
         self.calibrating = None
+        self.assumed = False
         self.found = []
         return self.laser

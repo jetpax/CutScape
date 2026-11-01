@@ -209,3 +209,39 @@ def test_a_double_click_saves_nothing(calibrating):
     assert session.calibrating == session.AIM_AT_CROSS
     assert not closed
     assert cutter.setting('laser') is None
+
+
+def test_laser_on_is_explained_at_the_start(ui):
+    window, session, sent, closed = ui(laser=(1.0, 2.0))
+    assert 'Laser button' in window.prompt.get_text()
+    session.head.move(30, 30)
+    window.go.clicked()
+    assert 'Laser button' not in window.prompt.get_text()
+
+
+def test_blade_tip_needs_no_laser_explained(ui):
+    window, session, sent, closed = ui()
+    assert 'Laser button' not in window.prompt.get_text()
+
+
+def test_cross_explains_laser_on(calibrating):
+    window, session, sent, closed = calibrating
+    session.head.move(50, 50)
+    window.go.clicked()
+    assert 'Laser button' in window.prompt.get_text()
+
+
+def test_a_saga_preset_starts_on_mark_2(tmp_path, monkeypatch):
+    if not Gtk.init_check()[0]:
+        pytest.skip("No display")
+    monkeypatch.setenv('CUTSCAPE_CONFIG', str(tmp_path / 'cutter.json'))
+    d = job.Settings(preset='Secabo C120 IV').device()
+    head = align.Head(d, job.Settings(), lambda data: None)
+    session = align.Session(head, MARKS, align.base(d, HEIGHT), d['laser'],
+                            assumed=True)
+    window = align_window.Window(Gtk, session, lambda: [])
+    text = window.prompt.get_text()
+    assert 'crop mark 2 (bottom right)' in text
+    assert 'usual laser offset' in text
+    window.press('Up')
+    assert (head.x, head.y) == (1, 0)

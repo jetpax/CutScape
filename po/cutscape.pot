@@ -55,7 +55,7 @@ msgstr ""
 
 #: extension/cutscape_cut.inx
 #: extension/cutscape_cut.inx
-#: extension/cutscape/align_window.py:198
+#: extension/cutscape/align_window.py:210
 msgid "Cut"
 msgstr ""
 
@@ -411,7 +411,7 @@ msgid "Added four crop marks, and moved the lines to cut to a hidden layer so th
 msgstr ""
 
 #: extension/cutscape_cut.py:137
-msgid "Next, print it at 100%, with no \"fit to page\". Put the sheet in the cutter and set the cutter's origin below and to the left of mark 1. Then open Extensions > CutScape > Cut, choose Line up with printed crop marks and cut, and click Apply."
+msgid "Next, print it at 100%, with no \"fit to page\". Put the sheet in the cutter and set the cutter's origin just outside the marks, at the corner where the cutter starts, so the head can reach all four. Then open Extensions > CutScape > Cut, choose Line up with printed crop marks and cut, and click Apply."
 msgstr ""
 
 #: extension/cutscape_cut.py:134
@@ -423,12 +423,12 @@ msgstr ""
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:164
+#: extension/cutscape_cut.py:167
 #, python-brace-format
 msgid "Sent {metres:.2f} m of cuts, lined up with the printed sheet, to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:181
+#: extension/cutscape_cut.py:184
 #, python-brace-format
 msgid "Laser calibrated. It points {x:+.2f} mm along X and {y:+.2f} mm along Y from the blade, and CutScape will remember that."
 msgstr ""
@@ -474,117 +474,125 @@ msgstr ""
 msgid "Lining up needs a direct connection to the cutter, to move the head as you click: its USB device on Linux (Add Cutter sets that up) or a serial port."
 msgstr ""
 
-#: extension/cutscape/align.py:81
+#: extension/cutscape/align.py:88
 msgid "Two crop marks are in the same place."
 msgstr ""
 
-#: extension/cutscape/align.py:97
+#: extension/cutscape/align.py:104
 msgid "The crop marks are in a line, so they don't show how the sheet lies."
 msgstr ""
 
-#: extension/cutscape/align.py:251
+#: extension/cutscape/align.py:275
 msgid "The sheet is stretched more than expected. Was it printed at 100%, with no \"fit to page\"?"
 msgstr ""
 
-#: extension/cutscape/align.py:254
+#: extension/cutscape/align.py:278
 msgid "The marks don't agree with each other. Go back and check you aimed at each one, in the right order."
 msgstr ""
 
-#: extension/cutscape/align.py:275
+#: extension/cutscape/align.py:299
 msgid "Move the laser onto the cross first: the head hasn't moved since cutting it."
 msgstr ""
 
-#: extension/cutscape/align.py:167
+#: extension/cutscape/align.py:175
 #, python-brace-format
 msgid "Move the head at least {size:.0f} mm from the origin first."
 msgstr ""
 
-#: extension/cutscape/align_window.py:84
+#: extension/cutscape/align_window.py:17
+msgid "If you can't see the dot, switch the laser on at the cutter: usually a Laser button on its panel."
+msgstr ""
+
+#: extension/cutscape/align_window.py:89
 msgid "If the head doesn't go the way the arrow points"
 msgstr ""
 
-#: extension/cutscape/align_window.py:210
+#: extension/cutscape/align_window.py:222
 msgid "Lining up needs CutScape's window, and GTK isn't available here."
 msgstr ""
 
-#: extension/cutscape/align_window.py:214
+#: extension/cutscape/align_window.py:226
 msgid "Line up with the printed sheet"
 msgstr ""
 
-#: extension/cutscape/align_window.py:75
+#: extension/cutscape/align_window.py:80
 msgid "Back"
 msgstr ""
 
-#: extension/cutscape/align_window.py:78
+#: extension/cutscape/align_window.py:83
 msgid "Calibrate laser…"
 msgstr ""
 
-#: extension/cutscape/align_window.py:82
+#: extension/cutscape/align_window.py:87
 msgid "Turn arrows"
 msgstr ""
 
-#: extension/cutscape/align_window.py:90
+#: extension/cutscape/align_window.py:95
 msgid "Cancel"
 msgstr ""
 
-#: extension/cutscape/align_window.py:117
+#: extension/cutscape/align_window.py:122
 msgid "That's as far as the cutter's origin. If the mark is further than that, move the origin back on the cutter's panel and start again."
 msgstr ""
 
-#: extension/cutscape/align_window.py:172
+#: extension/cutscape/align_window.py:177
 msgid "Cut the cross"
 msgstr ""
 
-#: extension/cutscape/align_window.py:55
+#: extension/cutscape/align_window.py:60
 msgid "Each arrow moves:"
 msgstr ""
 
-#: extension/cutscape/align_window.py:156
+#: extension/cutscape/align_window.py:161
 #, python-brace-format
 msgid "Head at X {x:.2f} mm, Y {y:.2f} mm"
 msgstr ""
 
-#: extension/cutscape/align_window.py:174
-msgid "Move the laser onto the centre of the cross you just cut."
-msgstr ""
-
-#: extension/cutscape/align_window.py:176
+#: extension/cutscape/align_window.py:182
 msgid "Laser is on the cross"
 msgstr ""
 
-#: extension/cutscape/align_window.py:192
+#: extension/cutscape/align_window.py:204
 #, python-brace-format
 msgid "All four marks found. The sheet is turned {angle:.2f}° and stretched {x:+.2f}% and {y:+.2f}%; the marks agree to within {error:.2f} mm."
 msgstr ""
 
-#: extension/cutscape/align_window.py:166
+#: extension/cutscape/align_window.py:171
 #, python-brace-format
 msgid "Put scrap material in the cutter and move the head over it, at least {margin:.0f} mm from the origin. CutScape will cut a {size:.0f} mm cross there, so don't leave your printed sheet under it."
 msgstr ""
 
-#: extension/cutscape/align_window.py:182
+#: extension/cutscape/align_window.py:179
+msgid "Move the laser onto the centre of the cross you just cut."
+msgstr ""
+
+#: extension/cutscape/align_window.py:188
 #, python-brace-format
 msgid "Move the laser onto crop mark {number} ({corner})."
 msgstr ""
 
-#: extension/cutscape/align_window.py:184
+#: extension/cutscape/align_window.py:190
 #, python-brace-format
 msgid "Move the blade tip onto crop mark {number} ({corner})."
 msgstr ""
 
-#: extension/cutscape/align_window.py:187
+#: extension/cutscape/align_window.py:199
 msgid "On the mark"
+msgstr ""
+
+#: extension/cutscape/align_window.py:196
+msgid "This uses your model's usual laser offset. Calibrate it for a closer cut."
 msgstr ""
 
 #: extension/cutscape/cutter.py:403
 msgid "cutter"
 msgstr ""
 
-#: extension/cutscape/cutter.py:425
+#: extension/cutscape/cutter.py:439
 msgid "No cutter has been added."
 msgstr ""
 
-#: extension/cutscape/cutter.py:426
+#: extension/cutscape/cutter.py:440
 msgid "Removed the cutter you added."
 msgstr ""
 
@@ -612,7 +620,7 @@ msgstr ""
 msgid "Set its language and steps per mm on Cut's Device tab."
 msgstr ""
 
-#: extension/cutscape/cutter.py:414
+#: extension/cutscape/cutter.py:415
 msgid "To check it, open Extensions > CutScape > Cut, choose Send a 50 mm test square and click Apply."
 msgstr ""
 
@@ -665,7 +673,17 @@ msgstr ""
 msgid "It calls itself {device}."
 msgstr ""
 
-#: extension/cutscape/cutter.py:434
+#: extension/cutscape/cutter.py:424
+#, python-brace-format
+msgid "Its usual blade offset is {offset:g} mm."
+msgstr ""
+
+#: extension/cutscape/cutter.py:427
+#, python-brace-format
+msgid "It's usually listed with force {force} and speed {speed}."
+msgstr ""
+
+#: extension/cutscape/cutter.py:448
 #, python-brace-format
 msgid "Removed its printer queue {queue}."
 msgstr ""

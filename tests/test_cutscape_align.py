@@ -274,6 +274,21 @@ def test_a_double_click_is_not_a_calibration():
     assert s.laser == (1, 2)
 
 
+def test_calibrating_replaces_an_assumed_offset():
+    d = device()
+    head = align.Head(d, job.Settings(), lambda data: None)
+    s = align.Session(head, MARKS, align.base(d, HEIGHT), (2.4, 33.0),
+                      assumed=True)
+    assert s.assumed
+    head.move(50, 50)
+    s.begin_calibration()
+    s.cut_cross()
+    head.move(20, 62)
+    s.laser_on_cross()
+    assert not s.assumed
+    assert s.laser == (30, -12)
+
+
 def test_calibrating_with_no_sheet():
     head = align.Head(device(), job.Settings(), lambda data: None)
     s = align.Session.for_calibration(head, turn=1)
@@ -294,6 +309,110 @@ def test_calibration_can_be_cancelled():
     s.cancel_calibration()
     assert not s.calibrating
     assert s.laser == (1, 2)
+
+
+# -----------------------------------------------------------------------------
+# A preset with its axes turned: Secabo's SAGA-built cutters
+# -----------------------------------------------------------------------------
+def saga():
+    sent = []
+    d = job.Settings(preset='Secabo C120 IV').device()
+    head = align.Head(d, job.Settings(), sent.append)
+    return align.Session(head, MARKS, align.base(d, HEIGHT), d['laser']), sent
+
+
+@pytest.mark.parametrize('key, moved', [
+    ((1, 0), (500, 499)), ((-1, 0), (500, 501)),
+    ((0, 1), (501, 500)), ((0, -1), (499, 500))])
+def test_arrows_follow_the_presets_axes(key, moved):
+    """ As DrawCut does: Up is +X, along the feed, and Right is -Y """
+    s, sent = saga()
+    s.head.move(500, 500)
+    s.arrow(key[0], key[1], 1.0)
+    assert (s.head.x, s.head.y) == moved
+
+
+def test_turn_still_applies_over_the_preset():
+    s, sent = saga()
+    s.turn = 1
+    s.head.move(500, 500)
+    s.arrow(1, 0, 1.0)
+    assert (s.head.x, s.head.y) == (501, 500)
+
+
+def test_starts_at_the_mark_nearest_the_origin():
+    """ With Y running left from the front right, that's the bottom right """
+    s, sent = saga()
+    assert s.numbers == [2, 3, 4, 1]
+    assert s.number == 2
+    s.head.move(10, 300)
+    s.on_mark()
+    assert s.number == 3
+
+
+def test_plain_axes_still_start_at_mark_1():
+    s, sent = make()
+    assert s.numbers == [1, 2, 3, 4]
+
+
+def test_next_mark_is_found_along_the_presets_axes():
+    s, sent = saga()
+    laser = s.laser
+    s.head.move(10, 300)
+    s.on_mark()
+    #: Mark 3 is 180 mm further up the sheet: along +X, with no sideways move
+    assert (s.head.x, s.head.y) == pytest.approx((190, 300))
+    assert laser == (2.4, 33.0)
+
+
+def test_lining_up_on_saga_axes():
+    s, sent = saga()
+
+    def sheet(p):
+        """ Page to head space, on a sheet lying 1 degree crooked """
+        x, y = align.base(job.Settings(preset='Secabo C120 IV').device(),
+                          HEIGHT)(*p)
+        a = math.radians(1)
+        return (x * math.cos(a) - y * math.sin(a) + 20,
+                x * math.sin(a) + y * math.cos(a) + 400)
+    for number in s.numbers:
+        x, y = sheet(MARKS[number - 1])
+        s.head.move(x - s.laser[0], y - s.laser[1])
+        s.on_mark()
+    assert s.done
+    assert s.fit().worst == pytest.approx(0, abs=1e-9)
+    assert s.fit().rotation == pytest.approx(1)
+    assert s.to_head()(80, 100) == pytest.approx(sheet((80, 100)))
+
+
+@pytest.mark.parametrize('name, width', [
+    ('Secabo C60 IV', 630), ('Secabo C120 IV', 1260),
+    ('Secabo S60 / T60', 630), ('Secabo S120 / T120', 1260),
+    ('Secabo S160 / T160', 1660)])
+def test_saga_presets(name, width):
+    d = job.Settings(preset=name).device()
+    assert d['protocol'] == 'hpgl'
+    assert d['steps'] == (40, 40)
+    assert d['width'] == width
+    assert d['swap_xy'] and d['invert_y'] and not d['invert_x']
+    assert d['laser'] == (2.4, 33.0)
+
+
+def test_saga_preset_cuts_across_the_width():
+    """ x runs across the material: past the width is refused, however long """
+    s = job.Settings(preset='Secabo C60 IV', overcut=0.0)
+    wide = [(0, 0), (700, 0), (700, 10), (0, 10), (0, 0)]
+    long_ = [(0, 0), (10, 0), (10, 2000), (0, 2000), (0, 0)]
+    assert job.plan([wide], 0, s).problems()
+    plan = job.plan([long_], 2000, s)
+    assert not plan.problems()
+    #: 2 metres along the feed is HPGL X
+    assert b'80000,' in job.encode(plan, s)
+
+
+def test_other_presets_keep_their_axes():
+    d = job.Settings(preset='Secabo C60 II / C IV').device()
+    assert not d['swap_xy'] and not d['invert_y'] and d['laser'] is None
 
 
 # -----------------------------------------------------------------------------

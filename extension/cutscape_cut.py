@@ -136,9 +136,10 @@ class CutScape(inkex.EffectExtension):
                            "the design smaller, and add them again."))
         lines.append(_("Next, print it at 100%, with no \"fit to page\". Put "
                        "the sheet in the cutter and set the cutter's origin "
-                       "below and to the left of mark 1. Then open Extensions "
-                       "> CutScape > Cut, choose Line up with printed crop "
-                       "marks and cut, and click Apply."))
+                       "just outside the marks, at the corner where the cutter "
+                       "starts, so the head can reach all four. Then open "
+                       "Extensions > CutScape > Cut, choose Line up with "
+                       "printed crop marks and cut, and click Apply."))
         self.say('\n\n'.join(lines),
                  notify.INFO if fits else notify.WARNING)
 
@@ -150,10 +151,12 @@ class CutScape(inkex.EffectExtension):
         align.check(device, self.options.transport)
         page_marks = document.crop_marks(self.svg)
         polys = self.polylines(settings, document.cut_lines)
+        saved = cutter.setting('laser')
         session = align.Session(
             self.head(device, settings), page_marks,
             align.base(device, document.page_size(self.svg)[1]),
-            cutter.setting('laser'), cutter.setting('arrow_turn', 0))
+            saved or device.get('laser'), cutter.setting('arrow_turn', 0),
+            assumed=not saved and bool(device.get('laser')))
 
         def plan():
             return job.plan_on_sheet(polys, session.to_head(), settings)

@@ -67,6 +67,11 @@
         <option translatable="no" value="Roland Stika SV-12">Roland Stika SV-12</option>
         <option translatable="no" value="Roland Stika SV-15">Roland Stika SV-15</option>
         <option translatable="no" value="Secabo C60 II / C IV">Secabo C60 II / C IV</option>
+        <option translatable="no" value="Secabo C60 IV">Secabo C60 IV</option>
+        <option translatable="no" value="Secabo C120 IV">Secabo C120 IV</option>
+        <option translatable="no" value="Secabo S60 / T60">Secabo S60 / T60</option>
+        <option translatable="no" value="Secabo S120 / T120">Secabo S120 / T120</option>
+        <option translatable="no" value="Secabo S160 / T160">Secabo S160 / T160</option>
         <option translatable="no" value="SeikiTech SK-870T">SeikiTech SK-870T</option>
         <option translatable="no" value="Sekonic SPL-450">Sekonic SPL-450</option>
         <option translatable="no" value="Silhouette Cameo 4">Silhouette Cameo 4</option>
