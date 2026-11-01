@@ -224,9 +224,11 @@ machines.
 7. After mark 4, the window shows how the sheet lies. Click **Cut**, or **Back**
    to aim again.
 
-**To aim with a laser,** click **Calibrate laser…** once, with scrap under the
-head. CutScape cuts a small cross; move the laser onto its centre and it learns
-how far the laser is from the blade. On a cutter with no laser, aim with the blade
+**To aim with a laser,** calibrate it once, with scrap in the cutter: in Cut,
+choose **Calibrate the laser for lining up** and click **Apply**. Any drawing
+will do; it needs no crop marks. Move the head over the scrap and click **Cut the
+cross**, then move the laser onto the centre of the cross, and CutScape learns how
+far the laser is from the blade. On a cutter with no laser, aim with the blade
 tip. **If the arrows go the wrong way,** click **Turn arrows**. CutScape remembers
 both.
 

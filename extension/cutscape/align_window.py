@@ -129,7 +129,7 @@ class Window(object):
         cutter.remember('arrow_turn', s.turn)
 
     def _on_cancel(self, _button):
-        if self.session.calibrating:
+        if self.session.calibrating and self.session.expected:
             self._do(self.session.cancel_calibration)
         else:
             self.close()
@@ -142,6 +142,8 @@ class Window(object):
             laser = self._do(s.laser_on_cross)
             if laser:
                 cutter.remember('laser', list(laser))
+                if not s.expected:
+                    self.close()
         elif s.done:
             self.cutting = True
             self.close()
@@ -162,9 +164,11 @@ class Window(object):
         self.go.set_sensitive(True)
         if s.calibrating == s.CUT_CROSS:
             self.prompt.set_text(_(
-                "Put scrap material under the head. CutScape will cut a "
-                "{size:.0f} mm cross there, so don't leave your printed sheet "
-                "under it.").format(size=align.CROSS))
+                "Put scrap material in the cutter and move the head over it, "
+                "at least {margin:.0f} mm from the origin. CutScape will cut "
+                "a {size:.0f} mm cross there, so don't leave your printed "
+                "sheet under it.").format(margin=align.CROSS / 2,
+                                          size=align.CROSS))
             self.go.set_label(_("Cut the cross"))
         elif s.calibrating == s.AIM_AT_CROSS:
             self.prompt.set_text(_(
@@ -172,7 +176,7 @@ class Window(object):
             self.go.set_label(_("Laser is on the cross"))
         elif ready:
             self._show_result()
-        else:
+        elif s.expected:
             number, corner = s.index + 1, marks.corners()[s.index]
             if s.laser:
                 text = _("Move the laser onto crop mark {number} ({corner}).")

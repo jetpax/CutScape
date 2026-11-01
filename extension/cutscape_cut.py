@@ -28,7 +28,7 @@ ADD = dict(model=devices.CUSTOM, address='')
 TEST_SQUARE = 50.0
 
 #: What Cut's "Apply will" offers
-CUT_ACTIONS = ('preview', 'send', 'test', 'align')
+CUT_ACTIONS = ('preview', 'send', 'test', 'align', 'calibrate')
 
 
 class CutScape(inkex.EffectExtension):
@@ -85,6 +85,9 @@ class CutScape(inkex.EffectExtension):
         try:
             if o.action == 'align':
                 self.cut_on_sheet(settings)
+                return
+            if o.action == 'calibrate':
+                self.calibrate_laser(settings)
                 return
             if o.action == 'test':
                 plan = self.test_plan(settings)
@@ -147,10 +150,8 @@ class CutScape(inkex.EffectExtension):
         align.check(device, self.options.transport)
         page_marks = document.crop_marks(self.svg)
         polys = self.polylines(settings, document.cut_lines)
-        head = align.Head(device, settings, lambda data: self.send(
-            data, timeout=align.MOVE_TIMEOUT))
         session = align.Session(
-            head, page_marks,
+            self.head(device, settings), page_marks,
             align.base(device, document.page_size(self.svg)[1]),
             cutter.setting('laser'), cutter.setting('arrow_turn', 0))
 
@@ -163,6 +164,28 @@ class CutScape(inkex.EffectExtension):
         self.say(_("Sent {metres:.2f} m of cuts, lined up with the printed "
                    "sheet, to {where}.").format(
             metres=cut.cut_length / 1000, where=where))
+
+    def calibrate_laser(self, settings):
+        """ Find the laser in a window of its own. The drawing isn't used,
+        so this needs no crop marks.
+        """
+        device = settings.device()
+        align.check(device, self.options.transport)
+        session = align.Session.for_calibration(
+            self.head(device, settings), cutter.setting('laser'),
+            cutter.setting('arrow_turn', 0))
+        align_window.run(session, lambda: [])
+        #: Closed before the end
+        if session.calibrating:
+            return
+        self.say(_("Laser calibrated. It points {x:+.2f} mm along X and "
+                   "{y:+.2f} mm along Y from the blade, and CutScape will "
+                   "remember that.").format(x=session.laser[0],
+                                            y=session.laser[1]))
+
+    def head(self, device, settings):
+        return align.Head(device, settings, lambda data: self.send(
+            data, timeout=align.MOVE_TIMEOUT))
 
     def say(self, text, kind=notify.INFO, report=False):
         """ Tell the user something that isn't an error, in CutScape's own

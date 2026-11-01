@@ -262,6 +262,32 @@ def test_calibration_finds_the_laser():
     assert s.index == 0
 
 
+def test_a_double_click_is_not_a_calibration():
+    """ The second click of "Cut the cross" lands on the next button """
+    s, sent = make(laser=(1.0, 2.0))
+    s.head.move(100, 100)
+    s.begin_calibration()
+    s.cut_cross()
+    with pytest.raises(ValueError):
+        s.laser_on_cross()
+    assert s.calibrating == s.AIM_AT_CROSS
+    assert s.laser == (1, 2)
+
+
+def test_calibrating_with_no_sheet():
+    head = align.Head(device(), job.Settings(), lambda data: None)
+    s = align.Session.for_calibration(head, turn=1)
+    assert s.calibrating == s.CUT_CROSS
+    assert s.turn == 1
+    assert not s.done
+    head.move(50, 50)
+    s.cut_cross()
+    head.move(20, 62)
+    assert s.laser_on_cross() == (30, -12)
+    assert not s.calibrating
+    assert not s.done
+
+
 def test_calibration_can_be_cancelled():
     s, sent = make(laser=(1.0, 2.0))
     s.begin_calibration()

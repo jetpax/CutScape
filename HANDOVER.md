@@ -156,7 +156,7 @@ inkex path ops is the main porting cost.
   with arrow buttons). The Extensions > CutScape
   submenu has five entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
-  square, line up), and Add Cutter…, Remove Cutter…, Add Crop Marks and
+  square, line up, calibrate the laser), and Add Cutter…, Remove Cutter…, Add Crop Marks and
   Remove Preview (the last two with no dialog)
   pass a hidden `--entry`. Inkscape stores settings per entry, so anything
   that needs the device or connection settings stays in Cut…. It also

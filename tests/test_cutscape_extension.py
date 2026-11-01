@@ -320,3 +320,33 @@ def test_lining_up_needs_a_direct_connection(tmp_path, monkeypatch):
     with pytest.raises(SystemExit):
         align_run(tmp_path, monkeypatch, source, lambda s, p: True,
                   '--transport=file')
+
+
+def test_calibrating_needs_no_crop_marks(tmp_path, monkeypatch, capsys):
+    """ The sample has no marks and nothing set aside to cut """
+    def drive(session, problems):
+        assert session.calibrating == session.CUT_CROSS
+        session.head.move(50, 50)
+        session.cut_cross()
+        session.head.move(20, 62)
+        session.laser_on_cross()
+        return False
+    sent = align_run(tmp_path, monkeypatch, SAMPLE, drive,
+                     '--action=calibrate')
+    assert sent[0][0].startswith(b'IN;')
+    assert any(b'PD' in data for data, timeout in sent)
+    assert all(timeout == 5.0 for data, timeout in sent)
+    assert 'Laser calibrated' in capsys.readouterr().err
+
+
+def test_calibrating_closed_early_says_nothing(tmp_path, monkeypatch, capsys):
+    sent = align_run(tmp_path, monkeypatch, SAMPLE, lambda s, p: False,
+                     '--action=calibrate')
+    assert not any(b'PD' in data for data, timeout in sent)
+    assert 'Laser calibrated' not in capsys.readouterr().err
+
+
+def test_calibrating_needs_a_direct_connection(tmp_path, monkeypatch):
+    with pytest.raises(SystemExit):
+        align_run(tmp_path, monkeypatch, SAMPLE, lambda s, p: False,
+                  '--action=calibrate', '--transport=file')

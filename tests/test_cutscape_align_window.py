@@ -158,3 +158,54 @@ def test_calibration_needs_room(ui):
     assert 'at least 5 mm' in window.notice.get_text()
     assert session.calibrating == session.CUT_CROSS
     assert not any(b'PD' in data for data in sent)
+
+
+@pytest.fixture
+def calibrating(tmp_path, monkeypatch):
+    if not Gtk.init_check()[0]:
+        pytest.skip("No display")
+    monkeypatch.setenv('CUTSCAPE_CONFIG', str(tmp_path / 'cutter.json'))
+    d = dict(protocol='hpgl', steps=(40.0, 40.0), swap_xy=False,
+             invert_x=False, invert_y=False, width=0.0, length=0.0,
+             options=dict(dmpl_mode=1))
+    sent = []
+    head = align.Head(d, job.Settings(), sent.append)
+    session = align.Session.for_calibration(head)
+    closed = []
+    window = align_window.Window(Gtk, session, lambda: [],
+                                 lambda: closed.append(True))
+    return window, session, sent, closed
+
+
+def test_calibrating_alone_closes_when_done(calibrating):
+    window, session, sent, closed = calibrating
+    assert 'scrap' in window.prompt.get_text()
+    assert 'at least 5 mm from the origin' in window.prompt.get_text()
+    assert not window.calibrate.get_sensitive()
+    session.head.move(50, 50)
+    window.go.clicked()
+    assert b'PD' in sent[-1]
+    assert not closed
+    session.head.move(20, 62)
+    window.go.clicked()
+    assert closed and not window.cutting
+    assert cutter.setting('laser') == [30, -12]
+
+
+def test_calibrating_alone_cancel_closes(calibrating):
+    window, session, sent, closed = calibrating
+    window.cancel.clicked()
+    assert closed
+    assert session.calibrating
+    assert cutter.setting('laser') is None
+
+
+def test_a_double_click_saves_nothing(calibrating):
+    window, session, sent, closed = calibrating
+    session.head.move(50, 50)
+    window.go.clicked()
+    window.go.clicked()
+    assert "hasn't moved" in window.notice.get_text()
+    assert session.calibrating == session.AIM_AT_CROSS
+    assert not closed
+    assert cutter.setting('laser') is None

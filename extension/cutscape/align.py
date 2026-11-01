@@ -194,13 +194,20 @@ class Session(object):
         self.turn = turn % 4
         self.calibrating = None
 
+    @classmethod
+    def for_calibration(cls, head, laser=None, turn=0):
+        """ Only finding the laser, with no sheet to line up """
+        session = cls(head, [], None, laser, turn)
+        session.begin_calibration()
+        return session
+
     @property
     def index(self):
         return len(self.found)
 
     @property
     def done(self):
-        return len(self.found) == len(self.expected)
+        return bool(self.expected) and len(self.found) == len(self.expected)
 
     def arrow(self, right, up, step):
         """ Move by step along the arrow (right, up); see Head.move """
@@ -263,6 +270,10 @@ class Session(object):
         """ Returns the new laser offset. Marks found so far were measured
         with the old one, so aiming starts again.
         """
+        if (self.head.x, self.head.y) == self.cross_at:
+            #: A double click on "Cut the cross" lands on this button
+            raise ValueError(_("Move the laser onto the cross first: the head "
+                               "hasn't moved since cutting it."))
         self.laser = (self.cross_at[0] - self.head.x,
                       self.cross_at[1] - self.head.y)
         self.calibrating = None
