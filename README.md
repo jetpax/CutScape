@@ -20,7 +20,7 @@ interface est en français quand Inkscape l’est.
 
 ![The toolpath preview on the canvas: cuts in red, blade-up moves dashed in blue, the cutter's origin as a blue dot](docs/images/cutscape-preview.png)
 
-> **Status: prototype (0.4).** Written for Inkscape 1.4 and 1.5. So far it has
+> **Status: prototype (0.5).** Written for Inkscape 1.4 and 1.5. So far it has
 > been run in Inkscape 1.4 on macOS, with output checked against files, but
 > not yet on a real cutter. The HPGL it sends matches what Inkcut sent to a
 > Secabo C IV. Please open an issue with what works on your cutter, or what

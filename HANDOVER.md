@@ -151,10 +151,13 @@ inkex path ops is the main porting cost.
   CutScape's own window) and [v0.3.1](https://github.com/jetpax/CutScape/releases/tag/v0.3.1) (Cut failed with a
   usage message when 0.2.0 had saved an action it no longer offers), then
   [v0.4.0](https://github.com/jetpax/CutScape/releases/tag/v0.4.0) (desktop CNC: Z lift for G-code, CNC 3018
-  preset, GRBL streaming). The Extensions > CutScape
-  submenu has four entries, each an .inx running `cutscape_cut.py`: Cut…
+  preset, GRBL streaming), then
+  [v0.5.0](https://github.com/jetpax/CutScape/releases/tag/v0.5.0) (print and cut: crop marks, lining up
+  with arrow buttons). The Extensions > CutScape
+  submenu has five entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
-  square), and Add Cutter…, Remove Cutter… and Remove Preview (no dialog)
+  square, line up), and Add Cutter…, Remove Cutter…, Add Crop Marks and
+  Remove Preview (the last two with no dialog)
   pass a hidden `--entry`. Inkscape stores settings per entry, so anything
   that needs the device or connection settings stays in Cut…. It also
   passes a saved choice the dialog no longer offers as it is (0.2.0 saved
@@ -188,7 +191,7 @@ inkex path ops is the main porting cost.
   sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
   reboot after the port opens, and drops its welcome. Only tested against
   a fake GRBL.
-- **Print and cut** (not released): LAPOS-style alignment, Linux USB first.
+- **Print and cut** (0.5.0): LAPOS-style alignment, Linux USB first.
   - The C IV manual says LAPOS is a laser pointer on the head, not a sensor:
     DrawCut (Windows) prints 4 crop marks, the user aims at each, and the
     software does the maths. So nothing here depends on a Secabo protocol, and
