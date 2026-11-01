@@ -192,6 +192,13 @@ inkex path ops is the main porting cost.
   sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
   reboot after the port opens, and drops its welcome. Only tested against
   a fake GRBL.
+- **Inkscape's warning dialog** (0.6.0): Inkscape shows anything on stderr under
+  its "additional data" warning, and inkex's `deprecated/main.py` turns on warnings
+  Python normally hides, so importing GTK for CutScape's own window set it off with
+  `ImportWarning`s. `cutscape_cut.py` now ignores warnings after importing inkex,
+  and `notify.gtk` silences stderr once a window is available. `effect` sends every
+  problem to that window, and a bug with its traceback; only with no window do they
+  go to Inkscape. `CUTSCAPE_STDERR=1` keeps them on stderr, for tests.
 - **Print and cut** (0.5.0): LAPOS-style alignment, Linux USB first.
   - The C IV manual says LAPOS is a laser pointer on the head, not a sensor:
     DrawCut (Windows) prints 4 crop marks, the user aims at each, and the

@@ -3,6 +3,9 @@ CutScape as Inkscape runs it: the effect script on a document, via inkex.
 Text-to-path conversion needs a real Inkscape, so these tests stick to
 shapes.
 """
+import subprocess
+import sys
+
 import pytest
 
 inkex = pytest.importorskip('inkex')
@@ -376,3 +379,73 @@ def test_a_calibrated_laser_beats_the_presets(tmp_path, monkeypatch):
         return False
     align_run(tmp_path, monkeypatch, source, drive,
               '--preset=Secabo C120 IV')
+
+
+# -----------------------------------------------------------------------------
+# What Inkscape gets to show
+# -----------------------------------------------------------------------------
+def test_python_warnings_stay_away_from_inkscape():
+    """ Inkscape shows anything on stderr under a warning of its own, and inkex
+    turns on warnings Python normally hides. Importing GTK gives ImportWarnings.
+    """
+    code = ("import runpy, warnings;"
+            "runpy.run_path('extension/cutscape_cut.py', run_name='loaded');"
+            "warnings.warn('noise', ImportWarning);"
+            "warnings.warn('noise', DeprecationWarning);"
+            "warnings.warn('noise')")
+    result = subprocess.run([sys.executable, '-c', code],
+                            capture_output=True, text=True)
+    assert result.returncode == 0
+    assert result.stderr == ''
+
+
+@pytest.fixture
+def window(monkeypatch):
+    """ What would have gone in CutScape's window """
+    from cutscape import notify
+    shown = []
+    monkeypatch.setattr(notify, 'show',
+                        lambda text, **kw: shown.append((text, kw)) or True)
+    return shown
+
+
+def test_a_problem_goes_in_the_window(tmp_path, window):
+    run(tmp_path, '--action=send', '--id=star', '--transport=file', '--file=')
+    assert 'No output file set' in window[0][0]
+    assert window[0][1]['kind'] == 'warning'
+
+
+def test_too_big_goes_in_the_window(tmp_path, window):
+    run(tmp_path, '--action=send', '--id=star', '--transport=file',
+        '--file=%s' % (tmp_path / 'job.plt'), '--width=1')
+    assert 'only 1.0 mm' in window[0][0]
+    assert not (tmp_path / 'job.plt').exists()
+
+
+def test_needing_a_cutter_goes_in_the_window(tmp_path, window):
+    run(tmp_path, '--action=send', '--id=star', '--transport=added')
+    assert 'No cutter has been added' in window[0][0]
+
+
+def test_a_bug_goes_in_the_window(tmp_path, window, monkeypatch):
+    from cutscape import job
+
+    def broken(*args):
+        raise RuntimeError('boom')
+    monkeypatch.setattr(job, 'plan', broken)
+    run(tmp_path, '--action=preview', '--id=star')
+    text, kw = window[0]
+    assert 'Please report it' in text
+    assert 'github.com/jetpax/CutScape/issues' in text
+    assert 'RuntimeError: boom' in text
+    assert kw['report'] and kw['kind'] == 'warning'
+
+
+def test_with_no_window_a_bug_is_still_raised(tmp_path, monkeypatch):
+    from cutscape import job
+
+    def broken(*args):
+        raise RuntimeError('boom')
+    monkeypatch.setattr(job, 'plan', broken)
+    with pytest.raises(RuntimeError):
+        run(tmp_path, '--action=preview', '--id=star')

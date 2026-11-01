@@ -5,8 +5,8 @@ Inkscape shows anything an extension writes to stderr with the warning
 "Inkscape has received additional data from the script executed ... this
 may indicate the results will not be as expected", even when it's the
 result the user asked for. show-stderr in the .inx doesn't change that.
-So reports and confirmations go in a GTK window (PyGObject ships with
-Inkscape for its Extension Manager); without GTK, or with
+So reports, confirmations and problems go in a GTK window (PyGObject ships
+with Inkscape for its Extension Manager); without GTK, or with
 CUTSCAPE_STDERR=1 set, show() returns False and the caller falls back to
 stderr.
 """
@@ -27,6 +27,11 @@ def gtk():
     #: No display (a batch run, CI): don't try
     if not Gtk.init_check()[0]:
         return None
+    #: GTK's own messages, about a missing theme or module, say, would bring
+    #: up Inkscape's warning too. From here on problems have a window to go to.
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, 2)
+    os.close(devnull)
     return Gtk
 
 

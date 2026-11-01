@@ -6,11 +6,17 @@ on a vinyl cutter or plotter, or preview the toolpath on the canvas.
 """
 import os
 import sys
+import traceback
+import warnings
 
 #: Find the cutscape package next to this script, even through a symlink
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 import inkex  # noqa: E402
+
+#: inkex turns on warnings Python normally hides, and Inkscape shows anything
+#: on stderr under a warning of its own, even when all went well
+warnings.simplefilter('ignore')
 
 from cutscape import (  # noqa: E402
     align, align_window, cutter, devices, document, job, marks, notify,
@@ -26,6 +32,8 @@ ADD = dict(model=devices.CUSTOM, address='')
 
 #: mm; also checks the scale
 TEST_SQUARE = 50.0
+
+ISSUES = 'https://github.com/jetpax/CutScape/issues'
 
 #: What Cut's "Apply will" offers
 CUT_ACTIONS = ('preview', 'send', 'test', 'align', 'calibrate')
@@ -53,6 +61,21 @@ class CutScape(inkex.EffectExtension):
             pars.add_argument('--' + name, default=default)
 
     def effect(self):
+        try:
+            self.act()
+        except (ValueError, cutter.CutterError, transports.TransportError,
+                inkex.AbortExtension) as e:
+            #: "No cutter found" is an answer, not a crash
+            if not notify.show(str(e), kind=notify.WARNING):
+                raise inkex.AbortExtension(str(e))
+        except Exception:
+            text = _("Something went wrong inside CutScape. Please report it "
+                     "at {url} with this:").format(url=ISSUES) + '\n\n' + \
+                traceback.format_exc()
+            if not notify.show(text, kind=notify.WARNING, report=True):
+                raise
+
+    def act(self):
         o = self.options
         if o.entry:
             o.action = o.entry
@@ -65,46 +88,34 @@ class CutScape(inkex.EffectExtension):
             self.add_marks()
             return
         if o.action in ('add', 'remove'):
-            try:
-                if o.action == 'add':
-                    text, ready = cutter.add(o.model, o.address)
-                else:
-                    text, ready = cutter.remove(), True
-            except (ValueError, cutter.CutterError) as e:
-                #: "No cutter found" is an answer, not a crash
-                if not notify.show(str(e), kind=notify.WARNING):
-                    raise inkex.AbortExtension(str(e))
-                return
+            if o.action == 'add':
+                text, ready = cutter.add(o.model, o.address)
+            else:
+                text, ready = cutter.remove(), True
             self.say(text, notify.INFO if ready else notify.WARNING)
             return
-        try:
-            cutter.use(o, sending=o.action != 'preview')
-        except (ValueError, cutter.CutterError) as e:
-            raise inkex.AbortExtension(str(e))
+        cutter.use(o, sending=o.action != 'preview')
         settings = job.Settings(**{k: getattr(o, k) for k in job.DEFAULTS})
-        try:
-            if o.action == 'align':
-                self.cut_on_sheet(settings)
-                return
-            if o.action == 'calibrate':
-                self.calibrate_laser(settings)
-                return
-            if o.action == 'test':
-                plan = self.test_plan(settings)
-            else:
-                plan = self.plan(settings)
-            problems = plan.problems()
-            if o.action == 'preview':
-                preview.draw(self.svg, plan)
-                if problems:
-                    self.say('\n'.join(problems), notify.WARNING)
-                return
+        if o.action == 'align':
+            self.cut_on_sheet(settings)
+            return
+        if o.action == 'calibrate':
+            self.calibrate_laser(settings)
+            return
+        if o.action == 'test':
+            plan = self.test_plan(settings)
+        else:
+            plan = self.plan(settings)
+        problems = plan.problems()
+        if o.action == 'preview':
+            preview.draw(self.svg, plan)
             if problems:
-                raise inkex.AbortExtension('\n'.join(problems))
-            data = job.encode(plan, settings)
-            where = self.send(data, ack=plan.device['protocol'] == 'gcode')
-        except (ValueError, transports.TransportError) as e:
-            raise inkex.AbortExtension(str(e))
+                self.say('\n'.join(problems), notify.WARNING)
+            return
+        if problems:
+            raise ValueError('\n'.join(problems))
+        data = job.encode(plan, settings)
+        where = self.send(data, ack=plan.device['protocol'] == 'gcode')
         if o.action == 'test':
             self.say(_("Sent a {size:.0f} mm test square to {where}. Measure "
                        "it: if it isn't {size:.0f} mm, the cutter's steps "
@@ -124,10 +135,7 @@ class CutScape(inkex.EffectExtension):
             baud=o.baud, flow=o.flow, file=o.file, **options)
 
     def add_marks(self):
-        try:
-            fits = marks.add(self.svg, list(self.options.ids or []) or None)
-        except ValueError as e:
-            raise inkex.AbortExtension(str(e))
+        fits = marks.add(self.svg, list(self.options.ids or []) or None)
         lines = [_("Added four crop marks, and moved the lines to cut to a "
                    "hidden layer so they don't print.")]
         if not fits:

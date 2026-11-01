@@ -2,6 +2,10 @@
 The line-up window's contents, driven by their own buttons, where GTK is
 available. The window itself isn't opened.
 """
+import os
+import subprocess
+import sys
+
 import pytest
 
 pytest.importorskip('inkex')
@@ -245,3 +249,21 @@ def test_a_saga_preset_starts_on_mark_2(tmp_path, monkeypatch):
     assert 'usual laser offset' in text
     window.press('Up')
     assert (head.x, head.y) == (1, 0)
+
+
+def test_gtk_leaves_stderr_quiet(tmp_path):
+    """ Run apart: it silences stderr for good, as it would in the extension """
+    env = dict(os.environ, CUTSCAPE_CONFIG=str(tmp_path / 'cutter.json'))
+    env.pop('CUTSCAPE_STDERR', None)
+    code = ("import os, runpy, sys;"
+            "m = runpy.run_path('extension/cutscape_cut.py', run_name='loaded');"
+            "gtk = m['notify'].gtk();"
+            "print('window' if gtk else 'none');"
+            "os.write(2, b'from GTK') if gtk else None;"
+            "gtk and gtk.Dialog(title='x').destroy()")
+    result = subprocess.run([sys.executable, '-c', code], env=env,
+                            capture_output=True, text=True)
+    assert result.returncode == 0
+    assert result.stderr == ''
+    if result.stdout.strip() != 'window':
+        pytest.skip("No display")

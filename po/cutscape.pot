@@ -406,36 +406,41 @@ msgstr ""
 msgid "Preview or cut the selection on a vinyl cutter or plotter"
 msgstr ""
 
-#: extension/cutscape_cut.py:131
+#: extension/cutscape_cut.py:139
 msgid "Added four crop marks, and moved the lines to cut to a hidden layer so they don't print."
 msgstr ""
 
-#: extension/cutscape_cut.py:137
+#: extension/cutscape_cut.py:145
 msgid "Next, print it at 100%, with no \"fit to page\". Put the sheet in the cutter and set the cutter's origin just outside the marks, at the corner where the cutter starts, so the head can reach all four. Then open Extensions > CutScape > Cut, choose Line up with printed crop marks and cut, and click Apply."
 msgstr ""
 
-#: extension/cutscape_cut.py:134
+#: extension/cutscape_cut.py:142
 msgid "The marks don't all fit on the page, leaving room for the printer's margin. Make the page bigger or the design smaller, and add them again."
 msgstr ""
 
-#: extension/cutscape_cut.py:115
+#: extension/cutscape_cut.py:126
 #, python-brace-format
 msgid "Sent {width:.0f} × {height:.0f} mm, {metres:.2f} m of cuts ({size} bytes) to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:167
+#: extension/cutscape_cut.py:175
 #, python-brace-format
 msgid "Sent {metres:.2f} m of cuts, lined up with the printed sheet, to {where}."
 msgstr ""
 
-#: extension/cutscape_cut.py:184
+#: extension/cutscape_cut.py:192
 #, python-brace-format
 msgid "Laser calibrated. It points {x:+.2f} mm along X and {y:+.2f} mm along Y from the blade, and CutScape will remember that."
 msgstr ""
 
-#: extension/cutscape_cut.py:109
+#: extension/cutscape_cut.py:120
 #, python-brace-format
 msgid "Sent a {size:.0f} mm test square to {where}. Measure it: if it isn't {size:.0f} mm, the cutter's steps per mm are wrong."
+msgstr ""
+
+#: extension/cutscape_cut.py:72
+#, python-brace-format
+msgid "Something went wrong inside CutScape. Please report it at {url} with this:"
 msgstr ""
 
 #: extension/cutscape_marks.inx
