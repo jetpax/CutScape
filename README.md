@@ -145,7 +145,9 @@ Add Cutter finds the cutter and sets up the best connection for your system:
 - **USB-serial cutters:** the serial port, found by its USB id. Set the baud
   rate and flow control on Cut's **Connection** tab, from the cutter's
   manual. For the *CNC 3018 (GRBL)* preset, CutScape sets 115200 baud
-  itself.
+  itself. Development boards and debug probes, such as an ESP32 or a
+  Raspberry Pi Pico, are left out; if yours really is the cutter, enter its
+  port in the **Address** field.
 
 If this needs an administrator, the system asks for the password in its own
 prompt, and CutScape never sees it. Where there's no prompt (over SSH, say),

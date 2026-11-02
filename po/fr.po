@@ -591,23 +591,23 @@ msgstr "Sur le repère"
 msgid "This uses your model's usual laser offset. Calibrate it for a closer cut."
 msgstr "Ceci utilise le décalage laser habituel de votre modèle. Calibrez-le pour une découpe plus précise."
 
-#: extension/cutscape/cutter.py:403
+#: extension/cutscape/cutter.py:424
 msgid "cutter"
 msgstr "découpeuse"
 
-#: extension/cutscape/cutter.py:439
+#: extension/cutscape/cutter.py:460
 msgid "No cutter has been added."
 msgstr "Aucune découpeuse n’a été ajoutée."
 
-#: extension/cutscape/cutter.py:440
+#: extension/cutscape/cutter.py:461
 msgid "Removed the cutter you added."
 msgstr "La découpeuse ajoutée a été retirée."
 
-#: extension/cutscape/cutter.py:166
+#: extension/cutscape/cutter.py:179
 msgid "No cutter found. Check that it is plugged in and switched on, then try again."
 msgstr "Aucune découpeuse trouvée. Vérifiez qu’elle est branchée et allumée, puis réessayez."
 
-#: extension/cutscape/cutter.py:300
+#: extension/cutscape/cutter.py:321
 #, python-brace-format
 msgid ""
 "You can't write to {path} yet. To fix that, run this in a terminal, then unplug the cutter and plug it back in:\n"
@@ -616,137 +616,142 @@ msgstr ""
 "Vous ne pouvez pas encore écrire dans {path}. Pour y remédier, lancez ceci dans un terminal, puis débranchez la découpeuse et rebranchez-la :\n"
 "  {command}"
 
-#: extension/cutscape/cutter.py:333
+#: extension/cutscape/cutter.py:354
 msgid "Set its baud rate and flow control on Cut's Connection tab."
 msgstr "Réglez son débit et son contrôle de flux dans l’onglet Connexion de Découpe."
 
-#: extension/cutscape/cutter.py:366
+#: extension/cutscape/cutter.py:387
 #, python-brace-format
 msgid "the printer queue {queue}"
 msgstr "la file d’impression {queue}"
 
-#: extension/cutscape/cutter.py:411
+#: extension/cutscape/cutter.py:432
 msgid "Set its language and steps per mm on Cut's Device tab."
 msgstr "Réglez son langage et ses pas par mm dans l’onglet Machine de Découpe."
 
-#: extension/cutscape/cutter.py:415
+#: extension/cutscape/cutter.py:436
 msgid "To check it, open Extensions > CutScape > Cut, choose Send a 50 mm test square and click Apply."
 msgstr "Pour la vérifier, ouvrez Extensions > CutScape > Découpe et envoyez un carré test de 50 mm."
 
-#: extension/cutscape/cutter.py:108
+#: extension/cutscape/cutter.py:116
 msgid "No cutter has been added yet. Plug it in and switch it on, then use Extensions > CutScape > Add Cutter. Or choose how to reach it on Cut's Connection tab."
 msgstr "Aucune découpeuse n’a encore été ajoutée. Branchez-la et allumez-la, puis utilisez Extensions > CutScape > Ajouter une découpeuse. Ou choisissez comment la joindre dans l’onglet Connexion de Découpe."
 
-#: extension/cutscape/cutter.py:169
+#: extension/cutscape/cutter.py:182
 msgid "CUPS wouldn't list USB printers for this account, so a cutter that needs a printer queue can't be found."
 msgstr "CUPS refuse de lister les imprimantes USB pour ce compte : une découpeuse qui a besoin d’une file d’impression ne peut donc pas être trouvée."
 
-#: extension/cutscape/cutter.py:177
+#: extension/cutscape/cutter.py:190
 msgid "A USB cutter must be added to Windows first: Settings > Bluetooth & devices > Printers & scanners, with the Generic / Text Only driver. Then enter the printer's name in the Address field."
 msgstr "Une découpeuse USB doit d’abord être ajoutée à Windows : Paramètres > Bluetooth et appareils > Imprimantes et scanners, avec le pilote Generic / Text Only. Saisissez ensuite le nom de l’imprimante dans le champ Adresse."
 
-#: extension/cutscape/cutter.py:191
+#: extension/cutscape/cutter.py:212
 msgid "Cutters on a serial port need pyserial: sudo apt install python3-serial"
 msgstr "Les découpeuses sur port série ont besoin de pyserial : sudo apt install python3-serial"
 
-#: extension/cutscape/cutter.py:289
+#: extension/cutscape/cutter.py:310
 msgid "CutScape needs to let you use your cutter."
 msgstr "CutScape doit vous donner accès à votre découpeuse."
 
-#: extension/cutscape/cutter.py:363
+#: extension/cutscape/cutter.py:384
 #, python-brace-format
 msgid "USB, as {device}"
 msgstr "USB, sous {device}"
 
-#: extension/cutscape/cutter.py:365
+#: extension/cutscape/cutter.py:386
 #, python-brace-format
 msgid "the serial port {port}"
 msgstr "le port série {port}"
 
-#: extension/cutscape/cutter.py:404
+#: extension/cutscape/cutter.py:425
 #, python-brace-format
 msgid "Added your {model}, connected through {connection}."
 msgstr "Votre {model} est ajoutée, connectée via {connection}."
 
-#: extension/cutscape/cutter.py:173
+#: extension/cutscape/cutter.py:186
 msgid "To allow it: sudo usermod -aG lpadmin $USER, then log out and back in."
 msgstr "Pour l’autoriser : sudo usermod -aG lpadmin $USER, puis déconnectez-vous et reconnectez-vous."
 
-#: extension/cutscape/cutter.py:227
+#: extension/cutscape/cutter.py:248
 #, python-brace-format
 msgid "CutScape doesn't know {address}. Enter the name of a printer queue, a usb://… address, a USB id such as usb:0483:5750, a device file or a serial port."
 msgstr "CutScape ne connaît pas {address}. Saisissez le nom d’une file d’impression, une adresse usb://…, un identifiant USB comme usb:0483:5750, un fichier de périphérique ou un port série."
 
-#: extension/cutscape/cutter.py:407
+#: extension/cutscape/cutter.py:428
 #, python-brace-format
 msgid "It calls itself {device}."
 msgstr "Elle se présente comme {device}."
 
-#: extension/cutscape/cutter.py:424
+#: extension/cutscape/cutter.py:445
 #, python-brace-format
 msgid "Its usual blade offset is {offset:g} mm."
 msgstr "Son décalage de lame habituel est de {offset:g} mm."
 
-#: extension/cutscape/cutter.py:427
+#: extension/cutscape/cutter.py:448
 #, python-brace-format
 msgid "It's usually listed with force {force} and speed {speed}."
 msgstr "Elle est généralement indiquée avec une force de {force} et une vitesse de {speed}."
 
-#: extension/cutscape/cutter.py:448
+#: extension/cutscape/cutter.py:469
 #, python-brace-format
 msgid "Removed its printer queue {queue}."
 msgstr "Sa file d’impression {queue} a été supprimée."
 
-#: extension/cutscape/cutter.py:187
+#: extension/cutscape/cutter.py:201
 msgid "If it is connected another way, enter one of these in the Address field:"
 msgstr "Si elle est connectée autrement, saisissez l’une de ces adresses dans le champ Adresse :"
 
-#: extension/cutscape/cutter.py:297
+#: extension/cutscape/cutter.py:318
 #, python-brace-format
 msgid "Added a udev rule ({file}) to give you access. Unplug the cutter and plug it back in to apply it."
 msgstr "Règle udev ajoutée ({file}) pour vous donner accès. Débranchez la découpeuse et rebranchez-la pour l’appliquer."
 
-#: extension/cutscape/cutter.py:329
+#: extension/cutscape/cutter.py:350
 #, python-brace-format
 msgid "It talks at {baud} baud."
 msgstr "Elle communique à {baud} bauds."
 
-#: extension/cutscape/cutter.py:350
+#: extension/cutscape/cutter.py:371
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it and cleared {count} stuck job(s)."
 msgstr "Sa file d’impression {queue} était arrêtée : elle a été relancée et {count} travail(aux) bloqué(s) effacé(s)."
 
-#: extension/cutscape/cutter.py:352
+#: extension/cutscape/cutter.py:373
 #, python-brace-format
 msgid "Its printer queue {queue} had stopped: restarted it."
 msgstr "Sa file d’impression {queue} était arrêtée : elle a été relancée."
 
-#: extension/cutscape/cutter.py:386
+#: extension/cutscape/cutter.py:407
 msgid "More than one possible cutter is connected. Enter the address of yours in the Address field and click Apply again:"
 msgstr "Plusieurs découpeuses possibles sont connectées. Saisissez l’adresse de la vôtre dans le champ Adresse et cliquez de nouveau sur Appliquer :"
 
-#: extension/cutscape/cutter.py:223
+#: extension/cutscape/cutter.py:206
+#, python-brace-format
+msgid "Left out {port} ({name}), which looks like a development board, not a cutter. If it really is your cutter, enter {port} in the Address field."
+msgstr "{port} ({name}) a été écarté : il ressemble à une carte de développement, pas à une découpeuse. Si c’est bien votre découpeuse, saisissez {port} dans le champ Adresse."
+
+#: extension/cutscape/cutter.py:244
 #: extension/cutscape/transports.py:295
 #, python-brace-format
 msgid "{path} isn't there. Is the cutter plugged in and switched on?"
 msgstr "{path} est introuvable. La découpeuse est-elle branchée et allumée ?"
 
-#: extension/cutscape/cutter.py:295
+#: extension/cutscape/cutter.py:316
 #, python-brace-format
 msgid "Gave you access to it with a udev rule ({file})."
 msgstr "Accès accordé avec une règle udev ({file})."
 
-#: extension/cutscape/cutter.py:323
+#: extension/cutscape/cutter.py:344
 #, python-brace-format
 msgid "You can't write to {path} yet."
 msgstr "Vous ne pouvez pas encore écrire dans {path}."
 
-#: extension/cutscape/cutter.py:341
+#: extension/cutscape/cutter.py:362
 #, python-brace-format
 msgid "Pointed the printer queue {queue} at it."
 msgstr "La file d’impression {queue} pointe désormais vers elle."
 
-#: extension/cutscape/cutter.py:343
+#: extension/cutscape/cutter.py:364
 #, python-brace-format
 msgid "Created the printer queue {queue} for it."
 msgstr "File d’impression {queue} créée pour elle."

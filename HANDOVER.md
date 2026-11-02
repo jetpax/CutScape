@@ -194,6 +194,12 @@ inkex path ops is the main porting cost.
   sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
   reboot after the port opens, and drops its welcome. Only tested against
   a fake GRBL.
+- **Debug boards:** Add Cutter took any USB serial port for a cutter, and saved an
+  ESP32's `USB JTAG/serial debug unit` as a VEVOR KH-720. `cutter._is_board` now
+  leaves out ports by name and by a few board makers' USB ids, and says so. Not
+  Arduino, which GRBL machines may use, and not ST as a maker, since the SAGA
+  family's USB id is `0483:5750`. Typing the port as an address still works. A
+  cutter already saved isn't rechecked, so Remove Cutter clears an old one.
 - **Inkscape's warning dialog** (0.6.0): Inkscape shows anything on stderr under
   its "additional data" warning, and inkex's `deprecated/main.py` turns on warnings
   Python normally hides, so importing GTK for CutScape's own window set it off with

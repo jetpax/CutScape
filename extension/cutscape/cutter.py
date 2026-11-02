@@ -29,6 +29,14 @@ ADDED = 'added'
 
 UDEV_RULES = '/etc/udev/rules.d/70-cutscape.rules'
 
+#: USB serial ports that belong to a development board or debug probe. They
+#: look just like a USB-serial cutter, and would be sent cut jobs. Their names,
+#: and makers no cutter is known to use: Espressif, Raspberry Pi, Adafruit,
+#: SEGGER and Nordic. Arduino stays out of it, as GRBL machines may use one.
+DEBUG_BOARD = re.compile(
+    r'jtag|debug|cmsis|st-?link|j-?link|picoprobe|black magic|bootloader', re.I)
+BOARD_MAKERS = {'303a', '2e8a', '239a', '1366', '1915'}
+
 #: What adding the same cutter again shouldn't forget (see align)
 LEARNED = ('laser', 'arrow_turn')
 
@@ -131,6 +139,11 @@ def _uri_label(uri):
     return unquote('%s %s' % m.groups()) if m else ''
 
 
+def _is_board(port):
+    return port['vid'] in BOARD_MAKERS or \
+        bool(DEBUG_BOARD.search(port['description']))
+
+
 class Scan(object):
     """ What is connected now, read once """
 
@@ -160,7 +173,7 @@ class Scan(object):
             return ready
         return [dict(kind='serial', address=transports.usb_id(p),
                      label=p['description'], path=p['path'])
-                for p in self.ports if p['vid']]
+                for p in self.ports if p['vid'] and not _is_board(p)]
 
     def nothing_found(self):
         lines = [_("No cutter found. Check that it is plugged in and "
@@ -182,11 +195,19 @@ class Scan(object):
         others = ['  %s  %s' % (q, u) for q, u in sorted(self.queues.items())
                   if not IPP.match(u)]
         others += ['  %s  %s' % (p['path'], p['description'])
-                   for p in self.ports if not NOT_CUTTERS.search(p['path'])]
+                   for p in self.ports if not NOT_CUTTERS.search(p['path'])
+                   and not _is_board(p)]
         if others:
             lines.append(_("If it is connected another way, enter one of "
                            "these in the Address field:") + '\n' +
                          '\n'.join(others))
+        for p in self.ports:
+            if _is_board(p):
+                lines.append(_(
+                    "Left out {port} ({name}), which looks like a development "
+                    "board, not a cutter. If it really is your cutter, enter "
+                    "{port} in the Address field.").format(
+                        port=p['path'], name=p['description']))
         if sys.platform.startswith('linux') and not _has_pyserial():
             lines.append(_("Cutters on a serial port need pyserial: sudo "
                            "apt install python3-serial"))

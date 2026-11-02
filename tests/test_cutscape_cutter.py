@@ -20,6 +20,11 @@ OTHER = 'usb://Brother/HL-3140CW?serial=y'
 CH340 = dict(path='/dev/ttyUSB0', description='USB Serial', vid='1a86',
              pid='7523', serial='')
 
+#: The ESP32 this was found on: Add Cutter took it for a VEVOR KH-720
+ESP32 = dict(path='/dev/cu.usbmodem1101',
+             description='USB JTAG/serial debug unit', vid='303a', pid='1001',
+             serial='44:1B:F6:85:60:14')
+
 pytestmark = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='CUPS and sysfs')
 
@@ -185,6 +190,76 @@ def test_serial_cutter(world):
     saved = cutter.load()
     assert (saved['transport'], saved['port']) == ('serial', 'usb:1a86:7523')
     assert 'baud rate' in text
+
+
+def test_a_debug_board_isnt_a_cutter(world):
+    world['ports'] = [ESP32]
+    with pytest.raises(CutterError) as e:
+        add(world, model='VEVOR KH-720')
+    msg = str(e.value)
+    assert msg.startswith('No cutter found.')
+    assert 'Left out /dev/cu.usbmodem1101 (USB JTAG/serial debug unit)' in msg
+    assert 'enter /dev/cu.usbmodem1101 in the Address field' in msg
+    #: Only that once, not also in the list of other connections
+    assert msg.count('  /dev/cu.usbmodem1101  ') == 0
+    assert cutter.load() is None
+
+
+@pytest.mark.parametrize('description, vid', [
+    ('Board CDC', '2e8a'),                  # Raspberry Pi Pico
+    ('ESP32S3 Dev Module', '303a'),
+    ('Feather M4', '239a'),
+    ('J-Link', '1366'),
+    ('nRF52 Connectivity', '1915'),
+    ('STM32 STLink', '0483'),
+    ('STLINK-V3', '0483'),
+    ('CMSIS-DAP', '0d28'),
+    ('Black Magic Probe', '1d50'),
+    ('USB JTAG', '0403'),
+])
+def test_development_boards(world, description, vid):
+    world['ports'] = [dict(path='/dev/ttyACM0', description=description,
+                           vid=vid, pid='0001', serial='')]
+    with pytest.raises(CutterError) as e:
+        add(world)
+    assert 'looks like a development board' in str(e.value)
+
+
+@pytest.mark.parametrize('description, vid', [
+    ('USB Serial', '1a86'),                 # CH340
+    ('FT232R USB UART', '0403'),
+    ('CP2102N USB to UART Bridge', '10c4'),
+    ('Arduino Uno', '2341'),                # GRBL on a CNC
+    ('USB-SERIAL CH340', '1a86'),
+])
+def test_usual_serial_adapters_are_still_cutters(world, description, vid):
+    world['ports'] = [dict(path='/dev/ttyUSB0', description=description,
+                           vid=vid, pid='0001', serial='')]
+    text, ready = add(world)
+    assert cutter.load()['transport'] == 'serial'
+
+
+def test_a_cutter_beside_a_debug_board_is_found(world):
+    """ Before, this asked which of the two it was """
+    world['ports'] = [ESP32, CH340]
+    add(world)
+    assert cutter.load()['port'] == 'usb:1a86:7523'
+
+
+def test_a_saga_cutter_isnt_a_board_though_st_made_its_chip(world):
+    """ It's 0483:5750, the same maker as an ST-Link """
+    world['ports'] = [dict(path='/dev/ttyACM0', description='CH554_CDC',
+                           vid='0483', pid='5750', serial='')]
+    add(world, model='VEVOR KH-720')
+    assert cutter.load()['port'] == 'usb:0483:5750'
+
+
+def test_a_debug_board_can_be_chosen_by_address(world):
+    world['ports'] = [ESP32]
+    add(world, address='/dev/cu.usbmodem1101')
+    saved = cutter.load()
+    assert (saved['transport'], saved['port']) == (
+        'serial', '/dev/cu.usbmodem1101')
 
 
 def test_grbl_cutter_gets_its_baud_rate(world):
