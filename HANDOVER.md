@@ -154,8 +154,10 @@ inkex path ops is the main porting cost.
   preset, GRBL streaming), then
   [v0.5.0](https://github.com/jetpax/CutScape/releases/tag/v0.5.0) (print and cut: crop marks, lining up
   with arrow buttons), [v0.5.1](https://github.com/jetpax/CutScape/releases/tag/v0.5.1) (calibrate the laser
-  with no crop marks) and [v0.6.0](https://github.com/jetpax/CutScape/releases/tag/v0.6.0) (Secabo presets from
-  DrawCut's driver data, preset width fixes, problems in CutScape's own window).
+  with no crop marks), [v0.6.0](https://github.com/jetpax/CutScape/releases/tag/v0.6.0) (Secabo presets from
+  DrawCut's driver data, preset width fixes, problems in CutScape's own window)
+  and [v0.6.1](https://github.com/jetpax/CutScape/releases/tag/v0.6.1) (development boards left out of Add
+  Cutter, GTK's start-up messages kept off stderr).
   The Extensions > CutScape
   submenu has five entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
