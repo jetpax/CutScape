@@ -15,9 +15,7 @@ import os
 INFO, WARNING = 'info', 'warning'
 
 
-def gtk():
-    if os.environ.get('CUTSCAPE_STDERR'):
-        return None
+def _start_gtk():
     try:
         import gi
         gi.require_version('Gtk', '3.0')
@@ -25,13 +23,27 @@ def gtk():
     except (ImportError, ValueError):
         return None
     #: No display (a batch run, CI): don't try
-    if not Gtk.init_check()[0]:
+    return Gtk if Gtk.init_check()[0] else None
+
+
+def gtk():
+    if os.environ.get('CUTSCAPE_STDERR'):
         return None
     #: GTK's own messages, about a missing theme or module, say, would bring
-    #: up Inkscape's warning too. From here on problems have a window to go to.
+    #: up Inkscape's warning too, and it says some of them while starting. So
+    #: stderr goes first, and comes back only if there's no window for problems
+    #: to go to.
+    stderr = os.dup(2)
     devnull = os.open(os.devnull, os.O_WRONLY)
     os.dup2(devnull, 2)
     os.close(devnull)
+    Gtk = None
+    try:
+        Gtk = _start_gtk()
+    finally:
+        if Gtk is None:
+            os.dup2(stderr, 2)
+        os.close(stderr)
     return Gtk
 
 

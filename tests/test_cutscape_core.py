@@ -4,7 +4,10 @@ CutScape core: plain Python, no inkex or Qt needed.
 import glob
 import importlib.util
 import math
+import os
 import re
+import subprocess
+import sys
 import xml.etree.ElementTree as ET
 
 import pytest
@@ -397,3 +400,62 @@ def test_menu_ids_unique():
     ids = [ET.parse(p).getroot().find('{%s}id' % NS['i']).text
            for p in sorted(glob.glob('extension/*.inx'))]
     assert len(ids) == len(set(ids)) == 5
+
+
+# -----------------------------------------------------------------------------
+# Inkscape's warning: nothing on stderr while GTK starts
+# -----------------------------------------------------------------------------
+#: Stands in for PyGObject on a Linux desktop whose GTK_MODULES names a module
+#: that isn't installed. Real GTK says this while starting, before CutScape gets
+#: anything back from it.
+STARTING_GTK = """
+import os, warnings
+warnings.warn('GLib.unix_signal_add_full is deprecated', DeprecationWarning)
+os.write(2, b'Gtk-Message: Failed to load module "xapp-gtk3-module"\\n')
+class Gtk:
+    init_check = staticmethod(lambda: (%s, []))
+"""
+
+
+def start_gtk(tmp_path, gi='require_version = lambda *args: None',
+              display=True):
+    """ Run apart: notify.gtk changes stderr for good, as in the extension.
+    inkex turns on all warnings, so this does too.
+    """
+    (tmp_path / 'gi' / 'repository').mkdir(parents=True)
+    (tmp_path / 'gi' / '__init__.py').write_text(gi)
+    (tmp_path / 'gi' / 'repository' / '__init__.py').write_text(
+        STARTING_GTK % display)
+    code = ("import os, warnings; warnings.simplefilter('default');"
+            "from cutscape import notify;"
+            "print('window' if notify.gtk() else 'none', flush=True);"
+            "os.write(2, b'afterwards')")
+    env = dict(os.environ, PYTHONPATH=os.pathsep.join(
+        [str(tmp_path), 'extension']))
+    env.pop('CUTSCAPE_STDERR', None)
+    return subprocess.run([sys.executable, '-c', code], env=env,
+                          capture_output=True, text=True)
+
+
+def test_gtk_starting_stays_off_stderr(tmp_path):
+    result = start_gtk(tmp_path)
+    assert result.stdout.strip() == 'window'
+    assert result.stderr == ''
+
+
+@pytest.mark.parametrize('gi, display', [
+    ('require_version = lambda *args: None', False),
+    ("def require_version(*args): raise ValueError('No Gtk 3')", True),
+    ("raise ImportError('No PyGObject')", True),
+])
+def test_stderr_is_back_when_no_window_can_open(tmp_path, gi, display):
+    """ The caller falls back to stderr then, so it has to work """
+    result = start_gtk(tmp_path, gi, display)
+    assert result.stdout.strip() == 'none'
+    assert result.stderr == 'afterwards'
+
+
+def test_gtk_going_wrong_still_shows(tmp_path):
+    result = start_gtk(tmp_path, "raise RuntimeError('Broken PyGObject')")
+    assert result.returncode != 0
+    assert 'Broken PyGObject' in result.stderr
