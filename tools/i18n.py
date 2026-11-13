@@ -79,7 +79,7 @@ def py_strings(path):
 
 def sources():
     for dirpath, dirs, files in os.walk(EXTENSION):
-        dirs[:] = sorted(d for d in dirs if d not in ('__pycache__', 'locale'))
+        dirs[:] = sorted(d for d in dirs if d not in ('__pycache__', 'locale', 'serial'))
         for name in sorted(files):
             if name.endswith(('.inx', '.py')):
                 yield os.path.join(dirpath, name)

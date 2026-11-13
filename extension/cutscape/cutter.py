@@ -155,7 +155,15 @@ class Scan(object):
         self.ports = transports.serial_ports()
 
     def candidates(self, saved=None):
-        """ Connections the cutter could be using, of the best kind found """
+        """ Connections the cutter could be using: the best kind found for a
+        USB printer, and USB serial ports, which are other devices
+        """
+        return self._usb_printer(saved) + [
+            dict(kind='serial', address=transports.usb_id(p),
+                 label=p['description'], path=p['path'])
+            for p in self.ports if p['vid'] and not _is_board(p)]
+
+    def _usb_printer(self, saved):
         if self.usb:
             return [dict(kind='device', address=transports.usb_id(d),
                          label=_usb_label(d), usb=d) for d in self.usb]
@@ -169,15 +177,13 @@ class Scan(object):
         ready = [dict(kind='queue', address=q, label=_uri_label(u))
                  for q, u in sorted(self.queues.items())
                  if q in mine and u in self.uris]
-        if ready:
-            return ready
-        return [dict(kind='serial', address=transports.usb_id(p),
-                     label=p['description'], path=p['path'])
-                for p in self.ports if p['vid'] and not _is_board(p)]
+        return ready
 
     def nothing_found(self):
         lines = [_("No cutter found. Check that it is plugged in and "
                    "switched on, then try again.")]
+        if transports.sandbox_note():
+            lines.append(transports.sandbox_note())
         if self.refused:
             lines.append(_(
                 "CUPS wouldn't list USB printers for this account, so a "
@@ -208,9 +214,6 @@ class Scan(object):
                     "board, not a cutter. If it really is your cutter, enter "
                     "{port} in the Address field.").format(
                         port=p['path'], name=p['description']))
-        if sys.platform.startswith('linux') and not _has_pyserial():
-            lines.append(_("Cutters on a serial port need pyserial: sudo "
-                           "apt install python3-serial"))
         return '\n\n'.join(lines)
 
     def lookup(self, address):
@@ -234,8 +237,9 @@ class Scan(object):
         if address in self.queues:
             return dict(kind='queue', address=address,
                         label=_uri_label(self.queues[address]))
+        #: realpath for a link to one, such as /dev/serial/by-id/...
         if re.match(r'^COM\d+$', address, re.I) or \
-                address.startswith(('/dev/tty', '/dev/cu.')):
+                os.path.realpath(address).startswith(('/dev/tty', '/dev/cu.')):
             return dict(kind='serial', address=address, label='',
                         path=address)
         if address.startswith(('/', '~')):
@@ -279,14 +283,6 @@ def _usb_uris():
             if line.startswith('direct usb://')], False
 
 
-def _has_pyserial():
-    try:
-        import serial  # noqa: F401
-    except ImportError:
-        return False
-    return True
-
-
 # -----------------------------------------------------------------------------
 # Setting it up
 # -----------------------------------------------------------------------------
@@ -327,6 +323,16 @@ def _grant_access(usb, path):
     return note, False
 
 
+def _serial_problem(path):
+    """ What stops this account using a serial port on Linux, or None """
+    if not sys.platform.startswith('linux') or _writable(path):
+        return None
+    if not os.path.exists(path):
+        return _("{path} isn't there. Is the cutter plugged in and switched "
+                 "on?").format(path=path)
+    return transports.serial_access_note(path)
+
+
 def _connect(c, scan, saved, serial=None):
     """ Make the connection c work; serial is the model's baud rate and
     flow control, if its preset has them. Returns (the settings Cut needs,
@@ -334,10 +340,14 @@ def _connect(c, scan, saved, serial=None):
     """
     kind, address = c['kind'], c['address']
     notes, ready = [], True
+    sandbox = kind in ('device', 'serial') and transports.sandbox_note()
+    if sandbox:
+        notes.append(sandbox)
+        ready = False
     if kind == 'device':
         path = c['usb']['path'] if c.get('usb') else \
             os.path.expanduser(address)
-        if not _writable(path):
+        if ready and not _writable(path):
             if c.get('usb') and sys.platform.startswith('linux'):
                 note, ready = _grant_access(c['usb'], path)
             else:
@@ -346,6 +356,10 @@ def _connect(c, scan, saved, serial=None):
             notes.append(note)
         return dict(transport='device', device=address), notes, ready
     if kind == 'serial':
+        problem = None if sandbox else _serial_problem(c['path'])
+        if problem:
+            notes.append(problem)
+            ready = False
         if serial:
             notes.append(_("It talks at {baud} baud.").format(
                 baud=serial['baud']))
@@ -397,7 +411,11 @@ def add(model, address='', sysfs=None):
     scan = Scan(sysfs)
     address = address.strip()
     if address:
-        c = scan.lookup(address)
+        try:
+            c = scan.lookup(address)
+        except CutterError as e:
+            raise CutterError('\n\n'.join(
+                x for x in (str(e), transports.sandbox_note()) if x))
     else:
         found = scan.candidates(saved)
         if not found:

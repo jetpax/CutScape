@@ -51,9 +51,16 @@ The user extensions folder is usually:
 **For every account on a Linux machine,** unzip into
 `/usr/share/inkscape/extensions` instead, using `sudo`.
 
-**Serial cutters** need pyserial. It ships with Inkscape on Windows and macOS.
-On Linux, run `sudo apt install python3-serial` or your distribution's
-equivalent. Nothing else is needed.
+**Serial cutters** need nothing else, as CutScape comes with pyserial. On Linux,
+your account has to be allowed to use the port; if it isn't, Add Cutter gives you
+the command.
+
+**Inkscape from Flatpak** can't see USB or serial ports until you allow it. Run
+this, then restart Inkscape; Add Cutter tells you if you need to:
+
+```bash
+flatpak override --user --device=all org.inkscape.Inkscape
+```
 
 ## Use
 
@@ -156,7 +163,8 @@ CutScape shows the commands to run with `sudo` instead.
 **If CutScape finds more than one possible cutter,** it lists their addresses.
 Enter yours in **Address** and click **Apply** again. **Address** also takes
 the name of a printer queue, a device file such as `/dev/cutter`, or a serial
-port such as `/dev/ttyUSB0` or `COM3`, for a cutter connected some other way.
+port such as `/dev/ttyUSB0`, `/dev/serial/by-id/…` or `COM3`, for a cutter
+connected some other way.
 If CutScape finds nothing, it says so, and lists any printer queues and
 serial ports you could enter instead.
 
@@ -381,4 +389,7 @@ Several upstream pull requests that were never merged are folded in:
   (inkcut/inkcut#442 by lukebmay)
 - G-code line-by-line streaming (inkcut/inkcut#388 by karliss)
 
-CutScape is licensed under the GPL v3, like Inkcut. See [LICENSE](LICENSE).
+CutScape is licensed under the GPL v3, like Inkcut. See [LICENSE](LICENSE). It
+comes with an unchanged copy of [pyserial](https://github.com/pyserial/pyserial)
+3.5 by Chris Liechti, in `extension/serial`, under the BSD licence in its
+`LICENSE.txt`.

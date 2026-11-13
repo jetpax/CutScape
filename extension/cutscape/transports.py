@@ -1,8 +1,10 @@
 """
 Ways to get the encoded job to the cutter. Everything here uses the
-standard library, except serial which needs pyserial (bundled with
-Inkscape on Windows and macOS, python3-serial on Linux).
+standard library, except serial which uses the pyserial that comes with
+CutScape (extension/serial): Inkscape's Flatpak and most Linux systems
+don't have it.
 """
+import configparser
 import errno
 import glob
 import os
@@ -23,6 +25,9 @@ TRANSPORTS = ('file', 'printer', 'serial', 'device')
 STALL_TIMEOUT = 30.0
 
 SYSFS = '/sys'
+
+#: Flatpak describes the running app here
+FLATPAK_INFO = '/.flatpak-info'
 
 
 class TransportError(Exception):
@@ -145,11 +150,7 @@ def to_serial(data, port, baud=9600, flow='xonxoff', ack=False,
     "ok" after each (G-code controllers such as GRBL); based on the idea in
     inkcut/inkcut#388 by karliss.
     """
-    try:
-        import serial
-    except ImportError:
-        raise TransportError(
-            _("Serial output needs pyserial (python3-serial on Linux)"))
+    import serial
     if not port:
         raise TransportError(_("No serial port set"))
     port = resolve_serial(port)
@@ -167,9 +168,36 @@ def to_serial(data, port, baud=9600, flow='xonxoff', ack=False,
     except serial.SerialTimeoutException:
         raise TransportError(_stalled(port, timeout))
     except serial.SerialException as e:
-        raise TransportError(_("Serial port {port}: {error}").format(
-            port=port, error=e))
+        raise TransportError(_serial_error(port, e))
     return port
+
+
+def _serial_group(path):
+    """ The group to join to use a serial port: dialout on most systems,
+    uucp on Arch. A port that seems to belong to no such group doesn't say.
+    """
+    try:
+        import grp
+        name = grp.getgrgid(os.stat(path).st_gid).gr_name
+    except (ImportError, OSError, KeyError):
+        return 'dialout'
+    return 'dialout' if name in ('root', 'nobody') else name
+
+
+def serial_access_note(path):
+    return _("You can't use {path} yet. To fix that, run this in a terminal, "
+             "then log out and back in:\n  sudo usermod -aG {group} "
+             "$USER").format(path=path, group=_serial_group(path))
+
+
+def _serial_error(port, e):
+    if e.errno in (errno.EACCES, errno.EPERM) and \
+            sys.platform.startswith('linux'):
+        return serial_access_note(port)
+    if e.errno in (errno.ENOENT, errno.ENODEV, errno.ENXIO):
+        return _("{path} isn't there. Is the cutter plugged in and switched "
+                 "on?").format(path=port)
+    return _("Serial port {port}: {error}").format(port=port, error=e)
 
 
 def _write_serial(s, data, timeout, chunk=256):
@@ -371,12 +399,9 @@ def resolve_device(path, sysfs=None):
 
 def serial_ports():
     """ Serial ports pyserial can see, as dicts with path, description and
-    the USB vid/pid/serial when there is one. Empty without pyserial.
+    the USB vid/pid/serial when there is one.
     """
-    try:
-        from serial.tools import list_ports
-    except ImportError:
-        return []
+    from serial.tools import list_ports
     found = []
     for p in sorted(list_ports.comports(), key=lambda p: p.device):
         d = dict(path=p.device, description=p.description or '',
@@ -414,8 +439,29 @@ def udev_rule(d):
     return rule + ', SYMLINK+="cutter", TAG+="uaccess"'
 
 
+def sandbox_note():
+    """ How to let Inkscape reach the cutter, if it's a Flatpak that can't:
+    Flathub's may use only the graphics card. '' if it isn't, or it can.
+    """
+    info = configparser.ConfigParser(interpolation=None)
+    try:
+        info.read(FLATPAK_INFO)
+    except (configparser.Error, UnicodeDecodeError):
+        return ''
+    if not info.has_section('Application') or \
+            'all' in info.get('Context', 'devices', fallback='').split(';'):
+        return ''
+    return _("Inkscape is running as a Flatpak, which can't see USB or serial "
+             "ports. To let it, run this in a terminal, then restart "
+             "Inkscape:\n  flatpak override --user --device=all {app}").format(
+                 app=info.get('Application', 'name',
+                              fallback='org.inkscape.Inkscape'))
+
+
 def send(data, transport, **options):
     """ Send data with the named transport; returns where it went """
+    if transport in ('serial', 'device') and sandbox_note():
+        raise TransportError(sandbox_note())
     if transport == 'file':
         return to_file(data, options.get('file', ''))
     if transport == 'printer':

@@ -174,9 +174,10 @@ inkex path ops is the main porting cost.
   `tools/i18n.py` does extract/compile. French is complete.
 - **Add Cutter** (`extension/cutscape/cutter.py`, 0.3.0) replaced the
   0.2.0 Find Connected Cutters report and Printer Queue dialog. It picks
-  the best connection it finds (usblp device by USB id, then a raw CUPS
-  queue for a USB printer with no queue, then the queue it made before,
-  then a USB serial port), sets it up, and saves model + connection in
+  the best connection it finds for a USB printer (usblp device by USB id,
+  then a raw CUPS queue for one with no queue, then the queue it made
+  before), and any USB serial ports, which are other devices, so it asks if
+  it finds both. It sets the connection up and saves model + connection in
   `cutter.json` (`CUTSCAPE_CONFIG` overrides the path; the tests use it).
   Cut's Device and Connection default to "The cutter you added". Admin
   steps (lpadmin, the udev rule) go through the system's own password
@@ -196,6 +197,18 @@ inkex path ops is the main porting cost.
   sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
   reboot after the port opens, and drops its welcome. Only tested against
   a fake GRBL.
+- **Serial on Linux:** a Silver Bullet owner on Linux couldn't get CutScape to
+  recognise the port, though their own software could use it. Their first report's
+  paths suggest Flathub's Inkscape, not yet confirmed. As of 1.4.4 on GNOME 50 it
+  has `--device=dri` only and no pyserial, so it sees no ports at all.
+  `transports.sandbox_note` reads `/.flatpak-info` and gives the `flatpak override`
+  command, in Add Cutter and on Send. pyserial 3.5 now comes with CutScape, unchanged,
+  in `extension/serial`, because `cutscape_cut.py` puts its own folder first on
+  `sys.path`. To update it, replace the folder from the wheel, keep `LICENSE.txt`, and
+  compare the files with upstream's tag. pyflakes should skip it. Add Cutter also
+  checks access to a serial port on Linux, naming the group that owns it (`uucp` on
+  Arch). None of this has run in a real Flatpak or on Linux; a pty stands in for the
+  port in the tests.
 - **Debug boards:** Add Cutter took any USB serial port for a cutter, and saved an
   ESP32's `USB JTAG/serial debug unit` as a VEVOR KH-720. `cutter._is_board` now
   leaves out ports by name and by a few board makers' USB ids, and says so. Not

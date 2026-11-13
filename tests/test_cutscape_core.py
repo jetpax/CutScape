@@ -459,3 +459,25 @@ def test_gtk_going_wrong_still_shows(tmp_path):
     result = start_gtk(tmp_path, "raise RuntimeError('Broken PyGObject')")
     assert result.returncode != 0
     assert 'Broken PyGObject' in result.stderr
+
+
+# -----------------------------------------------------------------------------
+# The pyserial that comes with CutScape
+# -----------------------------------------------------------------------------
+def test_pyserial_comes_with_cutscape():
+    import serial
+    assert os.path.dirname(os.path.abspath(serial.__file__)) == \
+        os.path.abspath(os.path.join('extension', 'serial'))
+    assert os.path.exists(os.path.join('extension', 'serial', 'LICENSE.txt'))
+
+
+def test_pyserial_loads_without_warnings(tmp_path):
+    """ Inkscape would show them, and pyserial is older than this Python """
+    env = dict(os.environ, PYTHONPATH='extension',
+               PYTHONPYCACHEPREFIX=str(tmp_path))
+    result = subprocess.run(
+        [sys.executable, '-W', 'error', '-c',
+         'import serial; from serial.tools import list_ports'],
+        env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert result.stderr == ''

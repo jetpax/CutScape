@@ -25,6 +25,12 @@ ESP32 = dict(path='/dev/cu.usbmodem1101',
              description='USB JTAG/serial debug unit', vid='303a', pid='1001',
              serial='44:1B:F6:85:60:14')
 
+#: The serial port of the Silver Bullet, going by a dealer's listing
+FTDI = dict(path='/dev/ttyUSB0', description='FT232R USB UART', vid='0403',
+            pid='6001', serial='A50285BI')
+
+OVERRIDE = 'flatpak override --user --device=all org.inkscape.Inkscape'
+
 pytestmark = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='CUPS and sysfs')
 
@@ -260,6 +266,115 @@ def test_a_debug_board_can_be_chosen_by_address(world):
     saved = cutter.load()
     assert (saved['transport'], saved['port']) == (
         'serial', '/dev/cu.usbmodem1101')
+
+
+def test_a_usb_printer_doesnt_hide_a_serial_cutter(world, tmp_path):
+    """ Whoever prints crop marks may well have a printer plugged in """
+    world['sysfs'] = fake_sysfs(tmp_path, SAGA)
+    world['ports'] = [FTDI]
+    with pytest.raises(CutterError) as e:
+        add(world)
+    assert 'More than one possible cutter' in str(e.value)
+    assert '  usb:0483:5750' in str(e.value)
+    assert '  usb:0403:6001:A50285BI  FT232R USB UART' in str(e.value)
+
+
+def test_a_printer_with_no_queue_doesnt_hide_a_serial_cutter(world):
+    world['usb'] = [OTHER]
+    world['ports'] = [FTDI]
+    with pytest.raises(CutterError) as e:
+        add(world)
+    assert OTHER in str(e.value)
+    assert 'usb:0403:6001:A50285BI' in str(e.value)
+    assert not admin_calls(world)
+
+
+def test_a_link_to_a_serial_port_is_a_serial_port(world, monkeypatch):
+    """ Going straight to it as a device would never set its baud rate """
+    link = '/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0'
+    monkeypatch.setattr(cutter.os.path, 'realpath', lambda p: '/dev/ttyUSB0')
+    add(world, address=link)
+    saved = cutter.load()
+    assert (saved['transport'], saved['port']) == ('serial', link)
+
+
+def test_no_access_to_a_serial_port(world, tmp_path, monkeypatch):
+    port = tmp_path / 'ttyUSB0'
+    port.touch()
+    monkeypatch.setattr(cutter.sys, 'platform', 'linux')
+    monkeypatch.setattr(transports, '_serial_group', lambda path: 'uucp')
+    world['ports'] = [dict(FTDI, path=str(port))]
+    world['writable'] = False
+    text, ready = add(world)
+    assert not ready
+    assert "You can't use %s yet." % port in text
+    assert 'sudo usermod -aG uucp $USER' in text
+    assert 'To check it' not in text
+    #: Joining the group is all that's left: no need to add it again
+    assert cutter.load()['transport'] == 'serial'
+
+
+def test_a_serial_port_thats_not_there(world, monkeypatch):
+    monkeypatch.setattr(cutter.sys, 'platform', 'linux')
+    world['writable'] = False
+    text, ready = add(world, address='/dev/ttyUSB7')
+    assert not ready
+    assert "/dev/ttyUSB7 isn't there." in text
+    assert 'usermod' not in text
+
+
+def test_serial_access_is_a_linux_matter(world, monkeypatch):
+    monkeypatch.setattr(cutter.sys, 'platform', 'darwin')
+    world['ports'] = [CH340]
+    world['writable'] = False
+    text, ready = add(world)
+    assert ready
+    assert 'usermod' not in text
+
+
+def test_flatpak_says_how_to_see_ports(world, flatpak):
+    """ It sees no ports, whatever is plugged in """
+    with pytest.raises(CutterError) as e:
+        add(world)
+    assert str(e.value).startswith('No cutter found.')
+    assert 'Inkscape is running as a Flatpak' in str(e.value)
+    assert OVERRIDE in str(e.value)
+
+
+def test_flatpak_allowed_to_see_ports_says_nothing(world, flatpak):
+    flatpak.write_text('[Application]\nname=org.inkscape.Inkscape\n\n'
+                       '[Context]\ndevices=dri;all;\n')
+    with pytest.raises(CutterError) as e:
+        add(world)
+    assert 'Flatpak' not in str(e.value)
+
+
+def test_flatpak_serial_address_isnt_ready(world, flatpak):
+    text, ready = add(world, address='/dev/ttyUSB0')
+    assert not ready
+    assert OVERRIDE in text
+    assert 'usermod' not in text
+    assert cutter.load()['port'] == '/dev/ttyUSB0'
+
+
+def test_flatpak_address_that_cant_be_seen(world, flatpak):
+    with pytest.raises(CutterError) as e:
+        add(world, address='/dev/usb/lp0')
+    assert "/dev/usb/lp0 isn't there." in str(e.value)
+    assert OVERRIDE in str(e.value)
+
+
+def test_flatpak_doesnt_try_a_udev_rule(world, flatpak, tmp_path, monkeypatch):
+    """ It could never work from inside the sandbox """
+    monkeypatch.setattr(cutter.sys, 'platform', 'linux')
+    world['sysfs'] = fake_sysfs(tmp_path, SAGA)
+    world['writable'] = False
+    world['admin'] = True
+    text, ready = add(world)
+    assert not ready
+    assert OVERRIDE in text
+    assert world['prompts'] == []
+    assert 'udev' not in text
 
 
 def test_grbl_cutter_gets_its_baud_rate(world):

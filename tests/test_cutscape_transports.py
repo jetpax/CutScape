@@ -4,7 +4,9 @@ Nothing here touches real hardware; sysfs is faked in a temp folder laid
 out like the kernel's, and a FIFO that nobody reads stands in for a
 cutter that has stopped taking data.
 """
+import errno
 import os
+import select
 import subprocess
 import sys
 import threading
@@ -160,6 +162,97 @@ def test_serial_chunks():
 def test_serial_drain_stall():
     with pytest.raises(TransportError, match='stopped accepting data'):
         transports._drain_serial(FakePort(waiting=10), 0.2)
+
+
+@pytest.mark.skipif(sys.platform == 'win32', reason='pty')
+def test_sends_through_the_bundled_pyserial():
+    """ A pty stands in for the cutter's port """
+    master, slave = os.openpty()
+    data = b'IN;PU0,0;PD100,100;' * 200
+    got = bytearray()
+
+    def cutter():
+        while len(got) < len(data) and select.select([master], [], [], 5)[0]:
+            got.extend(os.read(master, 4096))
+
+    reader = threading.Thread(target=cutter)
+    reader.start()
+    try:
+        transports.send(data, 'serial', port=os.ttyname(slave), baud='9600',
+                        flow='none', timeout=5)
+    finally:
+        reader.join()
+        os.close(slave)
+        os.close(master)
+    assert bytes(got) == data
+
+
+@pytest.mark.parametrize('code, expected', [
+    (errno.EACCES, r"(?s)You can't use /dev/ttyUSB0 yet.*usermod -aG dialout"),
+    (errno.ENOENT, "/dev/ttyUSB0 isn't there"),
+    (errno.EBUSY, 'Serial port /dev/ttyUSB0: .*in use'),
+])
+def test_serial_port_wont_open(monkeypatch, code, expected):
+    import serial
+
+    def refuse(*args, **kwargs):
+        raise serial.SerialException(code, 'could not open port: in use')
+
+    monkeypatch.setattr(serial, 'Serial', refuse)
+    monkeypatch.setattr(transports.sys, 'platform', 'linux')
+    monkeypatch.setattr(transports, '_serial_group', lambda path: 'dialout')
+    with pytest.raises(TransportError, match=expected):
+        transports.send(b'x', 'serial', port='/dev/ttyUSB0')
+
+
+@pytest.mark.parametrize('owner, expected', [
+    ('uucp', 'uucp'), ('dialout', 'dialout'), ('root', 'dialout'),
+    ('nobody', 'dialout'), (None, 'dialout'),
+])
+def test_serial_group(tmp_path, monkeypatch, owner, expected):
+    grp = pytest.importorskip('grp')
+
+    def group(gid):
+        if owner is None:
+            raise KeyError(gid)
+        return type('Group', (), dict(gr_name=owner))
+
+    monkeypatch.setattr(grp, 'getgrgid', group)
+    port = tmp_path / 'ttyUSB0'
+    port.touch()
+    assert transports._serial_group(str(port)) == expected
+
+
+def test_serial_group_of_a_missing_port():
+    pytest.importorskip('grp')
+    assert transports._serial_group('/dev/nothing-here') == 'dialout'
+
+
+# -----------------------------------------------------------------------------
+# Inkscape's Flatpak
+# -----------------------------------------------------------------------------
+def test_not_a_flatpak():
+    assert transports.sandbox_note() == ''
+
+
+def test_unreadable_flatpak_info(flatpak):
+    flatpak.write_bytes(b'\xff\xfe not an ini file')
+    assert transports.sandbox_note() == ''
+
+
+@pytest.mark.parametrize('transport, where', [
+    ('serial', dict(port='/dev/ttyUSB0')),
+    ('device', dict(device='/dev/usb/lp0')),
+])
+def test_flatpak_says_why_it_cant_send(flatpak, transport, where):
+    with pytest.raises(TransportError, match='flatpak override'):
+        transports.send(b'x', transport, **where)
+
+
+def test_flatpak_can_still_write_a_file(flatpak, tmp_path):
+    out = tmp_path / 'job.plt'
+    transports.send(b'x', 'file', file=str(out))
+    assert out.read_bytes() == b'x'
 
 
 class FakeGrbl(FakePort):
