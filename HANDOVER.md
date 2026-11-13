@@ -157,9 +157,11 @@ inkex path ops is the main porting cost.
   with no crop marks), [v0.6.0](https://github.com/jetpax/CutScape/releases/tag/v0.6.0) (Secabo presets from
   DrawCut's driver data, preset width fixes, problems in CutScape's own window),
   [v0.6.1](https://github.com/jetpax/CutScape/releases/tag/v0.6.1) (development boards left out of Add
-  Cutter, GTK's start-up messages kept off stderr) and
+  Cutter, GTK's start-up messages kept off stderr),
   [v0.6.2](https://github.com/jetpax/CutScape/releases/tag/v0.6.2) (pyserial bundled, Flatpak advice, serial
-  fixes in Add Cutter).
+  fixes in Add Cutter) and
+  [v0.6.3](https://github.com/jetpax/CutScape/releases/tag/v0.6.3) (presets for Cricut machines running
+  FreeExpression or CutCutGo).
   The Extensions > CutScape
   submenu has five entries, each an .inx running `cutscape_cut.py`: Cut…
   passes its "Apply will" choice as `--action` (preview, send, test
