@@ -289,6 +289,27 @@ restarts then, and stops on the first `error` or `ALARM` it reports. This
 hasn't been run on a real machine yet. Save to a **File** first to check the
 G-code, then try a pen before a knife.
 
+## Cricut machines with open firmware
+
+Cricut's own firmware works only with Cricut's software, so CutScape can't
+drive it. Some open-source firmware replaces it, and CutScape has presets for
+two. Installing either means opening the machine and erases Cricut's firmware
+for good: follow the project's own instructions. Neither preset has been tried
+on a machine yet, so start with a test on scrap, and please open an issue with
+what happens.
+
+- **Cricut Expression / Cake (FreeExpression)**, for
+  [FreeExpression](https://github.com/markawilliamson/FreeExpression): HPGL
+  over USB, at 9600 baud with XON/XOFF, which Add Cutter sets up. Speed and
+  force come from the machine's dials; it ignores Cut's.
+- **Cricut Maker (CutCutGo)**, for [CutCutGo](https://github.com/virtualabs/cutcutgo)
+  on the first Cricut Maker: G-code. Before each job CutScape selects tool A and
+  homes the machine. It lifts the tool to Z 0 and cuts at Z −8.5, CutCutGo's
+  own setting for paper, whatever Cut's G-code heights say. Set a speed: CutCutGo
+  moves at up to 1500 mm/min, so anything over 2.5 cm/s makes no difference.
+  CutCutGo's Inkcut guide suggests a left margin of at least 40 mm: **Margin x**
+  on Cut's **Material** tab.
+
 ## Troubleshooting
 
 - **Text takes a little longer.** CutScape converts text with a second, hidden
@@ -307,7 +328,8 @@ G-code, then try a pen before a knife.
 
 The **Cutter** list holds presets for ANAgraph, Creation, GCC, Graphtec, Ioline,
 KNK, Mimaki, Redsail, Rheinstern, Roland, Secabo, SeikiTech, Sekonic, Silhouette,
-Summa, US Cutter, VEVOR and Vision models, and a desktop CNC 3018 running GRBL.
+Summa, US Cutter, VEVOR and Vision models, a desktop CNC 3018 running GRBL, and
+Cricut machines running open firmware (see below).
 Any HPGL or DMPL cutter should work with *Custom*.
 
 The orientation of the Roland Stika and Silhouette presets was converted from

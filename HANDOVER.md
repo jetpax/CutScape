@@ -199,6 +199,19 @@ inkex path ops is the main porting cost.
   sends two blank lines, waits `WAKE_DELAY` (2 s) for the controller to
   reboot after the port opens, and drops its welcome. Only tested against
   a fake GRBL.
+- **Cricut with open firmware:** Cricut's own firmware is locked to Design Space,
+  and the user doesn't want to go near that. Presets cover open firmware instead,
+  from each project's source and docs, unverified on hardware.
+  [FreeExpression](https://github.com/markawilliamson/FreeExpression) (Expression,
+  Cake) takes HPGL units as steps, about 400 per inch, X along the mat feed, 9600
+  baud XON/XOFF, and ignores VS/FS (`cli.c`). Which way its carriage runs is
+  unclear from the source, so a mirrored cut is possible.
+  [CutCutGo](https://github.com/virtualabs/cutcutgo) (first Maker) is GRBL over USB
+  CDC `04d8:000a`, homing on (`$H`), 1500 mm/min max rate, 330 mm X travel; its
+  Inkscape extension sends Y down the mat from the top left and Z0/Z-8.5. A G-code
+  preset can now carry `gcode_start`, `z_up` and `z_down`, which win over Cut's.
+  The Joy 2 Pico 2 conversion (hackaday.io project 206395) has no public firmware
+  yet; its GitHub link was 404 on 2026-11-13.
 - **Serial on Linux:** a Silver Bullet owner on Linux couldn't get CutScape to
   recognise the port, though their own software could use it. Their first report's
   paths suggest Flathub's Inkscape, not yet confirmed. As of 1.4.4 on GNOME 50 it

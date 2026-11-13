@@ -92,6 +92,34 @@ def test_3018_too_big():
         'The job is 200.0 mm long but the material is only 180.0 mm.']
 
 
+#: Across the top of the page, then 10 mm down it
+TOP_THEN_DOWN = [(0, 0), (40, 0), (40, 10)]
+
+
+def test_cutcutgo_preset():
+    """ Tool A homed first, and CutCutGo's own heights whatever Cut's are,
+    with Y down the mat from the top left as its own extension sends it
+    """
+    s = job.Settings(preset='Cricut Maker (CutCutGo)', speed=2,
+                     gcode_z_up=5, gcode_z_down=0)
+    plan = job.plan([TOP_THEN_DOWN], 297, s)
+    assert not plan.problems()
+    out = job.encode(plan, s).decode()
+    assert out.startswith('T0\n$H\nG21\nG90\nG00 Z0\nG00 X0 Y0\n'
+                          'G01 Z-8.5 F1200\n')
+    assert 'G01 X40 Y0 F1200\nG01 X40 Y10 F1200\n' in out
+    assert s.device()['serial'] == dict(baud='115200', flow='none')
+
+
+def test_freeexpression_preset():
+    """ HPGL units of 1/400 inch, with X along the mat feed """
+    s = job.Settings(preset='Cricut Expression / Cake (FreeExpression)')
+    plan = job.plan([TOP_THEN_DOWN], 297, s)
+    assert job.encode(plan, s) == b'IN;SP1;PU157,0;PD157,630;PD0,630;PU0,0;IN;'
+    assert s.device()['width'] == pytest.approx(304.8)
+    assert s.device()['serial'] == dict(baud='9600', flow='xonxoff')
+
+
 def test_gcode_needs_a_speed():
     s = job.Settings(protocol='gcode')
     plan = job.plan([page(SQUARE)], 100, s)

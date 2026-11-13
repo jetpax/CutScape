@@ -183,7 +183,8 @@ class CAMMGL1(Protocol):
 class GCode(Protocol):
     """ G-code in millimetres, for GRBL and similar controllers. The tool
     is lifted to z_up for travel and lowered to z_down to cut; with both
-    the same, no Z moves are sent and G0/G1 alone imply up/down.
+    the same, no Z moves are sent and G0/G1 alone imply up/down. start goes
+    before everything, to select a tool and home, say.
     """
     name = 'gcode'
     steps_per_mm = 1.0
@@ -198,7 +199,7 @@ class GCode(Protocol):
 
     def begin(self):
         self._down = None
-        return 'G21\nG90\n'
+        return self.options.get('start', '') + 'G21\nG90\n'
 
     def _feed(self):
         #: speed is cm/s, feed rate is mm/min. GRBL refuses a G1 until it

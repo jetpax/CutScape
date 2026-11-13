@@ -9,7 +9,8 @@ feed; width and length are in millimetres (0 = unknown).
 Orientation maps material space to the device's axes: swap_xy exchanges
 them, invert_x/invert_y reflect the job in place (it stays at the origin).
 serial is the baud rate and flow control Add Cutter sets up when it finds
-the cutter on a serial port.
+the cutter on a serial port. A G-code preset may also have gcode_start, sent
+before each job, and its own z_up and z_down, which win over Cut's.
 laser is where a laser pointer's dot is from the blade, along the device's
 axes in millimetres, until the user calibrates it (see align). blade, force
 and speed are its usual blade offset and ranges, for Add Cutter to mention.
@@ -56,6 +57,22 @@ PRESETS = OrderedDict([
             serial=GRBL),
     #: Start/end sequence from inkcut/inkcut#382 by LDP-Soft
     _preset('Creation PCut CT-630', 'dmpl', width=610, dmpl_mode=7),
+    #: Cricut's own firmware works only with Cricut's software. These are for
+    #: open firmware that replaces it, from each project's source and docs.
+    #: Unverified on hardware.
+    #: FreeExpression (github.com/markawilliamson/FreeExpression) takes HPGL
+    #: units as its steps, about 400 per inch, with X along the mat feed and Y
+    #: across the 12 inch carriage. It ignores VS and FS: the dials set speed
+    #: and force.
+    _preset('Cricut Expression / Cake (FreeExpression)', width=12 * IN,
+            length=80 * IN, steps=(400 / IN, 400 / IN), swap_xy=True,
+            serial=dict(baud='9600', flow='xonxoff')),
+    #: CutCutGo (github.com/virtualabs/cutcutgo), GRBL for the first Cricut
+    #: Maker: X across its 330 mm of travel and Y down the mat from the top
+    #: left. Its Inkcut setup selects tool A and homes first, and its own
+    #: Inkscape extension lifts to Z0 and cuts paper at Z-8.5.
+    _preset('Cricut Maker (CutCutGo)', 'gcode', width=330, invert_y=True,
+            serial=GRBL, gcode_start='T0\n$H\n', z_up=0.0, z_down=-8.5),
     _preset('GCC Bobcat 60', width=600),
     _preset('Graphtec 8000-130', width=1300, length=7000),
     _preset('Graphtec CE5000-60', width=600),

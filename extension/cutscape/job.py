@@ -275,9 +275,13 @@ def encode(job, s):
 
 
 def protocol(device, s):
-    """ The encoder for a device with settings s """
+    """ The encoder for a device with settings s. A preset's own Z heights
+    win over Cut's, which are for a machine with Z zeroed on the work.
+    """
+    o = device['options']
     return protocols.get(
         device['protocol'], speed=s.speed, force=s.force, pen=s.pen,
-        mode=device['options']['dmpl_mode'], newline=s.hpgl_newline,
-        separate_z=s.hpgl_separate_z, z_up=s.gcode_z_up,
-        z_down=s.gcode_z_down)
+        mode=o['dmpl_mode'], newline=s.hpgl_newline,
+        separate_z=s.hpgl_separate_z, z_up=o.get('z_up', s.gcode_z_up),
+        z_down=o.get('z_down', s.gcode_z_down),
+        start=o.get('gcode_start', ''))

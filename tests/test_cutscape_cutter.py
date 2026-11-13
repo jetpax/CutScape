@@ -388,6 +388,17 @@ def test_grbl_cutter_gets_its_baud_rate(world):
         'CNC 3018 (GRBL)', 'serial', 'usb:1a86:7523', '115200', 'none')
 
 
+def test_cutcutgo_keeps_microchips_usb_id(world):
+    """ Not a development board, and talking GRBL's way """
+    world['ports'] = [dict(path='/dev/ttyACM0', description='USB Serial',
+                           vid='04d8', pid='000a', serial='')]
+    text, ready = add(world, model='Cricut Maker (CutCutGo)')
+    saved = cutter.load()
+    assert (saved['port'], saved['baud'], saved['flow']) == (
+        'usb:04d8:000a', '115200', 'none')
+    assert 'It talks at 115200 baud.' in text
+
+
 def test_not_listed_model(world):
     world['ports'] = [CH340]
     text, ready = add(world, model='custom')
